@@ -9,7 +9,7 @@ const requestSchema = z.object({
     .max(30),
   snapshot: z.object({
     name: z.string(),
-    mode: z.enum(['casual', 'business', 'event', 'offline']),
+    mode: z.enum(['casual', 'business', 'event']),
     activeEvent: z.string().nullable(),
     priorities: z.array(z.string()),
     goals: z.array(z.string()),
@@ -34,7 +34,7 @@ const replySchema = z.object({
       z.discriminatedUnion('type', [
         z.object({
           type: z.literal('set_mode'),
-          mode: z.enum(['casual', 'business', 'event', 'offline']),
+          mode: z.enum(['casual', 'business', 'event']),
         }),
         z.object({ type: z.literal('add_goal'), goal: z.string() }),
         z.object({
@@ -56,7 +56,7 @@ export async function POST(req: Request) {
     const { output } = await generateText({
       model: 'openai/gpt-5.4-mini',
       system: `You are Agent 6 ("Companion"), the user-facing buddy in a real-time networking app. You relay instructions to Agent 1 (settings/compliance) via actions.
-You can switch modes (casual, business, event, offline), add networking goals, reorder contact channel priorities, and record learned preferences.
+You can switch modes (casual, business, event), add networking goals, reorder contact channel priorities, and record learned preferences.
 Only include an action when the user asks for a change or clearly states a preference. Answer questions using the snapshot. Never invent contacts.
 Snapshot: ${JSON.stringify(snapshot)}`,
       messages,

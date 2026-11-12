@@ -66,7 +66,6 @@ export const MODE_META: Record<Mode, { label: string; blurb: string }> = {
   casual: { label: 'Casual', blurb: 'Socializing — personal links, light capture' },
   business: { label: 'Business', blurb: 'Working hours — professional links only' },
   event: { label: 'Event', blurb: 'Conference mode — passive collection on' },
-  offline: { label: 'Offline', blurb: 'No network — on-device recording' },
 }
 
 /** Agent 1: decide what each agent is allowed to do in the current mode. */
@@ -81,13 +80,11 @@ export function stewardPolicy(settings: Settings) {
     allowedSources:
       mode === 'casual'
         ? enabled.filter((s) => ['Google Maps', 'Google Calendar'].includes(s))
-        : mode === 'offline'
-          ? []
-          : enabled,
+        : enabled,
     passiveCollection: passive,
     captureDepth: mode === 'event' ? 'detailed' : mode === 'business' ? 'standard' : 'light',
     autoFollowUp: mode === 'event' || mode === 'business',
-    statusBroadcast: settings.statusBroadcast && mode !== 'offline',
+    statusBroadcast: settings.statusBroadcast,
   } as const
 }
 
@@ -115,7 +112,7 @@ export function contextWhy(state: AppState, now = Date.now()): WhyEntry {
   }
   return {
     context: state.settings.mode === 'casual' ? 'Social hangout' : 'Unscheduled meeting',
-    evidence: state.settings.mode === 'offline' ? ['Recorded offline — context pending'] : ['No overlapping event found'],
+    evidence: ['No overlapping event found'],
     confidence: 0.4,
     confirmed: false,
     alternatives: ['Coffee chat', 'Online intro', 'Other'],
@@ -248,7 +245,5 @@ export function statusLine(state: AppState) {
       return `${first} is working — reach out via email.`
     case 'casual':
       return `${first} is out and about.`
-    case 'offline':
-      return `${first} is offline.`
   }
 }

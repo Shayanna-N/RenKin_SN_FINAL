@@ -1,4 +1,4 @@
-export type Mode = 'casual' | 'business' | 'event' | 'offline'
+export type Mode = 'casual' | 'business' | 'event'
 
 export type LinkKind =
   | 'linkedin'

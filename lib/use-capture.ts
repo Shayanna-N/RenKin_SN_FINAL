@@ -44,7 +44,7 @@ export function useCapture() {
     try {
       let person = input.person
       let pending = false
-      const useAgent7 = !online || state.settings.mode === 'offline'
+      const useAgent7 = !online
 
       if (!person) {
         if (useAgent7 || (!input.text && !input.image)) {

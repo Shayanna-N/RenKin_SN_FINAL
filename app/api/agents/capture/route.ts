@@ -24,7 +24,7 @@ const personSchema = z.object({
 const requestSchema = z.object({
   text: z.string().max(8000).optional(),
   image: z.string().max(8_000_000).optional(),
-  mode: z.enum(['casual', 'business', 'event', 'offline']),
+  mode: z.enum(['casual', 'business', 'event']),
   depth: z.enum(['light', 'standard', 'detailed']),
   context: z.string().max(500).optional(),
 })

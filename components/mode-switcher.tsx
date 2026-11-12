@@ -1,6 +1,6 @@
 'use client'
 
-import { Briefcase, CalendarDays, Coffee, CloudOff } from 'lucide-react'
+import { Briefcase, CalendarDays, Coffee } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useStore } from '@/lib/store'
 import { MODE_META } from '@/lib/agents'
@@ -10,7 +10,6 @@ export const MODE_ICONS: Record<Mode, typeof Coffee> = {
   casual: Coffee,
   business: Briefcase,
   event: CalendarDays,
-  offline: CloudOff,
 }
 
 export function ModeSwitcher({ className }: { className?: string }) {

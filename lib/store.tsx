@@ -27,7 +27,7 @@ function migrateCompanion(seed: CompanionConfig, saved?: Partial<CompanionConfig
     ...rest,
     badges:
       rest.badges ??
-      (legacy ? { casual: legacy, business: legacy, event: legacy, offline: legacy } : seed.badges),
+      (legacy ? { casual: legacy, business: legacy, event: legacy } : seed.badges),
   } as CompanionConfig
 }
 
@@ -124,13 +124,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     [log],
   )
 
-  // Agent 7 takes over automatically when the network drops.
-  useEffect(() => {
-    if (!hydrated) return
-    if (!online && state.settings.mode !== 'offline' && state.settings.autoMode) {
-      setMode('offline', 'connection lost')
-    }
-  }, [online, hydrated, state.settings.mode, state.settings.autoMode, setMode])
 
   const addContact = useCallback((contact: Contact) => {
     setState((s) => ({ ...s, contacts: [contact, ...s.contacts] }))

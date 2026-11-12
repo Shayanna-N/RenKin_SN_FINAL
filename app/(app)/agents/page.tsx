@@ -17,7 +17,7 @@ export default function AgentsPage() {
   const { state } = useStore()
   const online = useOnline()
   const policy = stewardPolicy(state.settings)
-  const offline = !online || state.settings.mode === 'offline'
+  const offline = !online
 
   function status(id: number) {
     if (id === 7) return offline ? 'Active' : 'Standby'

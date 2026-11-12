@@ -13,7 +13,7 @@ const requestSchema = z.object({
     notes: z.string(),
     context: z.string(),
   }),
-  mode: z.enum(['casual', 'business', 'event', 'offline']),
+  mode: z.enum(['casual', 'business', 'event']),
   goals: z.array(z.string()),
   preferences: z.array(z.string()),
 })
