@@ -28,6 +28,7 @@ export default function CardPage() {
               companion={state.settings.companion}
               customQrUrl={state.settings.customQrUrl}
               customQrStyle={state.settings.customQrStyle}
+              customQrColor={state.settings.customQrColor}
               customCardFields={state.settings.customCardFields}
               customModeName={state.settings.customModeName}
               className="mx-auto max-w-md"

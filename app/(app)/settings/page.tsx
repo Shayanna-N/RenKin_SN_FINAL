@@ -1,17 +1,50 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowDown, ArrowUp, Activity, RotateCcw } from 'lucide-react'
+import { ArrowDown, ArrowUp, Activity, Check, RotateCcw } from 'lucide-react'
+import { useCallback, useRef, useState } from 'react'
 import { PageHeader } from '@/components/page-header'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { useStore } from '@/lib/store'
 import { MODE_META } from '@/lib/agents'
+import { cn } from '@/lib/utils'
 import type { Mode, ModeRule, ReadMethod, Settings, ShareMethod } from '@/lib/types'
 
 const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-function Section({ id, title, desc, children }: { id: string; title: string; desc: string; children: React.ReactNode }) {
+function useSaved() {
+  const [saved, setSaved] = useState(false)
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const flash = useCallback(() => {
+    setSaved(true)
+    clearTimeout(timer.current)
+    timer.current = setTimeout(() => setSaved(false), 1800)
+  }, [])
+  return { saved, flash }
+}
+
+function SaveButton({ saved, onClick }: { saved: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        'mt-4 flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-colors',
+        saved
+          ? 'bg-green-500/15 text-green-700 dark:text-green-400'
+          : 'bg-primary text-primary-foreground hover:bg-primary/90',
+      )}
+    >
+      {saved && <Check className="size-3.5" aria-hidden />}
+      {saved ? 'Saved' : 'Save'}
+    </button>
+  )
+}
+
+function Section({ id, title, desc, children, onSave }: { id: string; title: string; desc: string; children: React.ReactNode; onSave?: () => void; savedState?: boolean }) {
+  const { saved, flash } = useSaved()
+  function handleSave() { flash(); onSave?.() }
   return (
     <section aria-labelledby={id} className="rounded-2xl border bg-card p-5 md:p-6">
       <h2 id={id} className="font-semibold">
@@ -19,6 +52,7 @@ function Section({ id, title, desc, children }: { id: string; title: string; des
       </h2>
       <p className="text-sm text-muted-foreground">{desc}</p>
       <div className="mt-4">{children}</div>
+      <SaveButton saved={saved} onClick={handleSave} />
     </section>
   )
 }

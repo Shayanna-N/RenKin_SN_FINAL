@@ -1,12 +1,49 @@
 'use client'
 
 import { Check, Moon, Sun } from 'lucide-react'
+import { useCallback, useRef, useState } from 'react'
+import { QRCodeSVG } from 'qrcode.react'
 import { useStore } from '@/lib/store'
 import { cn } from '@/lib/utils'
 import { CARD_STYLES, readableOn } from '@/lib/companion'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import type { Settings } from '@/lib/types'
+
+function useSaved() {
+  const [saved, setSaved] = useState(false)
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const flash = useCallback(() => {
+    setSaved(true)
+    clearTimeout(timer.current)
+    timer.current = setTimeout(() => setSaved(false), 1800)
+  }, [])
+  return { saved, flash }
+}
+
+function SaveButton({ saved, onClick }: { saved: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        'mt-5 flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-colors',
+        saved
+          ? 'bg-green-500/15 text-green-700 dark:text-green-400'
+          : 'bg-primary text-primary-foreground hover:bg-primary/90',
+      )}
+    >
+      {saved && <Check className="size-3.5" aria-hidden />}
+      {saved ? 'Saved' : 'Save'}
+    </button>
+  )
+}
+
+const QR_STYLE_OPTIONS: { value: Settings['customQrStyle']; label: string }[] = [
+  { value: 'squares', label: 'Squares' },
+  { value: 'rounded', label: 'Rounded' },
+  { value: 'dots', label: 'Dots' },
+]
 
 const SWATCHES = [
   { name: 'Teal', value: '#0f766e' },
@@ -22,6 +59,7 @@ export function Appearance() {
   const { state, update } = useStore()
   const s = state.settings
   const set = (patch: Partial<Settings>) => update((st) => ({ ...st, settings: { ...st.settings, ...patch } }))
+  const { saved, flash } = useSaved()
 
   return (
     <section aria-labelledby="appearance-heading" className="rounded-2xl border bg-card p-5 md:p-6">
@@ -89,6 +127,65 @@ export function Appearance() {
       </div>
 
       <fieldset className="mt-5">
+        <legend className="text-sm font-medium">QR code</legend>
+        <div className="mt-2 flex flex-wrap items-center gap-4">
+          {/* Shape */}
+          <div className="flex flex-col gap-1.5">
+            <span className="text-xs text-muted-foreground">Shape</span>
+            <div className="flex gap-2">
+              {QR_STYLE_OPTIONS.map((o) => (
+                <button
+                  key={o.value}
+                  type="button"
+                  aria-pressed={s.customQrStyle === o.value}
+                  onClick={() => set({ customQrStyle: o.value })}
+                  className={cn(
+                    'rounded-md border px-3 py-1.5 text-xs font-medium transition-colors',
+                    s.customQrStyle === o.value
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'text-muted-foreground hover:text-foreground',
+                  )}
+                >
+                  {o.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Color */}
+          <div className="flex flex-col gap-1.5">
+            <span className="text-xs text-muted-foreground">Color</span>
+            <label className="flex items-center gap-2 text-xs text-muted-foreground">
+              <input
+                type="color"
+                value={s.customQrColor ?? '#ffffff'}
+                onChange={(e) => set({ customQrColor: e.target.value })}
+                className="size-9 cursor-pointer rounded-full border bg-transparent"
+                aria-label="QR code color"
+              />
+              Custom
+            </label>
+          </div>
+
+          {/* Live preview */}
+          {s.customQrUrl && (
+            <div className="flex flex-col gap-1.5">
+              <span className="text-xs text-muted-foreground">Preview</span>
+              <div className="rounded-md p-1" style={{ background: s.brand }}>
+                <QRCodeSVG
+                  value={s.customQrUrl}
+                  size={48}
+                  bgColor="transparent"
+                  fgColor={s.customQrColor ?? '#ffffff'}
+                  level="M"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      </fieldset>
+
+      <fieldset className="mt-5">
         <legend className="text-sm font-medium">Theme</legend>
         <div className="mt-2 grid grid-cols-2 gap-2">
           {(['light', 'dark'] as const).map((t) => (
@@ -108,6 +205,8 @@ export function Appearance() {
           ))}
         </div>
       </fieldset>
+
+      <SaveButton saved={saved} onClick={flash} />
     </section>
   )
 }

@@ -200,6 +200,8 @@ export interface Settings {
   customQrUrl: string
   /** QR code dot style. */
   customQrStyle: 'squares' | 'dots' | 'rounded'
+  /** QR code foreground color (hex). Defaults to white to show on card background. */
+  customQrColor: string
   /** Default sort order for the contacts list. */
   defaultContactSort: 'az' | 'za' | 'recent' | 'title' | 'company'
 }

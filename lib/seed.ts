@@ -123,6 +123,7 @@ export function createSeedState(): AppState {
       customCardFields: [],
       customQrUrl: '',
       customQrStyle: 'squares' as const,
+      customQrColor: '#ffffff',
       defaultContactSort: 'az' as const,
     },
     contacts: [

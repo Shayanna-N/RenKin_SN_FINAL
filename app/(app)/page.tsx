@@ -2,20 +2,52 @@
 
 import Link from 'next/link'
 import { Watch } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 import { useStore } from '@/lib/store'
-import { PageHeader } from '@/components/page-header'
 import { CardWidget } from '@/components/today/card-widget'
 import { ContextBanner } from '@/components/today/context-banner'
 import { Checklist } from '@/components/today/checklist'
 import { InsightsPanel } from '@/components/today/insights-panel'
-import { CompanionChat } from '@/components/today/companion-chat'
-
 export default function TodayPage() {
   const { state } = useStore()
   const first = state.profile.name.split(' ')[0]
   const today = state.contacts.filter(
     (c) => new Date(c.capturedAt).toDateString() === new Date().toDateString(),
   ).length
+
+  // true = full-width (default), false = column-width (previous/compact)
+  const [cardExpanded, setCardExpanded] = useState(true)
+
+  // Fade-out the greeting as the user scrolls down
+  const greetingRef = useRef<HTMLDivElement>(null)
+  const [opacity, setOpacity] = useState(1)
+  useEffect(() => {
+    function onScroll() {
+      const el = greetingRef.current
+      if (!el) return
+      const h = el.offsetHeight
+      const scrollY = window.scrollY
+      setOpacity(Math.max(0, 1 - scrollY / (h * 0.8)))
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  const greeting = (
+    <div
+      ref={greetingRef}
+      style={{ opacity }}
+      className="pointer-events-none mt-3 transition-opacity duration-75"
+      aria-hidden={opacity === 0}
+    >
+      <h1 className="text-2xl font-semibold tracking-tight text-balance md:text-3xl">
+        Hi {first}
+      </h1>
+      <p className="mt-1 text-sm text-muted-foreground">
+        {today} new connection{today === 1 ? '' : 's'} today. Your agents are watching for context.
+      </p>
+    </div>
+  )
 
   const watchButton = (
     <Link
@@ -30,25 +62,45 @@ export default function TodayPage() {
 
   return (
     <>
-      <PageHeader
-        title={`Hi ${first}`}
-        description={`${today} new connection${today === 1 ? '' : 's'} today. Your agents are watching for context.`}
-      />
-      <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
-        <div className="flex min-w-0 flex-col gap-6">
-          <CardWidget />
-          {/* Watch button: visible on mobile only, sits below the card widget */}
+      {cardExpanded ? (
+        /* ── Expanded layout: card full-width, widgets in a row below ── */
+        <div className="flex flex-col gap-6">
+          <CardWidget
+            expanded={cardExpanded}
+            onToggleExpand={() => setCardExpanded((v) => !v)}
+          />
+          {greeting}
           <div className="lg:hidden">{watchButton}</div>
-          <ContextBanner />
-          <Checklist />
+          <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
+            <div className="flex min-w-0 flex-col gap-6">
+              <ContextBanner />
+              <Checklist />
+            </div>
+            <div className="flex min-w-0 flex-col gap-6">
+              <div className="hidden lg:block">{watchButton}</div>
+              <InsightsPanel />
+            </div>
+          </div>
         </div>
-        <div className="flex min-w-0 flex-col gap-6">
-          {/* Watch button: visible on desktop only, sits above the organizer widget */}
-          <div className="hidden lg:block">{watchButton}</div>
-          <InsightsPanel />
-          <CompanionChat />
+      ) : (
+        /* ── Compact layout: card in left column, widgets in right column ── */
+        <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
+          <div className="flex min-w-0 flex-col gap-6">
+            <CardWidget
+              expanded={cardExpanded}
+              onToggleExpand={() => setCardExpanded((v) => !v)}
+            />
+            {greeting}
+            <div className="lg:hidden">{watchButton}</div>
+            <ContextBanner />
+            <Checklist />
+          </div>
+          <div className="flex min-w-0 flex-col gap-6">
+            <div className="hidden lg:block">{watchButton}</div>
+            <InsightsPanel />
+          </div>
         </div>
-      </div>
+      )}
     </>
   )
 }

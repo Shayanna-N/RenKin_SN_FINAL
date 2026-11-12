@@ -50,6 +50,7 @@ function migrate(saved: Partial<AppState>): AppState {
       customCardFields: saved.settings?.customCardFields ?? seed.settings.customCardFields,
       customQrUrl: saved.settings?.customQrUrl ?? seed.settings.customQrUrl,
       customQrStyle: saved.settings?.customQrStyle ?? seed.settings.customQrStyle,
+      customQrColor: saved.settings?.customQrColor ?? seed.settings.customQrColor,
       defaultContactSort: saved.settings?.defaultContactSort ?? seed.settings.defaultContactSort,
     },
     watchSaved: saved.watchSaved ?? [],

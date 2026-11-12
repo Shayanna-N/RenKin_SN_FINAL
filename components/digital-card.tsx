@@ -15,6 +15,7 @@ export function DigitalCard({
   companion,
   customQrUrl,
   customQrStyle = 'squares',
+  customQrColor = '#ffffff',
   customCardFields = [],
   customModeName,
   className,
@@ -25,6 +26,7 @@ export function DigitalCard({
   companion?: CompanionConfig
   customQrUrl?: string
   customQrStyle?: Settings['customQrStyle']
+  customQrColor?: string
   customCardFields?: Settings['customCardFields']
   customModeName?: string
   className?: string
@@ -65,7 +67,7 @@ export function DigitalCard({
             value={customQrUrl}
             size={999}
             bgColor="transparent"
-            fgColor="currentColor"
+            fgColor={customQrColor}
             level="M"
             style={{
               width: '72%',

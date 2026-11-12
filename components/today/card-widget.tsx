@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Check, CreditCard, Loader2, ScanLine, Share2, X } from 'lucide-react'
+import { Check, CreditCard, Loader2, Maximize2, Minimize2, ScanLine, Share2, X } from 'lucide-react'
 import { DigitalCard } from '@/components/digital-card'
 import { SharePanel } from '@/components/card/share-panel'
 import { CardReader } from '@/components/scan/card-reader'
@@ -103,7 +103,13 @@ function StepBar({ phase, steps }: { phase: TaskPhase; steps: string[] }) {
 
 // ─── Main widget ──────────────────────────────────────────────────────────────
 
-export function CardWidget() {
+export function CardWidget({
+  expanded = false,
+  onToggleExpand,
+}: {
+  expanded?: boolean
+  onToggleExpand?: () => void
+} = {}) {
   const { state, log } = useStore()
   const vcard = buildVCard(state.profile, state.settings.mode)
 
@@ -192,7 +198,20 @@ export function CardWidget() {
     <>
       <section aria-label="My card" className="overflow-hidden rounded-2xl border bg-card">
         <Tabs defaultValue="my-card">
-          <div className="flex items-center justify-center border-b px-5 pt-3">
+          <div className="flex items-center justify-between border-b px-5 pt-3">
+            {/* Resize button — desktop only */}
+            {onToggleExpand && (
+              <button
+                type="button"
+                onClick={onToggleExpand}
+                title={expanded ? 'Shrink card to column' : 'Expand card to full width'}
+                className="hidden lg:flex items-center gap-1.5 rounded-md px-2 py-1 text-xs text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+              >
+                {expanded ? <Minimize2 className="size-3.5" aria-hidden /> : <Maximize2 className="size-3.5" aria-hidden />}
+                {expanded ? 'Shrink' : 'Expand'}
+              </button>
+            )}
+            {!onToggleExpand && <div />}
             <TabsList className="w-full sm:max-w-sm [&]:h-16 sm:[&]:h-8">
               <TabsTrigger value="my-card" className="flex-1 gap-1.5 text-sm sm:text-xs">
                 <CreditCard className="size-5 sm:size-4" aria-hidden />
@@ -207,6 +226,9 @@ export function CardWidget() {
                 Read
               </TabsTrigger>
             </TabsList>
+            {/* Spacer to balance flex layout when resize button is shown */}
+            {onToggleExpand && <div className="hidden lg:block w-20" />}
+            {!onToggleExpand && <div />}
           </div>
 
           {/* ── My Card tab ─────────────────────────────────────────────── */}
@@ -219,6 +241,7 @@ export function CardWidget() {
                 companion={state.settings.companion}
                 customQrUrl={state.settings.customQrUrl}
                 customQrStyle={state.settings.customQrStyle}
+                customQrColor={state.settings.customQrColor}
                 customCardFields={state.settings.customCardFields}
                 customModeName={state.settings.customModeName}
               />

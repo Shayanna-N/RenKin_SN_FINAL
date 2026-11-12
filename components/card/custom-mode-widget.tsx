@@ -1,28 +1,53 @@
 'use client'
 
-import { useState } from 'react'
-import { Plus, X } from 'lucide-react'
+import { useCallback, useRef, useState } from 'react'
+import { Check, Plus, X } from 'lucide-react'
 import { useStore } from '@/lib/store'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { cn } from '@/lib/utils'
 import type { Settings } from '@/lib/types'
+
+function useSaved() {
+  const [saved, setSaved] = useState(false)
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const flash = useCallback(() => {
+    setSaved(true)
+    clearTimeout(timer.current)
+    timer.current = setTimeout(() => setSaved(false), 1800)
+  }, [])
+  return { saved, flash }
+}
 
 const MAX_FIELDS = 5
 const MAX_NAME_LEN = 10
 
-const QR_STYLES: { value: Settings['customQrStyle']; label: string }[] = [
-  { value: 'squares', label: 'Squares' },
-  { value: 'rounded', label: 'Rounded' },
-  { value: 'dots', label: 'Dots' },
-]
-
 export function CustomModeWidget() {
   const { state, update } = useStore()
-  const { customModeName, customCardFields, customQrUrl, customQrStyle } = state.settings
+  const { customModeName, customCardFields, customQrUrl } = state.settings
   const [labelDraft, setLabelDraft] = useState('')
   const [valueDraft, setValueDraft] = useState('')
+  const { saved, flash } = useSaved()
+
+  function SaveBtn() {
+    return (
+      <button
+        type="button"
+        onClick={flash}
+        className={cn(
+          'flex items-center gap-1.5 self-start rounded-lg px-4 py-2 text-sm font-medium transition-colors',
+          saved
+            ? 'bg-green-500/15 text-green-700 dark:text-green-400'
+            : 'bg-primary text-primary-foreground hover:bg-primary/90',
+        )}
+      >
+        {saved && <Check className="size-3.5" aria-hidden />}
+        {saved ? 'Saved' : 'Save'}
+      </button>
+    )
+  }
 
   function setCustomModeName(name: string) {
     update((s) => ({
@@ -33,10 +58,6 @@ export function CustomModeWidget() {
 
   function setCustomQrUrl(url: string) {
     update((s) => ({ ...s, settings: { ...s.settings, customQrUrl: url } }))
-  }
-
-  function setCustomQrStyle(style: Settings['customQrStyle']) {
-    update((s) => ({ ...s, settings: { ...s.settings, customQrStyle: style } }))
   }
 
   function addField() {
@@ -81,26 +102,6 @@ export function CustomModeWidget() {
         </p>
       </div>
 
-      {/* QR style */}
-      <div className="flex flex-col gap-1.5">
-        <Label>QR code style</Label>
-        <div className="flex gap-2">
-          {QR_STYLES.map((s) => (
-            <button
-              key={s.value}
-              type="button"
-              onClick={() => setCustomQrStyle(s.value)}
-              className={`rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${
-                customQrStyle === s.value
-                  ? 'border-primary bg-primary text-primary-foreground'
-                  : 'bg-card text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              {s.label}
-            </button>
-          ))}
-        </div>
-      </div>
     </div>
   )
 
@@ -201,13 +202,22 @@ export function CustomModeWidget() {
       </TabsList>
 
       <TabsContent value="everyday" className="pt-4">
-        {sharedContent}
+        <div className="flex flex-col gap-5">
+          {sharedContent}
+          <SaveBtn />
+        </div>
       </TabsContent>
       <TabsContent value="event" className="pt-4">
-        {sharedContent}
+        <div className="flex flex-col gap-5">
+          {sharedContent}
+          <SaveBtn />
+        </div>
       </TabsContent>
       <TabsContent value="custom" className="pt-4">
-        {customContent}
+        <div className="flex flex-col gap-5">
+          {customContent}
+          <SaveBtn />
+        </div>
       </TabsContent>
     </Tabs>
   )
