@@ -1,0 +1,267 @@
+import type { AppState } from './types'
+
+const HOUR = 60 * 60 * 1000
+
+function at(offsetHours: number) {
+  return new Date(Date.now() + offsetHours * HOUR).toISOString()
+}
+
+export function createSeedState(): AppState {
+  return {
+    profile: {
+      name: 'Jordan Rivera',
+      headline: 'Product Designer',
+      company: 'Northwind Labs',
+      email: 'jordan@northwind.dev',
+      phone: '+1 (415) 555-0142',
+      bio: 'Designing calm tools for busy people. Currently exploring design lead roles.',
+      links: [
+        {
+          id: 'l1',
+          kind: 'linkedin',
+          label: 'LinkedIn',
+          url: 'https://linkedin.com/in/jordanrivera',
+          modes: ['business', 'event', 'offline'],
+        },
+        {
+          id: 'l2',
+          kind: 'portfolio',
+          label: 'Portfolio',
+          url: 'https://jordanrivera.design',
+          modes: ['business', 'event', 'casual', 'offline'],
+        },
+        {
+          id: 'l3',
+          kind: 'instagram',
+          label: 'Instagram',
+          url: 'https://instagram.com/jordan.makes',
+          modes: ['casual'],
+        },
+        {
+          id: 'l4',
+          kind: 'calendly',
+          label: 'Book a chat',
+          url: 'https://cal.com/jordanrivera',
+          modes: ['business', 'event'],
+        },
+      ],
+      share: {
+        email: ['business', 'event', 'offline'],
+        phone: ['casual', 'business'],
+      },
+    },
+    settings: {
+      mode: 'event',
+      autoMode: true,
+      theme: 'light',
+      brand: '#0f766e',
+      cardStyle: 'gradient',
+      matchUiToCard: true,
+      companion: {
+        animal: 'capybara',
+        name: 'Kapi',
+        color: null,
+        photo: null,
+        badges: {
+          casual: ['coffee', 'music', 'sun'],
+          business: ['briefcase', 'grad-cap', 'star'],
+          event: ['sprout', 'camera', 'coffee'],
+          offline: ['sprout'],
+        },
+        badgesVisible: true,
+        showOnCard: true,
+      },
+      priorities: ['email', 'linkedin', 'website', 'phone', 'social'],
+      passiveCollection: true,
+      statusBroadcast: true,
+      integrations: {
+        'Google Calendar': true,
+        Eventbrite: true,
+        Todoist: true,
+        Indeed: true,
+        Gmail: true,
+        'Google Maps': true,
+        Zoom: false,
+        Slack: false,
+        'Canvas (syllabus)': false,
+      },
+      goals: ['Meet 3 design leaders', 'Ask about hiring for senior design roles'],
+      rules: [
+        {
+          id: 'r1',
+          mode: 'event',
+          trigger: 'Arriving at a ticketed or calendar event venue',
+          enabled: true,
+        },
+        {
+          id: 'r2',
+          mode: 'business',
+          trigger: 'Weekdays 9:00 – 17:00',
+          enabled: true,
+        },
+        {
+          id: 'r3',
+          mode: 'casual',
+          trigger: 'At bars, restaurants or hangouts',
+          enabled: true,
+        },
+        {
+          id: 'r4',
+          mode: 'offline',
+          trigger: 'No network connection detected',
+          enabled: true,
+        },
+      ],
+      learnedPreferences: [
+        'Prefers email over LinkedIn for follow-ups',
+        'Tends to forget end-of-day follow-ups',
+      ],
+      defaultShareMethod: null,
+      defaultReadMethod: null,
+    },
+    contacts: [
+      {
+        id: 'c1',
+        name: 'Priya Natarajan',
+        headline: 'Head of Design',
+        company: 'Lumen Health',
+        email: 'priya@lumenhealth.com',
+        links: [
+          { kind: 'linkedin', url: 'https://linkedin.com/in/priyan' },
+          { kind: 'website', url: 'https://lumenhealth.com' },
+        ],
+        source: 'nfc',
+        capturedAt: at(-1.2),
+        mode: 'event',
+        what: [
+          'Hiring two senior product designers in Q3',
+          'Interested in design systems for clinical apps',
+          'Suggested connecting after the keynote',
+        ],
+        why: {
+          context: 'Design Forward Summit 2026',
+          evidence: [
+            'Location matched Moscone West',
+            'Ticket confirmed via Eventbrite',
+          ],
+          confidence: 0.94,
+          confirmed: true,
+          alternatives: [],
+        },
+        notes: '',
+        tags: ['hiring', 'design-leadership'],
+        followedUp: false,
+        pendingEnrichment: false,
+      },
+      {
+        id: 'c2',
+        name: 'Marcus Chen',
+        headline: 'Founder',
+        company: 'Fieldnote',
+        email: 'marcus@fieldnote.app',
+        phone: '+1 (628) 555-0199',
+        links: [{ kind: 'x', url: 'https://x.com/marcuschen' }],
+        source: 'qr',
+        capturedAt: at(-0.6),
+        mode: 'event',
+        what: [
+          'Building a note-taking app for field researchers',
+          'Looking for a design advisor',
+        ],
+        why: {
+          context: 'Design Forward Summit 2026',
+          evidence: ['Location matched Moscone West'],
+          confidence: 0.71,
+          confirmed: false,
+          alternatives: ['Hallway chat (unrelated to event)', 'Mutual friend intro'],
+        },
+        notes: '',
+        tags: ['founder', 'advisor'],
+        followedUp: false,
+        pendingEnrichment: false,
+      },
+      {
+        id: 'c3',
+        name: 'Sam Okafor',
+        headline: 'Engineer',
+        company: 'Independent',
+        links: [{ kind: 'github', url: 'https://github.com/samokafor' }],
+        phone: '+1 (510) 555-0117',
+        source: 'manual',
+        capturedAt: at(-26),
+        mode: 'casual',
+        what: ['Into climbing and open-source hardware'],
+        why: {
+          context: 'Dinner at Lazy Bear',
+          evidence: ['Google Maps visit'],
+          confidence: 0.82,
+          confirmed: true,
+          alternatives: [],
+        },
+        notes: 'Friend of Alex.',
+        tags: ['friend-of-friend'],
+        followedUp: true,
+        pendingEnrichment: false,
+      },
+    ],
+    events: [
+      {
+        id: 'e1',
+        title: 'Design Forward Summit 2026',
+        venue: 'Moscone West, San Francisco',
+        start: at(-3),
+        end: at(5),
+        source: 'Eventbrite',
+        ticketed: true,
+      },
+      {
+        id: 'e2',
+        title: 'Portfolio review with Dana',
+        venue: 'Zoom',
+        start: at(20),
+        end: at(21),
+        source: 'Google Calendar',
+        ticketed: false,
+      },
+    ],
+    todos: [
+      { id: 't1', text: 'Get feedback on case study deck', done: false, source: 'Todoist' },
+      { id: 't2', text: 'Find a mentor for leadership track', done: false, source: 'Todoist' },
+      { id: 't3', text: 'Collect 5 new contacts for newsletter', done: true, source: 'Todoist' },
+    ],
+    jobs: [
+      { id: 'j1', role: 'Design Lead', company: 'Lumen Health', source: 'Indeed' },
+      { id: 'j2', role: 'Senior Product Designer', company: 'Stripe', source: 'Indeed' },
+      { id: 'j3', role: 'Staff Designer', company: 'Figma', source: 'Indeed' },
+    ],
+    watchSaved: [],
+    log: [
+      {
+        id: 'g1',
+        agent: 2,
+        message: 'Matched location to Design Forward Summit 2026 (Eventbrite ticket).',
+        at: at(-3),
+      },
+      {
+        id: 'g2',
+        agent: 6,
+        message: 'Switched mode to Event and updated Slack status.',
+        at: at(-3),
+      },
+      {
+        id: 'g3',
+        agent: 3,
+        message: 'Captured Priya Natarajan via NFC tap and transcribed 3 notes.',
+        at: at(-1.2),
+      },
+    ],
+    chat: [
+      {
+        id: 'm0',
+        role: 'assistant',
+        content:
+          "Hi Jordan — you're at Design Forward Summit. I switched you to Event mode and queued your hiring-related goals. Ask me anything or tell me how to sort your contacts.",
+      },
+    ],
+  }
+}

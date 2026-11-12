@@ -1,0 +1,267 @@
+
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Environment Setup Tutorial</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #1f2328;
+    background: #ffffff;
+    padding: 40px 20px 60px;
+  }
+  .wrapper { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .subtitle { color: #57606a; margin-bottom: 32px; font-size: 13px; }
+  h2 { font-size: 15px; font-weight: 600; margin-bottom: 10px; margin-top: 32px; }
+  p { margin-bottom: 10px; color: #1f2328; }
+  .step {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+  .step-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: #f7f8fa;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .step-num {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: #3b82d4;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .step-title { font-weight: 600; font-size: 14px; }
+  .step-body { padding: 16px 18px; }
+  .step-body p { margin-bottom: 8px; }
+  pre {
+    background: #1f2328;
+    color: #e6edf3;
+    border-radius: 6px;
+    padding: 14px 16px;
+    font-size: 12.5px;
+    font-family: "Cascadia Code", "Fira Code", "Consolas", monospace;
+    overflow-x: auto;
+    margin: 10px 0;
+    line-height: 1.7;
+  }
+  code {
+    background: #f0f1f3;
+    color: #1f2328;
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-size: 12.5px;
+    font-family: "Cascadia Code", "Fira Code", "Consolas", monospace;
+  }
+  .comment { color: #8b949e; }
+  .key { color: #79c0ff; }
+  .val { color: #a5d6ff; }
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .tag-required { background: #ffd8d8; color: #9b1c1c; }
+  .tag-optional { background: #dbeafe; color: #1e40af; }
+  .tag-auto { background: #d1fae5; color: #065f46; }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
+  th { text-align: left; padding: 8px 10px; background: #f7f8fa; border: 1px solid #e5e7eb; font-weight: 600; }
+  td { padding: 8px 10px; border: 1px solid #e5e7eb; vertical-align: top; }
+  td:first-child { font-family: "Cascadia Code", "Fira Code", "Consolas", monospace; font-size: 12px; color: #0550ae; white-space: nowrap; }
+  .note {
+    background: #fffbeb;
+    border: 1px solid #fcd34d;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 13px;
+    margin: 10px 0;
+    color: #92400e;
+  }
+  .info {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 13px;
+    margin: 10px 0;
+    color: #1e40af;
+  }
+  ul { padding-left: 20px; margin: 8px 0; }
+  li { margin-bottom: 4px; }
+  footer {
+    margin-top: 48px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+    text-align: center;
+    font-size: 12px;
+    color: #57606a;
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <h1>Environment Setup Tutorial</h1>
+  <p class="subtitle">How to configure the required environment variables for this Next.js networking app.</p>
+
+  <h2>What you need</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Variable</th>
+        <th>Required?</th>
+        <th>Purpose</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>AI_GATEWAY_API_KEY</td>
+        <td><span class="tag tag-required">Required</span></td>
+        <td>Powers all 3 AI agent routes (Scribe, Doer, Companion) via Vercel AI Gateway</td>
+      </tr>
+      <tr>
+        <td>DATABASE_URL</td>
+        <td><span class="tag tag-required">Required</span></td>
+        <td>PostgreSQL connection string for contacts, sessions, and user data</td>
+      </tr>
+      <tr>
+        <td>BETTER_AUTH_SECRET</td>
+        <td><span class="tag tag-required">Required</span></td>
+        <td>Secret key used by better-auth to sign sessions and tokens</td>
+      </tr>
+      <tr>
+        <td>BETTER_AUTH_URL</td>
+        <td><span class="tag tag-optional">Optional</span></td>
+        <td>Base URL for auth callbacks. Auto-detected from Vercel env vars if omitted.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div class="step-title">Create your <code>.env.local</code> file</div>
+    </div>
+    <div class="step-body">
+      <p>At the root of the project (next to <code>package.json</code>), create a file called <code>.env.local</code>. This file is already listed in <code>.gitignore</code> so it will never be committed.</p>
+      <pre><span class="comment"># .env.local — never commit this file</span>
+
+<span class="key">AI_GATEWAY_API_KEY</span>=<span class="val">your_key_here</span>
+<span class="key">DATABASE_URL</span>=<span class="val">postgresql://user:password@host:5432/dbname</span>
+<span class="key">BETTER_AUTH_SECRET</span>=<span class="val">a_long_random_string</span>
+
+<span class="comment"># Only needed if not running on Vercel</span>
+<span class="key">BETTER_AUTH_URL</span>=<span class="val">http://localhost:3000</span></pre>
+      <div class="note">⚠️ Never use real values in examples shared with others. Keep this file local only.</div>
+    </div>
+  </div>
+
+  
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div class="step-title">Get your <code>AI_GATEWAY_API_KEY</code></div>
+    </div>
+    <div class="step-body">
+      <p>This app routes all AI calls (<code>openai/gpt-4o-mini</code>, <code>openai/gpt-5.4-mini</code>) through the <strong>Vercel AI Gateway</strong>.</p>
+      <ul>
+        <li>Go to <strong>vercel.com → your team → Settings → AI</strong></li>
+        <li>Under <em>AI Gateway</em>, generate an API key</li>
+        <li>Paste it as the value of <code>AI_GATEWAY_API_KEY</code></li>
+      </ul>
+      <div class="info">ℹ️ If you're running locally and don't want to use AI Gateway, you can swap the model strings in the route files to use a direct provider (e.g. <code>openai('gpt-4o-mini')</code> with <code>OPENAI_API_KEY</code> set), but that requires editing the route files.</div>
+    </div>
+  </div>
+
+  
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div class="step-title">Set up <code>DATABASE_URL</code></div>
+    </div>
+    <div class="step-body">
+      <p>The app uses a <strong>PostgreSQL</strong> database (via <code>pg</code> pool in <code>lib/db/index.ts</code>) for user accounts and contact data.</p>
+      <ul>
+        <li><strong>Local:</strong> install Postgres and create a database, e.g. <code>createdb networking</code>, then use <code>postgresql://localhost/networking</code></li>
+        <li><strong>Vercel Postgres:</strong> add the Vercel Postgres integration to your project — it auto-populates <code>DATABASE_URL</code> in the Vercel environment</li>
+        <li><strong>Neon / Supabase / Railway:</strong> copy the connection string from the dashboard</li>
+      </ul>
+      <pre><span class="key">DATABASE_URL</span>=<span class="val">postgresql://user:pass@localhost:5432/networking</span></pre>
+      <p>After setting this, run the better-auth migration to create the required tables:</p>
+      <pre>npx @better-auth/cli migrate</pre>
+    </div>
+  </div>
+
+  
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <div class="step-title">Generate <code>BETTER_AUTH_SECRET</code></div>
+    </div>
+    <div class="step-body">
+      <p>This must be a long, random string. Generate one with any of these:</p>
+      <pre><span class="comment"># Node.js</span>
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+
+<span class="comment"># OpenSSL</span>
+openssl rand -hex 32
+
+<span class="comment"># Or use the better-auth CLI</span>
+npx @better-auth/cli secret</pre>
+      <p>Paste the output as the value of <code>BETTER_AUTH_SECRET</code>.</p>
+    </div>
+  </div>
+
+  
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">5</div>
+      <div class="step-title">Start the dev server</div>
+    </div>
+    <div class="step-body">
+      <p>Once your <code>.env.local</code> is populated, start the app normally:</p>
+      <pre>pnpm dev</pre>
+      <p>Next.js automatically loads <code>.env.local</code> — no extra tooling needed.</p>
+      <div class="info">ℹ️ If you see <em>"AI_GATEWAY_API_KEY missing"</em> errors in the console, double-check the variable name is exactly <code>AI_GATEWAY_API_KEY</code> with no extra spaces or quotes.</div>
+    </div>
+  </div>
+
+  
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">6</div>
+      <div class="step-title">Deploying to Vercel</div>
+    </div>
+    <div class="step-body">
+      <p><code>.env.local</code> is only for local development. For production, add the variables in the Vercel dashboard:</p>
+      <ul>
+        <li>Go to your project → <strong>Settings → Environment Variables</strong></li>
+        <li>Add <code>AI_GATEWAY_API_KEY</code>, <code>DATABASE_URL</code>, and <code>BETTER_AUTH_SECRET</code></li>
+        <li><code>BETTER_AUTH_URL</code> is not needed on Vercel — it's auto-detected from <code>VERCEL_PROJECT_PRODUCTION_URL</code></li>
+      </ul>
+      <div class="note">⚠️ Set <code>DATABASE_URL</code> for the <em>Production</em> environment only, unless you want preview branches to share the same database.</div>
+    </div>
+  </div>
+
+</div>
+
+<footer>Made with IBM Bob</footer>
+</body>
+</html>
