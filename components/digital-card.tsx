@@ -1,6 +1,7 @@
 'use client'
 
 import { Globe, Link2, Mail, Phone } from 'lucide-react'
+import { QRCodeSVG } from 'qrcode.react'
 import { cn } from '@/lib/utils'
 import { visibleProfile } from '@/lib/vcard'
 import { MODE_META } from '@/lib/agents'
@@ -12,12 +13,14 @@ export function DigitalCard({
   mode,
   style,
   companion,
+  customQrUrl,
   className,
 }: {
   profile: Profile
   mode: Mode
   style: Settings['cardStyle']
   companion?: CompanionConfig
+  customQrUrl?: string
   className?: string
 }) {
   const v = visibleProfile(profile, mode)
@@ -45,23 +48,36 @@ export function DigitalCard({
               {v.headline} · {v.company}
             </p>
           </div>
-          {showAnimal && companion ? (
-            <AnimalSilhouette
-              animal={companion.animal}
-              className="size-12 shrink-0 opacity-90 sm:size-14"
-              style={companion.color ? { color: companion.color } : undefined}
-            />
-          ) : (
-            <span
-              className={cn(
-                'flex size-11 shrink-0 items-center justify-center rounded-full text-sm font-semibold',
-                minimal ? 'bg-primary text-primary-foreground' : 'bg-white/15',
-              )}
-              aria-hidden
-            >
-              {initials}
-            </span>
-          )}
+          <div className="flex shrink-0 flex-col items-center gap-1.5">
+            {showAnimal && companion ? (
+              <AnimalSilhouette
+                animal={companion.animal}
+                className="size-12 opacity-90 sm:size-14"
+                style={companion.color ? { color: companion.color } : undefined}
+              />
+            ) : (
+              <span
+                className={cn(
+                  'flex size-11 items-center justify-center rounded-full text-sm font-semibold',
+                  minimal ? 'bg-primary text-primary-foreground' : 'bg-white/15',
+                )}
+                aria-hidden
+              >
+                {initials}
+              </span>
+            )}
+            {customQrUrl && (
+              <div className="rounded-md bg-white p-0.5">
+                <QRCodeSVG
+                  value={customQrUrl}
+                  size={40}
+                  bgColor="#ffffff"
+                  fgColor="#000000"
+                  level="M"
+                />
+              </div>
+            )}
+          </div>
         </div>
 
         <ul className="flex flex-col gap-1 text-xs sm:text-sm">

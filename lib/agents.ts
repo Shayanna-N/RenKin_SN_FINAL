@@ -63,9 +63,9 @@ export const AGENTS = [
 ] as const
 
 export const MODE_META: Record<Mode, { label: string; blurb: string }> = {
-  casual: { label: 'Casual', blurb: 'Socializing — personal links, light capture' },
-  business: { label: 'Business', blurb: 'Working hours — professional links only' },
+  everyday: { label: 'Everyday', blurb: 'Socializing — personal links, light capture' },
   event: { label: 'Event', blurb: 'Conference mode — passive collection on' },
+  custom: { label: 'Custom', blurb: 'Your custom networking mode' },
 }
 
 /** Agent 1: decide what each agent is allowed to do in the current mode. */
@@ -74,16 +74,16 @@ export function stewardPolicy(settings: Settings) {
     .filter(([, on]) => on)
     .map(([name]) => name)
   const mode = settings.mode
-  const passive = settings.passiveCollection && mode !== 'casual'
+  const passive = settings.passiveCollection && mode !== 'everyday'
   return {
     mode,
     allowedSources:
-      mode === 'casual'
+      mode === 'everyday'
         ? enabled.filter((s) => ['Google Maps', 'Google Calendar'].includes(s))
         : enabled,
     passiveCollection: passive,
-    captureDepth: mode === 'event' ? 'detailed' : mode === 'business' ? 'standard' : 'light',
-    autoFollowUp: mode === 'event' || mode === 'business',
+    captureDepth: mode === 'event' ? 'detailed' : mode === 'custom' ? 'standard' : 'light',
+    autoFollowUp: mode === 'event' || mode === 'custom',
     statusBroadcast: settings.statusBroadcast,
   } as const
 }
@@ -111,7 +111,7 @@ export function contextWhy(state: AppState, now = Date.now()): WhyEntry {
     }
   }
   return {
-    context: state.settings.mode === 'casual' ? 'Social hangout' : 'Unscheduled meeting',
+    context: state.settings.mode === 'everyday' ? 'Social hangout' : 'Unscheduled meeting',
     evidence: ['No overlapping event found'],
     confidence: 0.4,
     confirmed: false,
@@ -241,9 +241,9 @@ export function statusLine(state: AppState) {
       return event
         ? `${first} is with ${company} at ${event.title} today.`
         : `${first} is at an event with ${company}.`
-    case 'business':
+    case 'custom':
       return `${first} is working — reach out via email.`
-    case 'casual':
+    case 'everyday':
       return `${first} is out and about.`
   }
 }

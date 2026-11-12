@@ -7,9 +7,10 @@ import { ModeSwitcher } from '@/components/mode-switcher'
 import { CardEditor } from '@/components/card/card-editor'
 import { Appearance } from '@/components/card/appearance'
 import { CompanionCustomizer } from '@/components/card/companion-customizer'
+import { CustomModeWidget } from '@/components/card/custom-mode-widget'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { ContactChannelRecommender } from '@/components/card/contact-channel-recommender'
-import { CreditCard, Smile, Sparkles } from 'lucide-react'
+import { CreditCard, Smile, Sparkles, SlidersHorizontal } from 'lucide-react'
 
 export default function CardPage() {
   const { state } = useStore()
@@ -25,10 +26,24 @@ export default function CardPage() {
               mode={state.settings.mode}
               style={state.settings.cardStyle}
               companion={state.settings.companion}
+              customQrUrl={state.settings.customQrUrl}
               className="mx-auto max-w-md"
             />
             <div className="flex justify-center">
               <ModeSwitcher />
+            </div>
+          </div>
+
+          {/* Custom mode widget */}
+          <div className="overflow-hidden rounded-2xl border bg-card">
+            <div className="border-b px-5 py-3">
+              <div className="flex items-center gap-2 font-medium text-sm">
+                <SlidersHorizontal className="size-4" aria-hidden />
+                Custom mode
+              </div>
+            </div>
+            <div className="p-5 md:p-6">
+              <CustomModeWidget />
             </div>
           </div>
 

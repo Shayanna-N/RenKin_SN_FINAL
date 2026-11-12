@@ -1,4 +1,4 @@
-export type Mode = 'casual' | 'business' | 'event'
+export type Mode = 'everyday' | 'event' | 'custom'
 
 export type LinkKind =
   | 'linkedin'
@@ -185,6 +185,12 @@ export interface Settings {
   learnedPreferences: string[]
   defaultShareMethod: ShareMethod | null
   defaultReadMethod: ReadMethod | null
+  /** User-defined label for the "custom" mode (max 10 chars). */
+  customModeName: string
+  /** Up to 5 extra field labels the user wants shown on their card in custom mode. */
+  customCardFields: string[]
+  /** URL the card-page QR code links to. Editable without regenerating a new code. */
+  customQrUrl: string
 }
 
 export interface AgentLogEntry {

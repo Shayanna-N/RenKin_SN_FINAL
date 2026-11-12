@@ -13,7 +13,7 @@ const requestSchema = z.object({
     notes: z.string(),
     context: z.string(),
   }),
-  mode: z.enum(['casual', 'business', 'event']),
+  mode: z.enum(['everyday', 'event', 'custom']),
   goals: z.array(z.string()),
   preferences: z.array(z.string()),
 })
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
     const { output } = await generateText({
       model: 'openai/gpt-4o-mini',
       system: `You are Agent 5 ("Doer") in a networking app. Draft a follow-up for the user to review before sending.
-Tone: ${mode === 'casual' ? 'friendly and relaxed' : 'professional but human'}. Keep the email under 120 words. Do not fabricate facts beyond what is provided.
+Tone: ${mode === 'everyday' ? 'friendly and relaxed' : 'professional but human'}. Keep the email under 120 words. Do not fabricate facts beyond what is provided.
 User goals: ${goals.join('; ') || 'none'}. Learned preferences: ${preferences.join('; ') || 'none'}.`,
       prompt: `Sender: ${sender.name}, ${sender.headline} at ${sender.company}.
 Contact: ${contact.name}, ${contact.headline} at ${contact.company}.
