@@ -187,10 +187,12 @@ export interface Settings {
   defaultReadMethod: ReadMethod | null
   /** User-defined label for the "custom" mode (max 10 chars). */
   customModeName: string
-  /** Up to 5 extra field labels the user wants shown on their card in custom mode. */
-  customCardFields: string[]
+  /** Up to 5 extra fields shown on the card in custom mode. */
+  customCardFields: { label: string; value: string }[]
   /** URL the card-page QR code links to. Editable without regenerating a new code. */
   customQrUrl: string
+  /** QR code dot style. */
+  customQrStyle: 'squares' | 'dots' | 'rounded'
 }
 
 export interface AgentLogEntry {

@@ -14,6 +14,9 @@ export function DigitalCard({
   style,
   companion,
   customQrUrl,
+  customQrStyle = 'squares',
+  customCardFields = [],
+  customModeName,
   className,
 }: {
   profile: Profile
@@ -21,6 +24,9 @@ export function DigitalCard({
   style: Settings['cardStyle']
   companion?: CompanionConfig
   customQrUrl?: string
+  customQrStyle?: Settings['customQrStyle']
+  customCardFields?: Settings['customCardFields']
+  customModeName?: string
   className?: string
 }) {
   const v = visibleProfile(profile, mode)
@@ -31,6 +37,15 @@ export function DigitalCard({
     .slice(0, 2)
   const minimal = style === 'minimal'
   const showAnimal = companion?.showOnCard
+
+  // Safe label lookup — falls back gracefully if stored mode key is stale
+  const modeLabel =
+    mode === 'custom' && customModeName
+      ? customModeName
+      : (MODE_META[mode]?.label ?? mode)
+
+  // QR dot radius based on style
+  const qrRadius = customQrStyle === 'dots' ? 0.5 : customQrStyle === 'rounded' ? 0.3 : 0
 
   return (
     <div
@@ -67,15 +82,17 @@ export function DigitalCard({
               </span>
             )}
             {customQrUrl && (
-              <div className="rounded-md bg-white p-0.5">
-                <QRCodeSVG
-                  value={customQrUrl}
-                  size={40}
-                  bgColor="#ffffff"
-                  fgColor="#000000"
-                  level="M"
-                />
-              </div>
+              <QRCodeSVG
+                value={customQrUrl}
+                size={48}
+                bgColor="transparent"
+                fgColor="currentColor"
+                level="M"
+                className="opacity-90 sm:size-14"
+                {...(qrRadius > 0 ? {
+                  style: { borderRadius: `${qrRadius * 8}px` },
+                } : {})}
+              />
             )}
           </div>
         </div>
@@ -103,10 +120,16 @@ export function DigitalCard({
               {l.url.replace(/^https?:\/\//, '')}
             </li>
           ))}
+          {mode === 'custom' && customCardFields.slice(0, 5).map((f, i) => (
+            <li key={i} className="flex items-center gap-2 truncate opacity-90">
+              <span className="opacity-70">{f.label}:</span>
+              <span>{f.value}</span>
+            </li>
+          ))}
         </ul>
 
         <div className="flex items-center justify-between text-[10px] font-medium uppercase tracking-widest opacity-70">
-          <span>{MODE_META[mode].label} card</span>
+          <span>{modeLabel} card</span>
           <span className="font-mono">Renkin · Tap</span>
         </div>
       </div>

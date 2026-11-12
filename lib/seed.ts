@@ -114,6 +114,7 @@ export function createSeedState(): AppState {
       customModeName: 'Custom',
       customCardFields: [],
       customQrUrl: '',
+      customQrStyle: 'squares' as const,
     },
     contacts: [
       {

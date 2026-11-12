@@ -27,6 +27,9 @@ export default function CardPage() {
               style={state.settings.cardStyle}
               companion={state.settings.companion}
               customQrUrl={state.settings.customQrUrl}
+              customQrStyle={state.settings.customQrStyle}
+              customCardFields={state.settings.customCardFields}
+              customModeName={state.settings.customModeName}
               className="mx-auto max-w-md"
             />
             <div className="flex justify-center">
