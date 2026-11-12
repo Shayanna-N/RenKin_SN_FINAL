@@ -166,6 +166,11 @@ export interface ModeRule {
   mode: Mode
   trigger: string
   enabled: boolean
+  /** Time range for custom rule, e.g. "09:00" */
+  timeFrom?: string
+  timeTo?: string
+  /** Days of week: 0=Sun … 6=Sat */
+  days?: number[]
 }
 
 export interface Settings {
@@ -179,6 +184,8 @@ export interface Settings {
   priorities: Priority[]
   passiveCollection: boolean
   statusBroadcast: boolean
+  /** Per-mode custom broadcast message. */
+  broadcastMessages: Record<Mode, string>
   integrations: Record<string, boolean>
   goals: string[]
   rules: ModeRule[]
@@ -193,6 +200,8 @@ export interface Settings {
   customQrUrl: string
   /** QR code dot style. */
   customQrStyle: 'squares' | 'dots' | 'rounded'
+  /** Default sort order for the contacts list. */
+  defaultContactSort: 'az' | 'za' | 'recent' | 'title' | 'company'
 }
 
 export interface AgentLogEntry {

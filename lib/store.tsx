@@ -45,10 +45,12 @@ function migrate(saved: Partial<AppState>): AppState {
       // Remap stale mode keys from previous versions
       mode: savedMode && VALID_MODES.has(savedMode) ? savedMode : seed.settings.mode,
       companion: migrateCompanion(seed.settings.companion, saved.settings?.companion),
+      broadcastMessages: saved.settings?.broadcastMessages ?? seed.settings.broadcastMessages,
       customModeName: saved.settings?.customModeName ?? seed.settings.customModeName,
       customCardFields: saved.settings?.customCardFields ?? seed.settings.customCardFields,
       customQrUrl: saved.settings?.customQrUrl ?? seed.settings.customQrUrl,
       customQrStyle: saved.settings?.customQrStyle ?? seed.settings.customQrStyle,
+      defaultContactSort: saved.settings?.defaultContactSort ?? seed.settings.defaultContactSort,
     },
     watchSaved: saved.watchSaved ?? [],
   } as AppState
