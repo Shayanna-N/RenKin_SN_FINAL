@@ -55,6 +55,27 @@ export function DigitalCard({
       )}
       aria-label={`Digital card for ${profile.name}`}
     >
+      {/* QR code: absolutely positioned, vertically centered, right half of card */}
+      {customQrUrl && (
+        <div
+          className="pointer-events-none absolute inset-y-0 right-0 flex w-[45%] items-center justify-center opacity-90"
+          aria-hidden
+        >
+          <QRCodeSVG
+            value={customQrUrl}
+            size={999}
+            bgColor="transparent"
+            fgColor="currentColor"
+            level="M"
+            style={{
+              width: '72%',
+              height: '72%',
+              borderRadius: qrRadius > 0 ? `${qrRadius * 12}px` : undefined,
+            }}
+          />
+        </div>
+      )}
+
       <div className="flex h-full flex-col justify-between">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
@@ -80,19 +101,6 @@ export function DigitalCard({
               >
                 {initials}
               </span>
-            )}
-            {customQrUrl && (
-              <QRCodeSVG
-                value={customQrUrl}
-                size={48}
-                bgColor="transparent"
-                fgColor="currentColor"
-                level="M"
-                className="opacity-90 sm:size-14"
-                {...(qrRadius > 0 ? {
-                  style: { borderRadius: `${qrRadius * 8}px` },
-                } : {})}
-              />
             )}
           </div>
         </div>

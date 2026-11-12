@@ -31,16 +31,25 @@ function migrateCompanion(seed: CompanionConfig, saved?: Partial<CompanionConfig
   } as CompanionConfig
 }
 
+const VALID_MODES = new Set(['everyday', 'event', 'custom'])
+
 function migrate(saved: Partial<AppState>): AppState {
   const seed = createSeedState()
+  const savedMode = saved.settings?.mode
   return {
     ...seed,
     ...saved,
     settings: {
-    ...seed.settings,
-    ...saved.settings,
-    companion: migrateCompanion(seed.settings.companion, saved.settings?.companion),
-  },
+      ...seed.settings,
+      ...saved.settings,
+      // Remap stale mode keys from previous versions
+      mode: savedMode && VALID_MODES.has(savedMode) ? savedMode : seed.settings.mode,
+      companion: migrateCompanion(seed.settings.companion, saved.settings?.companion),
+      customModeName: saved.settings?.customModeName ?? seed.settings.customModeName,
+      customCardFields: saved.settings?.customCardFields ?? seed.settings.customCardFields,
+      customQrUrl: saved.settings?.customQrUrl ?? seed.settings.customQrUrl,
+      customQrStyle: saved.settings?.customQrStyle ?? seed.settings.customQrStyle,
+    },
     watchSaved: saved.watchSaved ?? [],
   } as AppState
 }

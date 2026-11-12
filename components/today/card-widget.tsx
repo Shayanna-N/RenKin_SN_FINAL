@@ -217,6 +217,10 @@ export function CardWidget() {
                 mode={state.settings.mode}
                 style={state.settings.cardStyle}
                 companion={state.settings.companion}
+                customQrUrl={state.settings.customQrUrl}
+                customQrStyle={state.settings.customQrStyle}
+                customCardFields={state.settings.customCardFields}
+                customModeName={state.settings.customModeName}
               />
             </Link>
           </TabsContent>
