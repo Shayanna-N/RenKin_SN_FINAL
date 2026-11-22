@@ -10,11 +10,15 @@ import { ContextBanner } from '@/components/today/context-banner'
 import { Checklist } from '@/components/today/checklist'
 import { InsightsPanel } from '@/components/today/insights-panel'
 export default function TodayPage() {
-  const { state } = useStore()
+  const { state, hydrated } = useStore()
   const first = state.profile.name.split(' ')[0]
-  const today = state.contacts.filter(
-    (c) => new Date(c.capturedAt).toDateString() === new Date().toDateString(),
-  ).length
+  // Seed timestamps and "today" depend on the current time and timezone, which differ
+  // between server and client, so the count is only rendered after client hydration.
+  const today = hydrated
+    ? state.contacts.filter(
+        (c) => new Date(c.capturedAt).toDateString() === new Date().toDateString(),
+      ).length
+    : null
 
   // false = column-width (default/compact), true = full-width
   const [cardExpanded, setCardExpanded] = useState(false)
@@ -45,7 +49,9 @@ export default function TodayPage() {
         Hi {first}
       </h1>
       <p className="mt-1 text-sm text-muted-foreground">
-        {today} new connection{today === 1 ? '' : 's'} today. Your agents are watching for context.
+        {today === null
+          ? 'Your agents are watching for context.'
+          : `${today} new connection${today === 1 ? '' : 's'} today. Your agents are watching for context.`}
       </p>
     </div>
   )
