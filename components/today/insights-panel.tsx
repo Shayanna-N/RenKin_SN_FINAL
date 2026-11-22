@@ -1,5 +1,6 @@
 'use client'
 
+import { HoverHint } from '@/components/ui/hover-hint'
 import Link from 'next/link'
 import { Lightbulb } from 'lucide-react'
 import { toast } from 'sonner'
@@ -42,9 +43,11 @@ export function InsightsPanel() {
                   </Button>
                 )}
                 {(i.action === 'confirm-why' || i.action === 'enrich') && (
-                  <Button size="sm" variant="outline" nativeButton={false} render={<Link href="/contacts" />}>
-                    Review
-                  </Button>
+                  <HoverHint hint="Opens Contacts so you can review this suggestion." align="end">
+                    <Button size="sm" variant="outline" nativeButton={false} render={<Link href="/contacts" />}>
+                      Review
+                    </Button>
+                  </HoverHint>
                 )}
               </div>
             </li>

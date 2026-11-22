@@ -1,5 +1,6 @@
 'use client'
 
+import { HoverHint } from '@/components/ui/hover-hint'
 import Link from 'next/link'
 import { useState } from 'react'
 import { ArrowLeft, Loader2 } from 'lucide-react'
@@ -44,19 +45,23 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
   return (
     <main className="flex min-h-dvh items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-sm">
-        <Link
-          href="/"
-          className="mb-6 -ml-2 inline-flex items-center gap-1.5 rounded-md px-2 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <ArrowLeft className="size-4" aria-hidden />
-          Back to RenKin
-        </Link>
-        <Link href="/" className="mb-8 flex items-center gap-2">
-          <span className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <span className="text-sm font-bold">R</span>
-          </span>
-          <span className="text-lg font-semibold tracking-tight">RenKin</span>
-        </Link>
+        <HoverHint hint="Leaves this page and returns to the RenKin app." align="start" className="mb-6 -ml-2 flex">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 rounded-md px-2 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <ArrowLeft className="size-4" aria-hidden />
+            Back to RenKin
+          </Link>
+        </HoverHint>
+        <HoverHint hint="Returns to the RenKin home screen." align="start" className="mb-8 flex">
+          <Link href="/" className="flex items-center gap-2">
+            <span className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+              <span className="text-sm font-bold">R</span>
+            </span>
+            <span className="text-lg font-semibold tracking-tight">RenKin</span>
+          </Link>
+        </HoverHint>
         <h1 className="text-2xl font-semibold tracking-tight text-balance">
           {isSignUp ? 'Create your RenKin account' : 'Welcome back'}
         </h1>
@@ -101,9 +106,11 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
 
         <p className="mt-6 text-sm text-muted-foreground">
           {isSignUp ? 'Already have an account? ' : 'New to RenKin? '}
-          <Link href={isSignUp ? '/sign-in' : '/sign-up'} className="font-medium text-foreground underline underline-offset-4">
-            {isSignUp ? 'Sign in' : 'Create an account'}
-          </Link>
+          <HoverHint hint={isSignUp ? 'Opens the sign-in page.' : 'Opens the sign-up page.'} align="start">
+            <Link href={isSignUp ? '/sign-in' : '/sign-up'} className="font-medium text-foreground underline underline-offset-4">
+              {isSignUp ? 'Sign in' : 'Create an account'}
+            </Link>
+          </HoverHint>
         </p>
         <p className="mt-2 text-xs text-muted-foreground">
           {'RenKin works without an account too — everything is saved on this device.'}

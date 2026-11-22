@@ -1,5 +1,6 @@
 'use client'
 
+import { HoverHint } from '@/components/ui/hover-hint'
 import { useRef, useState } from 'react'
 import {
   Camera,
@@ -198,20 +199,26 @@ function NotesTab() {
             </li>
           ))}
           {orphans.length > 5 && (
-            <a href="/notes" className="text-xs text-primary hover:underline">
-              See all {orphans.length} unassigned notes →
-            </a>
+            <li>
+              <HoverHint hint="Opens the Notes page with every unassigned note." align="start">
+                <a href="/notes" className="text-xs text-primary hover:underline">
+                  See all {orphans.length} unassigned notes →
+                </a>
+              </HoverHint>
+            </li>
           )}
         </ul>
       )}
       {orphans.length > 0 && (
-        <a
-          href="/notes"
-          className="mt-1 flex items-center justify-between rounded-xl border px-3 py-2.5 text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
-        >
-          See all Unassigned Notes
-          <ChevronDown className="size-4 -rotate-90" aria-hidden />
-        </a>
+        <HoverHint hint="Opens the Notes page, where you can file notes against a contact." className="mt-1 flex">
+          <a
+            href="/notes"
+            className="flex w-full items-center justify-between rounded-xl border px-3 py-2.5 text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+          >
+            See all Unassigned Notes
+            <ChevronDown className="size-4 -rotate-90" aria-hidden />
+          </a>
+        </HoverHint>
       )}
     </div>
   )
@@ -503,19 +510,21 @@ export function CaptureWidget() {
               <PenLine className="size-4 text-muted-foreground" aria-hidden />
               <span className="text-sm font-medium">Conversation Capture</span>
             </div>
-            <TabsList className="mx-auto w-full sm:w-auto">
-              <TabsTrigger value="voice" className="flex-1 gap-1.5 sm:flex-none">
-                <Mic className="size-4" aria-hidden />
-                Voice
-              </TabsTrigger>
-              <TabsTrigger value="manual" className="flex-1 gap-1.5 sm:flex-none">
-                <PenLine className="size-4" aria-hidden />
-                Manual
-              </TabsTrigger>
-              <TabsTrigger value="notes" className="flex-1 gap-1.5 sm:flex-none">
-                Notes
-              </TabsTrigger>
-            </TabsList>
+            <div className="flex justify-center pb-3">
+              <TabsList className="w-full sm:w-auto">
+                <TabsTrigger value="voice" className="flex-1 gap-1.5 sm:flex-none">
+                  <Mic className="size-4" aria-hidden />
+                  Voice
+                </TabsTrigger>
+                <TabsTrigger value="manual" className="flex-1 gap-1.5 sm:flex-none">
+                  <PenLine className="size-4" aria-hidden />
+                  Manual
+                </TabsTrigger>
+                <TabsTrigger value="notes" className="flex-1 gap-1.5 sm:flex-none">
+                  Notes
+                </TabsTrigger>
+              </TabsList>
+            </div>
           </div>
 
           <TabsContent value="voice" className="p-5">

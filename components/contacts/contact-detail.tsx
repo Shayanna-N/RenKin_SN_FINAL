@@ -1,5 +1,6 @@
 'use client'
 
+import { HoverHint } from '@/components/ui/hover-hint'
 import { useRef, useState } from 'react'
 import { Check, ChevronDown, FileText, Loader2, Mail, Mic, MicOff, Phone, Send, Sparkles, Trash2, X } from 'lucide-react'
 import { toast } from 'sonner'
@@ -314,24 +315,33 @@ export function ContactDetail({ contact, onClose }: { contact: Contact | null; o
               <div className="flex flex-col gap-6 px-4 pb-8">
                 <div className="flex flex-wrap gap-2">
                   {contact.email && (
-                    <a href={`mailto:${contact.email}`} className={buttonVariants({ size: 'sm', variant: 'outline' })}>
-                      <Mail className="size-4" aria-hidden /> {contact.email}
-                    </a>
+                    <HoverHint hint="Opens your email app with a new message to this contact." align="start">
+                      <a href={`mailto:${contact.email}`} className={buttonVariants({ size: 'sm', variant: 'outline' })}>
+                        <Mail className="size-4" aria-hidden /> {contact.email}
+                      </a>
+                    </HoverHint>
                   )}
                   {contact.phone && (
-                    <a href={`tel:${contact.phone}`} className={buttonVariants({ size: 'sm', variant: 'outline' })}>
-                      <Phone className="size-4" aria-hidden /> {contact.phone}
-                    </a>
+                    <HoverHint hint="Starts a call using your phone app." align="start">
+                      <a href={`tel:${contact.phone}`} className={buttonVariants({ size: 'sm', variant: 'outline' })}>
+                        <Phone className="size-4" aria-hidden /> {contact.phone}
+                      </a>
+                    </HoverHint>
                   )}
                   {contact.links.map((l) => (
-                    <a
+                    <HoverHint
                       key={l.url}
-                      href={l.url}
-                      {...(l.kind === 'phone' ? {} : { target: '_blank', rel: 'noreferrer' })}
-                      className={buttonVariants({ size: 'sm', variant: 'outline', className: 'capitalize' })}
+                      hint={l.kind === 'phone' ? 'Starts a call using your phone app.' : `Opens this contact's ${l.kind} page in a new tab.`}
+                      align="start"
                     >
-                      {l.kind}
-                    </a>
+                      <a
+                        href={l.url}
+                        {...(l.kind === 'phone' ? {} : { target: '_blank', rel: 'noreferrer' })}
+                        className={buttonVariants({ size: 'sm', variant: 'outline', className: 'capitalize' })}
+                      >
+                        {l.kind}
+                      </a>
+                    </HoverHint>
                   ))}
                 </div>
 

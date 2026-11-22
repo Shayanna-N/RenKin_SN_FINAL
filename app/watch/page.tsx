@@ -1,5 +1,6 @@
 'use client'
 
+import { HoverHint } from '@/components/ui/hover-hint'
 import { useState } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, BluetoothSearching, BookmarkPlus, Check, Loader2, Mic, Nfc, Smartphone, Users, WalletCards, Wifi } from 'lucide-react'
@@ -142,9 +143,11 @@ export default function WatchPage() {
 
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center gap-6 bg-neutral-950 p-6 text-white">
-      <Link href="/" className="flex items-center gap-1 text-sm text-neutral-400 hover:text-white">
-        <ArrowLeft className="size-4" aria-hidden /> Back to phone app
-      </Link>
+      <HoverHint hint="Leaves the watch preview and returns to the phone app.">
+        <Link href="/" className="flex items-center gap-1 text-sm text-neutral-400 hover:text-white">
+          <ArrowLeft className="size-4" aria-hidden /> Back to phone app
+        </Link>
+      </HoverHint>
 
       {/* ── Connect button ─────────────────────────────────────────────────── */}
       <button

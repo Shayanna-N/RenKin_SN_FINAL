@@ -1,5 +1,6 @@
 'use client'
 
+import { HoverHint } from '@/components/ui/hover-hint'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ArrowDown, ArrowUp, Activity, Check, PlayCircle, RotateCcw } from 'lucide-react'
@@ -370,9 +371,11 @@ export default function SettingsPage() {
             </ul>
           )}
           <div className="mt-6 flex flex-wrap gap-3">
-            <Button variant="outline" nativeButton={false} render={<Link href="/agents" />}>
-              <Activity className="size-4" aria-hidden /> View my activity
-            </Button>
+            <HoverHint hint="Opens the activity log of what your agents have done." align="start">
+              <Button variant="outline" nativeButton={false} render={<Link href="/agents" />}>
+                <Activity className="size-4" aria-hidden /> View my activity
+              </Button>
+            </HoverHint>
             <Button variant="outline" onClick={reset}>
               <RotateCcw className="size-4" aria-hidden /> Reset demo data
             </Button>

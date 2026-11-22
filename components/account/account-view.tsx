@@ -1,5 +1,6 @@
 'use client'
 
+import { HoverHint } from '@/components/ui/hover-hint'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
@@ -86,12 +87,16 @@ export function AccountView({ welcome = false }: { welcome?: boolean }) {
           description="Back up contacts, use the same card on phone, desktop and watch, and get notified when mutual connections change how they want to be reached."
         >
           <div className="flex flex-wrap gap-2">
-            <Button nativeButton={false} render={<Link href="/sign-up" />}>
-              Create account
-            </Button>
-            <Button variant="outline" nativeButton={false} render={<Link href="/sign-in" />}>
-              Sign in
-            </Button>
+            <HoverHint hint="Opens the sign-up page to create a free account." align="start">
+              <Button nativeButton={false} render={<Link href="/sign-up" />}>
+                Create account
+              </Button>
+            </HoverHint>
+            <HoverHint hint="Opens the sign-in page for existing accounts." align="start">
+              <Button variant="outline" nativeButton={false} render={<Link href="/sign-in" />}>
+                Sign in
+              </Button>
+            </HoverHint>
           </div>
         </Section>
       </div>

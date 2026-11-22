@@ -1,5 +1,6 @@
 'use client'
 
+import { HoverHint } from '@/components/ui/hover-hint'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Check, CreditCard, Loader2, Maximize2, Minimize2, ScanLine, Share2, X } from 'lucide-react'
@@ -234,18 +235,20 @@ export function CardWidget({
 
           {/* ── My Card tab ─────────────────────────────────────────────── */}
           <TabsContent value="my-card" className="p-5">
-            <Link href="/card" aria-label="Customise my card" className="block rounded-2xl transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
-              <DigitalCard
-                profile={activeProfile(state)}
-                mode={state.settings.mode}
-                style={state.settings.cardStyle}
-                companion={state.settings.companion}
-                customQrStyle={state.settings.customQrStyle}
-                customQrColor={state.settings.customQrColor}
-                customCardFields={state.settings.customCardFields}
-                customModeName={state.settings.customModeName}
-              />
-            </Link>
+            <HoverHint hint="Opens My card, where you can edit your details and style." className="flex">
+              <Link href="/card" aria-label="Customise my card" className="block w-full rounded-2xl transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                <DigitalCard
+                  profile={activeProfile(state)}
+                  mode={state.settings.mode}
+                  style={state.settings.cardStyle}
+                  companion={state.settings.companion}
+                  customQrStyle={state.settings.customQrStyle}
+                  customQrColor={state.settings.customQrColor}
+                  customCardFields={state.settings.customCardFields}
+                  customModeName={state.settings.customModeName}
+                />
+              </Link>
+            </HoverHint>
           </TabsContent>
 
           <TabsContent value="share" className="p-5">
@@ -367,13 +370,15 @@ export function CardWidget({
             {/* Actions */}
             {readProgress?.phase === 'done' && readProgress.contact && (
               <div className="flex flex-col gap-2">
-                <Button
-                  nativeButton={false}
-                  render={<Link href={`/contacts?open=${readProgress.contact.id}`} />}
-                  onClick={() => setReadProgress(null)}
-                >
-                  View contact
-                </Button>
+                <HoverHint hint="Opens the Contacts page with this person's details." className="flex [&>*]:w-full">
+                  <Button
+                    nativeButton={false}
+                    render={<Link href={`/contacts?open=${readProgress.contact.id}`} />}
+                    onClick={() => setReadProgress(null)}
+                  >
+                    View contact
+                  </Button>
+                </HoverHint>
                 <Button variant="outline" onClick={() => setReadProgress(null)}>Done</Button>
               </div>
             )}
