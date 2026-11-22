@@ -4,6 +4,7 @@ import { StyledQr } from '@/components/styled-qr'
 import { Download, Nfc, Wallet } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useStore } from '@/lib/store'
+import { activeProfile } from '@/lib/profile'
 import { buildVCard } from '@/lib/vcard'
 
 /**
@@ -21,7 +22,7 @@ export function SharePanel({
   onVcf: () => void
 }) {
   const { state } = useStore()
-  const vcard = buildVCard(state.profile, state.settings.mode)
+  const vcard = buildVCard(activeProfile(state))
 
   return (
     <div className="flex flex-col gap-5">
@@ -33,7 +34,7 @@ export function SharePanel({
           color={state.settings.brand}
           margin={0}
           className="size-48 max-h-48 max-w-full"
-          title={`QR code for ${state.profile.name}'s contact card`}
+          title={`QR code for ${activeProfile(state).name}'s contact card`}
         />
         <p className="text-xs text-neutral-600">Point any phone camera here</p>
       </div>

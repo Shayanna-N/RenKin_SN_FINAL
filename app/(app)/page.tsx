@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Watch } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useStore } from '@/lib/store'
+import { activeProfile } from '@/lib/profile'
 import { CardWidget } from '@/components/today/card-widget'
 import { CaptureWidget } from '@/components/today/capture-widget'
 import { ContextBanner } from '@/components/today/context-banner'
@@ -11,7 +12,7 @@ import { Checklist } from '@/components/today/checklist'
 import { InsightsPanel } from '@/components/today/insights-panel'
 export default function TodayPage() {
   const { state, hydrated } = useStore()
-  const first = state.profile.name.split(' ')[0]
+  const first = activeProfile(state).name.split(' ')[0]
   // Seed timestamps and "today" depend on the current time and timezone, which differ
   // between server and client, so the count is only rendered after client hydration.
   const today = hydrated

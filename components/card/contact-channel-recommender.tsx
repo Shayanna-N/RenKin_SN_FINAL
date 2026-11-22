@@ -1,9 +1,9 @@
 'use client'
 
 import { useStore } from '@/lib/store'
-import { stewardPolicy } from '@/lib/agents'
 import { MODE_META } from '@/lib/agents'
-import type { Mode, Priority } from '@/lib/types'
+import { activeProfile, modeLabel } from '@/lib/profile'
+import type { Priority } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import {
   AtSign,
@@ -21,7 +21,6 @@ interface RankedChannel {
   label: string
   value: string
   kind: 'email' | 'phone' | 'linkedin' | 'website' | 'portfolio' | 'instagram' | 'x' | 'github' | 'calendly' | 'other'
-  modesEnabled: Mode[]
   activeInCurrentMode: boolean
   priorityRank: number // 1 = top priority, higher = lower
   score: number
@@ -57,84 +56,41 @@ function priorityRank(kind: RankedChannel['kind'], priorities: Priority[]): numb
   return priorities.length + 1
 }
 
-function reasonText(channel: Omit<RankedChannel, 'reason'>, totalModes: number): string {
-  if (!channel.activeInCurrentMode) {
-    return `Not shared in ${channel.modesEnabled.length > 0 ? channel.modesEnabled.join(', ') + ' mode' + (channel.modesEnabled.length > 1 ? 's only' : ' only') : 'any mode'}.`
-  }
+function reasonText(channel: Omit<RankedChannel, 'reason'>): string {
   const rankSuffix = (n: number) => (n === 1 ? '1st' : n === 2 ? '2nd' : n === 3 ? '3rd' : `${n}th`)
-  const modeCount = channel.modesEnabled.length
-  const parts: string[] = []
-  parts.push(`${rankSuffix(channel.priorityRank)} in your contact priority list.`)
-  if (modeCount === totalModes) parts.push('Shared in all modes.')
-  else parts.push(`Shared in ${channel.modesEnabled.join(', ')}.`)
-  return parts.join(' ')
+  return `${rankSuffix(channel.priorityRank)} in your contact priority list.`
 }
 
 export function ContactChannelRecommender() {
   const { state } = useStore()
-  const { profile, settings } = state
-  const policy = stewardPolicy(settings)
+  const { settings } = state
+  const profile = activeProfile(state)
   const currentMode = settings.mode
-  const ALL_MODES = Object.keys(MODE_META) as Mode[]
+  const currentLabel = modeLabel(currentMode, settings.customModeName, MODE_META[currentMode].label)
 
-  // Build the full list of available channels from the profile
+  // Every channel on the active mode's card is shared in that mode
   const channels: Omit<RankedChannel, 'reason'>[] = []
 
-  // Email
-  if (profile.email) {
-    const modesEnabled = profile.share.email
-    const active = modesEnabled.includes(currentMode)
-    const rank = priorityRank('email', settings.priorities)
-    channels.push({
-      key: 'email',
-      label: 'Email',
-      value: profile.email,
-      kind: 'email',
-      modesEnabled,
-      activeInCurrentMode: active,
-      priorityRank: rank,
-      score: active ? (10 - rank) * 10 + 50 : (10 - rank) * 2,
-    })
-  }
-
-  // Phone
-  if (profile.phone) {
-    const modesEnabled = profile.share.phone
-    const active = modesEnabled.includes(currentMode)
-    const rank = priorityRank('phone', settings.priorities)
-    channels.push({
-      key: 'phone',
-      label: 'Phone',
-      value: profile.phone,
-      kind: 'phone',
-      modesEnabled,
-      activeInCurrentMode: active,
-      priorityRank: rank,
-      score: active ? (10 - rank) * 10 + 50 : (10 - rank) * 2,
-    })
-  }
-
-  // Profile links
-  for (const link of profile.links) {
-    const modesEnabled = link.modes
-    const active = modesEnabled.includes(currentMode)
-    const kind = link.kind as RankedChannel['kind']
+  const addChannel = (key: string, label: string, value: string, kind: RankedChannel['kind']) => {
     const rank = priorityRank(kind, settings.priorities)
     channels.push({
-      key: link.id,
-      label: link.label,
-      value: link.url,
+      key,
+      label,
+      value,
       kind,
-      modesEnabled,
-      activeInCurrentMode: active,
+      activeInCurrentMode: true,
       priorityRank: rank,
-      score: active ? (10 - rank) * 10 + 50 : (10 - rank) * 2,
+      score: (10 - rank) * 10 + 50,
     })
   }
+
+  if (profile.email) addChannel('email', 'Email', profile.email, 'email')
+  if (profile.phone) addChannel('phone', 'Phone', profile.phone, 'phone')
+  for (const link of profile.links) addChannel(link.id, link.label, link.url, link.kind)
 
   // Sort: active first, then by score desc, then by priority rank asc
   const ranked: RankedChannel[] = channels
-    .map((c) => ({ ...c, reason: reasonText(c, ALL_MODES.length) }))
+    .map((c) => ({ ...c, reason: reasonText(c) }))
     .sort((a, b) => {
       if (a.activeInCurrentMode !== b.activeInCurrentMode)
         return a.activeInCurrentMode ? -1 : 1
@@ -157,8 +113,7 @@ export function ContactChannelRecommender() {
       <div className="rounded-xl bg-muted/60 px-4 py-3 text-sm text-muted-foreground">
         <span className="font-medium text-foreground">Context agent · </span>
         Ranked for{' '}
-        <span className="font-medium text-foreground capitalize">{MODE_META[currentMode].label}</span> mode.
-        {' '}Channels not shared in this mode are shown below the divider.
+        <span className="font-medium text-foreground capitalize">{currentLabel}</span> mode.
       </div>
 
       {/* Ranked list */}
@@ -166,16 +121,8 @@ export function ContactChannelRecommender() {
         {ranked.map((ch, i) => {
           const Icon = KIND_ICON[ch.kind]
           const barPct = Math.max(4, Math.round((ch.score / maxScore) * 100))
-          const isFirstInactive = !ch.activeInCurrentMode && ranked[i - 1]?.activeInCurrentMode
           return (
             <li key={ch.key}>
-              {isFirstInactive && (
-                <div className="mb-3 flex items-center gap-2 text-xs text-muted-foreground">
-                  <div className="h-px flex-1 bg-border" />
-                  Not shared in {MODE_META[currentMode].label} mode
-                  <div className="h-px flex-1 bg-border" />
-                </div>
-              )}
               <div
                 className={cn(
                   'flex flex-col gap-2 rounded-xl border p-3 transition-colors',

@@ -10,8 +10,20 @@ import {
   useSyncExternalStore,
 } from 'react'
 import { readableOn } from './companion'
+import { cloneProfile } from './profile'
 import { createSeedState } from './seed'
-import type { AgentLogEntry, AppState, CompanionConfig, Contact, Mode, NoteEntry, OrphanNote } from './types'
+import type {
+  AgentLogEntry,
+  AppState,
+  CompanionConfig,
+  Contact,
+  Mode,
+  NoteEntry,
+  OrphanNote,
+  Profile,
+  ProfileLink,
+  Settings,
+} from './types'
 
 const STORAGE_KEY = 'renkin:v1'
 const LEGACY_KEYS = ['handshake:v1']
@@ -49,24 +61,72 @@ function migrateContact(c: Contact & { notes?: string }): Contact {
   return { ...c, noteEntries: [entry] }
 }
 
+type LegacyProfile = Omit<Profile, 'links' | 'qrUrl'> & {
+  links: (ProfileLink & { modes?: Mode[] })[]
+  share?: { email?: Mode[]; phone?: Mode[] }
+  qrUrl?: string
+}
+
+/**
+ * Builds one profile per mode. Older saves had a single profile with per-field mode
+ * chips; each mode keeps exactly what it used to show so nothing changes on upgrade.
+ */
+function migrateProfiles(
+  saved: Partial<AppState> & { profile?: LegacyProfile },
+  seed: AppState,
+  legacyQrUrl: string,
+): Record<Mode, Profile> {
+  const withQr = (p: Profile): Profile => ({ ...p, qrUrl: p.qrUrl ?? legacyQrUrl })
+
+  if (saved.profiles) {
+    const everyday = withQr(saved.profiles.everyday ?? seed.profiles.everyday)
+    return {
+      everyday,
+      event: withQr(saved.profiles.event ?? cloneProfile(everyday)),
+      custom: withQr(saved.profiles.custom ?? cloneProfile(everyday)),
+    }
+  }
+
+  const legacy = saved.profile
+  if (!legacy) return seed.profiles
+
+  const forMode = (mode: Mode): Profile => {
+    const { share, links, qrUrl, ...rest } = legacy
+    return {
+      ...rest,
+      qrUrl: qrUrl ?? legacyQrUrl,
+      email: !share?.email || share.email.includes(mode) ? legacy.email : '',
+      phone: !share?.phone || share.phone.includes(mode) ? legacy.phone : '',
+      links: links
+        .filter((l) => !l.modes || l.modes.includes(mode))
+        .map(({ modes: _modes, ...l }) => ({ ...l, id: crypto.randomUUID() })),
+    }
+  }
+  return { everyday: forMode('everyday'), event: forMode('event'), custom: forMode('custom') }
+}
+
 function migrate(saved: Partial<AppState>): AppState {
   const seed = createSeedState()
   const savedMode = saved.settings?.mode
   const contacts = (saved.contacts ?? seed.contacts).map(migrateContact)
+  const { profile: _legacyProfile, ...savedRest } = saved as Partial<AppState> & { profile?: LegacyProfile }
+  const { customQrUrl: legacyQrUrl = '', ...savedSettings } = (saved.settings ?? {}) as Partial<Settings> & {
+    customQrUrl?: string
+  }
   return {
     ...seed,
-    ...saved,
+    ...savedRest,
+    profiles: migrateProfiles(saved as Partial<AppState> & { profile?: LegacyProfile }, seed, legacyQrUrl),
     contacts,
     settings: {
       ...seed.settings,
-      ...saved.settings,
+      ...savedSettings,
       // Remap stale mode keys from previous versions
       mode: savedMode && VALID_MODES.has(savedMode) ? savedMode : seed.settings.mode,
       companion: migrateCompanion(seed.settings.companion, saved.settings?.companion),
       broadcastMessages: saved.settings?.broadcastMessages ?? seed.settings.broadcastMessages,
       customModeName: saved.settings?.customModeName ?? seed.settings.customModeName,
       customCardFields: saved.settings?.customCardFields ?? seed.settings.customCardFields,
-      customQrUrl: saved.settings?.customQrUrl ?? seed.settings.customQrUrl,
       customQrStyle: saved.settings?.customQrStyle ?? seed.settings.customQrStyle,
       customQrColor: saved.settings?.customQrColor ?? seed.settings.customQrColor,
       defaultContactSort: saved.settings?.defaultContactSort ?? seed.settings.defaultContactSort,

@@ -1,4 +1,4 @@
-import type { AppState } from './types'
+import type { AppState, Profile } from './types'
 
 const HOUR = 60 * 60 * 1000
 
@@ -6,50 +6,28 @@ function at(offsetHours: number) {
   return new Date(Date.now() + offsetHours * HOUR).toISOString()
 }
 
+function seedProfile(): Profile {
+  return {
+    name: 'Jordan Rivera',
+    headline: 'Product Designer',
+    company: 'Northwind Labs',
+    email: 'jordan@northwind.dev',
+    phone: '+1 (415) 555-0142',
+    bio: 'Designing calm tools for busy people. Currently exploring design lead roles.',
+    qrUrl: '',
+    links: [
+      { id: 'l1', kind: 'linkedin', label: 'LinkedIn', url: 'https://linkedin.com/in/jordanrivera' },
+      { id: 'l2', kind: 'portfolio', label: 'Portfolio', url: 'https://jordanrivera.design' },
+      { id: 'l3', kind: 'instagram', label: 'Instagram', url: 'https://instagram.com/jordan.makes' },
+      { id: 'l4', kind: 'calendly', label: 'Book a chat', url: 'https://cal.com/jordanrivera' },
+    ],
+  }
+}
+
 export function createSeedState(): AppState {
   return {
-    profile: {
-      name: 'Jordan Rivera',
-      headline: 'Product Designer',
-      company: 'Northwind Labs',
-      email: 'jordan@northwind.dev',
-      phone: '+1 (415) 555-0142',
-      bio: 'Designing calm tools for busy people. Currently exploring design lead roles.',
-      links: [
-        {
-          id: 'l1',
-          kind: 'linkedin',
-          label: 'LinkedIn',
-          url: 'https://linkedin.com/in/jordanrivera',
-          modes: ['custom', 'event'],
-        },
-        {
-          id: 'l2',
-          kind: 'portfolio',
-          label: 'Portfolio',
-          url: 'https://jordanrivera.design',
-          modes: ['custom', 'event', 'everyday'],
-        },
-        {
-          id: 'l3',
-          kind: 'instagram',
-          label: 'Instagram',
-          url: 'https://instagram.com/jordan.makes',
-          modes: ['everyday'],
-        },
-        {
-          id: 'l4',
-          kind: 'calendly',
-          label: 'Book a chat',
-          url: 'https://cal.com/jordanrivera',
-          modes: ['custom', 'event'],
-        },
-      ],
-      share: {
-        email: ['custom', 'event'],
-        phone: ['everyday', 'custom'],
-      },
-    },
+    // Event and Custom start as copies of Everyday.
+    profiles: { everyday: seedProfile(), event: seedProfile(), custom: seedProfile() },
     settings: {
       mode: 'event' as const,
       autoMode: true,
@@ -121,7 +99,6 @@ export function createSeedState(): AppState {
       defaultReadMethod: null,
       customModeName: 'Custom',
       customCardFields: [],
-      customQrUrl: '',
       customQrStyle: 'squares' as const,
       customQrColor: '',
       defaultContactSort: 'az' as const,

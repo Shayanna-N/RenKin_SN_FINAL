@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { useOnline, useStore } from '@/lib/store'
+import { activeProfile } from '@/lib/profile'
 import { cn } from '@/lib/utils'
 import type { Contact, NoteEntry } from '@/lib/types'
 
@@ -264,7 +265,7 @@ export function ContactDetail({ contact, onClose }: { contact: Contact | null; o
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          sender: { name: state.profile.name, headline: state.profile.headline, company: state.profile.company },
+          sender: { name: activeProfile(state).name, headline: activeProfile(state).headline, company: activeProfile(state).company },
           contact: {
             name: c.name,
             headline: c.headline,

@@ -1,18 +1,18 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Trash2 } from 'lucide-react'
+import { Copy, Plus, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useStore } from '@/lib/store'
 import { MODE_META } from '@/lib/agents'
-import { cn } from '@/lib/utils'
+import { MODES, cloneProfile, modeLabel, normalizeUrl } from '@/lib/profile'
 import type { LinkKind, Mode, Profile } from '@/lib/types'
 
-const MODES = Object.keys(MODE_META) as Mode[]
 const KINDS: LinkKind[] = ['linkedin', 'website', 'portfolio', 'instagram', 'x', 'github', 'calendly', 'phone', 'other']
 
 const KIND_LABEL: Record<LinkKind, string> = {
@@ -32,38 +32,80 @@ const VALUE_PLACEHOLDER: Partial<Record<LinkKind, string>> = {
   other: 'Link or detail',
 }
 
-function ModeChips({ value, onChange, label }: { value: Mode[]; onChange: (m: Mode[]) => void; label: string }) {
+type TextField = 'name' | 'headline' | 'company' | 'email' | 'phone' | 'bio' | 'qrUrl'
+
+function linksSignature(p: Profile) {
+  return p.links.map((l) => `${l.kind}|${l.label}|${normalizeUrl(l.url)}`).join('\n')
+}
+
+/** Small "Copy from" picker. Only offers modes whose value differs from the current one. */
+function CopyFrom({
+  idPrefix,
+  label,
+  options,
+  onCopy,
+}: {
+  idPrefix: string
+  label: string
+  options: { mode: Mode; name: string }[]
+  onCopy: (mode: Mode) => void
+}) {
+  if (options.length === 0) return null
   return (
-    <div role="group" aria-label={`Modes that share ${label}`} className="flex flex-wrap gap-1">
-      {MODES.map((m) => {
-        const on = value.includes(m)
-        return (
-          <button
-            key={m}
-            type="button"
-            aria-pressed={on}
-            onClick={() => onChange(on ? value.filter((x) => x !== m) : [...value, m])}
-            className={cn(
-              'rounded-full border px-2 py-0.5 text-[11px] font-medium',
-              on ? 'border-primary bg-primary/10 text-primary' : 'text-muted-foreground',
-            )}
-          >
-            {MODE_META[m].label}
-          </button>
-        )
-      })}
-    </div>
+    <Select value="" onValueChange={(v) => onCopy(v as Mode)}>
+      <SelectTrigger
+        id={`${idPrefix}-copy`}
+        size="sm"
+        aria-label={`Copy ${label} from another mode`}
+        className="h-6 w-auto gap-1 border-0 bg-transparent px-1.5 text-[11px] text-muted-foreground shadow-none hover:text-foreground"
+      >
+        <Copy className="size-3" aria-hidden />
+        <SelectValue placeholder="Copy from" />
+      </SelectTrigger>
+      <SelectContent align="end">
+        {options.map((o) => (
+          <SelectItem key={o.mode} value={o.mode}>
+            {o.name}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   )
 }
 
-export function CardEditor({ embedded }: { embedded?: boolean }) {
+function ModeForm({ mode }: { mode: Mode }) {
   const { state, update } = useStore()
-  const p = state.profile
+  const p = state.profiles[mode]
   const [newUrl, setNewUrl] = useState('')
   const [newKind, setNewKind] = useState<LinkKind>('website')
   const [newLabel, setNewLabel] = useState('')
 
-  const set = (patch: Partial<Profile>) => update((s) => ({ ...s, profile: { ...s.profile, ...patch } }))
+  const nameOf = (m: Mode) => modeLabel(m, state.settings.customModeName, MODE_META[m].label)
+  const others = MODES.filter((m) => m !== mode)
+
+  const set = (patch: Partial<Profile>) =>
+    update((s) => ({ ...s, profiles: { ...s.profiles, [mode]: { ...s.profiles[mode], ...patch } } }))
+
+  const differing = (field: TextField) =>
+    others
+      .filter((m) => (state.profiles[m][field] ?? '') !== (p[field] ?? ''))
+      .map((m) => ({ mode: m, name: nameOf(m) }))
+
+  const copyField = (field: TextField, from: Mode) => set({ [field]: state.profiles[from][field] ?? '' })
+
+  const linkOptions = others
+    .filter((m) => linksSignature(state.profiles[m]) !== linksSignature(p))
+    .map((m) => ({ mode: m, name: nameOf(m) }))
+
+  const allOptions = others
+    .filter(
+      (m) =>
+        linksSignature(state.profiles[m]) !== linksSignature(p) ||
+        (['name', 'headline', 'company', 'email', 'phone', 'bio', 'qrUrl'] as TextField[]).some(
+          (f) => (state.profiles[m][f] ?? '') !== (p[f] ?? ''),
+        ),
+    )
+    .map((m) => ({ mode: m, name: nameOf(m) }))
 
   function addLink(e: React.FormEvent) {
     e.preventDefault()
@@ -76,103 +118,145 @@ export function CardEditor({ embedded }: { embedded?: boolean }) {
         ? value
         : `https://${value}`
     const label = newKind === 'other' ? newLabel.trim() || KIND_LABEL.other : KIND_LABEL[newKind]
-    set({
-      links: [
-        ...p.links,
-        {
-          id: crypto.randomUUID(),
-          kind: newKind,
-          label,
-          url,
-          modes: [state.settings.mode],
-        },
-      ],
-    })
+    set({ links: [...p.links, { id: crypto.randomUUID(), kind: newKind, label, url }] })
     setNewUrl('')
     setNewLabel('')
   }
 
-  const inner = (
-    <>
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="min-w-0">
-          <h2 id="editor-heading" className="font-semibold">
-            Card details
-          </h2>
-          <p className="text-sm text-muted-foreground">Choose which modes share each field.</p>
-        </div>
-        <div className="grid gap-1.5 sm:w-1/2 sm:max-w-sm">
-          <Label htmlFor="qr-url">QR code link</Label>
+  const fieldLabel = (field: TextField, text: string) => (
+    <div className="flex items-center justify-between gap-2">
+      <Label htmlFor={`${mode}-${field}`}>{text}</Label>
+      <CopyFrom
+        idPrefix={`${mode}-${field}`}
+        label={text.toLowerCase()}
+        options={differing(field)}
+        onCopy={(from) => copyField(field, from)}
+      />
+    </div>
+  )
+
+  return (
+    <div>
+      {mode === 'custom' && (
+        <div className="mb-5 grid gap-1.5 rounded-xl bg-muted p-3 sm:max-w-xs">
+          <Label htmlFor="custom-mode-name">Mode name</Label>
           <Input
-            id="qr-url"
+            id="custom-mode-name"
+            value={state.settings.customModeName}
+            maxLength={20}
+            placeholder="Custom"
+            onChange={(e) =>
+              update((s) => ({ ...s, settings: { ...s.settings, customModeName: e.target.value } }))
+            }
+            aria-describedby="custom-mode-name-hint"
+          />
+          <p id="custom-mode-name-hint" className="text-xs text-muted-foreground">
+            Shown on your card and mode switcher. Leave blank for &ldquo;Custom&rdquo;.
+          </p>
+        </div>
+      )}
+
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-sm text-muted-foreground">
+          These details are only used in {nameOf(mode)} mode.
+        </p>
+        {allOptions.length > 0 && (
+          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <span>Copy everything from</span>
+            <Select
+              value=""
+              onValueChange={(v) =>
+                update((s) => ({
+                  ...s,
+                  profiles: { ...s.profiles, [mode]: cloneProfile(s.profiles[v as Mode]) },
+                }))
+              }
+            >
+              <SelectTrigger size="sm" aria-label="Copy all details from another mode" className="h-7 w-32">
+                <SelectValue placeholder="Choose mode" />
+              </SelectTrigger>
+              <SelectContent align="end">
+                {allOptions.map((o) => (
+                  <SelectItem key={o.mode} value={o.mode}>
+                    {o.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+      </div>
+
+      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-1.5">
+          {fieldLabel('name', 'Name')}
+          <Input id={`${mode}-name`} value={p.name} onChange={(e) => set({ name: e.target.value })} />
+        </div>
+        <div className="grid gap-1.5">
+          {fieldLabel('headline', 'Title')}
+          <Input id={`${mode}-headline`} value={p.headline} onChange={(e) => set({ headline: e.target.value })} />
+        </div>
+        <div className="grid gap-1.5 sm:col-span-2">
+          {fieldLabel('company', 'Company')}
+          <Input id={`${mode}-company`} value={p.company} onChange={(e) => set({ company: e.target.value })} />
+        </div>
+        <div className="grid gap-1.5">
+          {fieldLabel('email', 'Email')}
+          <Input id={`${mode}-email`} type="email" value={p.email} onChange={(e) => set({ email: e.target.value })} />
+        </div>
+        <div className="grid gap-1.5">
+          {fieldLabel('phone', 'Phone')}
+          <Input id={`${mode}-phone`} type="tel" value={p.phone} onChange={(e) => set({ phone: e.target.value })} />
+        </div>
+        <div className="grid gap-1.5 sm:col-span-2">
+          {fieldLabel('bio', 'Short bio')}
+          <Textarea id={`${mode}-bio`} rows={2} value={p.bio} onChange={(e) => set({ bio: e.target.value })} />
+        </div>
+        <div className="grid gap-1.5 sm:col-span-2">
+          {fieldLabel('qrUrl', 'QR code link')}
+          <Input
+            id={`${mode}-qrUrl`}
             type="url"
             inputMode="url"
             placeholder="https://yoursite.com"
-            value={state.settings.customQrUrl ?? ''}
-            onChange={(e) =>
-              update((s) => ({ ...s, settings: { ...s.settings, customQrUrl: e.target.value } }))
-            }
-            aria-describedby="qr-url-hint"
+            value={p.qrUrl ?? ''}
+            onChange={(e) => set({ qrUrl: e.target.value })}
+            aria-describedby={`${mode}-qrUrl-hint`}
           />
-          <p id="qr-url-hint" className="text-xs text-muted-foreground">
+          <p id={`${mode}-qrUrl-hint`} className="text-xs text-muted-foreground">
             Your card&apos;s QR updates automatically.
           </p>
         </div>
       </div>
 
-      <div className="mt-5 grid gap-4 sm:grid-cols-2">
-        <div className="grid gap-1.5">
-          <Label htmlFor="name">Name</Label>
-          <Input id="name" value={p.name} onChange={(e) => set({ name: e.target.value })} />
-        </div>
-        <div className="grid gap-1.5">
-          <Label htmlFor="headline">Title</Label>
-          <Input id="headline" value={p.headline} onChange={(e) => set({ headline: e.target.value })} />
-        </div>
-        <div className="grid gap-1.5 sm:col-span-2">
-          <Label htmlFor="company">Company</Label>
-          <Input id="company" value={p.company} onChange={(e) => set({ company: e.target.value })} />
-        </div>
-        <div className="grid gap-1.5">
-          <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" value={p.email} onChange={(e) => set({ email: e.target.value })} />
-          <ModeChips label="email" value={p.share.email} onChange={(email) => set({ share: { ...p.share, email } })} />
-        </div>
-        <div className="grid gap-1.5">
-          <Label htmlFor="phone">Phone</Label>
-          <Input id="phone" type="tel" value={p.phone} onChange={(e) => set({ phone: e.target.value })} />
-          <ModeChips label="phone" value={p.share.phone} onChange={(phone) => set({ share: { ...p.share, phone } })} />
-        </div>
-        <div className="grid gap-1.5 sm:col-span-2">
-          <Label htmlFor="bio">Short bio</Label>
-          <Textarea id="bio" rows={2} value={p.bio} onChange={(e) => set({ bio: e.target.value })} />
-        </div>
+      <div className="mt-6 flex items-center justify-between gap-2">
+        <h3 className="text-sm font-medium">Links & social connections</h3>
+        <CopyFrom
+          idPrefix={`${mode}-links`}
+          label="links"
+          options={linkOptions}
+          onCopy={(from) =>
+            set({ links: state.profiles[from].links.map((l) => ({ ...l, id: crypto.randomUUID() })) })
+          }
+        />
       </div>
-
-      <h3 className="mt-6 text-sm font-medium">Links & social connections</h3>
       <ul className="mt-2 flex flex-col divide-y rounded-xl border">
+        {p.links.length === 0 && <li className="p-3 text-sm text-muted-foreground">No links yet.</li>}
         {p.links.map((l) => (
-          <li key={l.id} className="flex flex-col gap-2 p-3 sm:flex-row sm:items-center sm:justify-between">
+          <li key={l.id} className="flex items-center justify-between gap-2 p-3">
             <div className="min-w-0">
               <p className="text-sm font-medium">{l.label}</p>
               <p className="truncate text-xs text-muted-foreground">{l.url}</p>
             </div>
-            <div className="flex items-center gap-2">
-              <ModeChips
-                label={l.label}
-                value={l.modes}
-                onChange={(modes) => set({ links: p.links.map((x) => (x.id === l.id ? { ...x, modes } : x)) })}
-              />
-              <Button
-                variant="ghost"
-                size="icon"
-                className="size-7"
-                aria-label={`Remove ${l.label}`}
-                onClick={() => set({ links: p.links.filter((x) => x.id !== l.id) })}
-              >
-                <Trash2 className="size-3.5" aria-hidden />
-              </Button>
-            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-7 shrink-0"
+              aria-label={`Remove ${l.label}`}
+              onClick={() => set({ links: p.links.filter((x) => x.id !== l.id) })}
+            >
+              <Trash2 className="size-3.5" aria-hidden />
+            </Button>
           </li>
         ))}
       </ul>
@@ -191,11 +275,11 @@ export function CardEditor({ embedded }: { embedded?: boolean }) {
         </Select>
         {newKind === 'other' && (
           <>
-            <label htmlFor="new-label" className="sr-only">
+            <label htmlFor={`${mode}-new-label`} className="sr-only">
               Custom name
             </label>
             <Input
-              id="new-label"
+              id={`${mode}-new-label`}
               value={newLabel}
               onChange={(e) => setNewLabel(e.target.value)}
               placeholder="Name (e.g. Telegram)"
@@ -204,11 +288,11 @@ export function CardEditor({ embedded }: { embedded?: boolean }) {
             />
           </>
         )}
-        <label htmlFor="new-url" className="sr-only">
+        <label htmlFor={`${mode}-new-url`} className="sr-only">
           {newKind === 'phone' ? 'Phone number' : 'Link URL'}
         </label>
         <Input
-          id="new-url"
+          id={`${mode}-new-url`}
           type={newKind === 'phone' ? 'tel' : 'text'}
           inputMode={newKind === 'phone' ? 'tel' : undefined}
           value={newUrl}
@@ -220,6 +304,37 @@ export function CardEditor({ embedded }: { embedded?: boolean }) {
           <Plus className="size-4" aria-hidden />
         </Button>
       </form>
+    </div>
+  )
+}
+
+export function CardEditor({ embedded }: { embedded?: boolean }) {
+  const { state, update } = useStore()
+  const nameOf = (m: Mode) => modeLabel(m, state.settings.customModeName, MODE_META[m].label)
+
+  const inner = (
+    <>
+      <h2 id="editor-heading" className="font-semibold">
+        Card details
+      </h2>
+      <p className="mb-4 text-sm text-muted-foreground">Each mode has its own details. Pick a tab to edit it.</p>
+      <Tabs
+        value={state.settings.mode}
+        onValueChange={(v) => update((s) => ({ ...s, settings: { ...s.settings, mode: v as Mode } }))}
+      >
+        <TabsList className="w-full sm:w-auto">
+          {MODES.map((m) => (
+            <TabsTrigger key={m} value={m} className="flex-1 sm:flex-none">
+              <span className="max-w-28 truncate">{nameOf(m)}</span>
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        {MODES.map((m) => (
+          <TabsContent key={m} value={m} className="mt-4">
+            <ModeForm mode={m} />
+          </TabsContent>
+        ))}
+      </Tabs>
     </>
   )
 

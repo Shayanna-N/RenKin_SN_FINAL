@@ -1,6 +1,8 @@
 'use client'
 
-import { Check, ChevronDown, Moon, Sun } from 'lucide-react'
+import { Check, ChevronDown, Moon, Palette, Smile, Sun } from 'lucide-react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { CompanionCustomizer } from '@/components/card/companion-customizer'
 import { useCallback, useRef, useState } from 'react'
 import { useStore } from '@/lib/store'
 import { cn } from '@/lib/utils'
@@ -77,7 +79,22 @@ export function Appearance() {
       </h2>
 
       <div id="appearance-panel" hidden={!open}>
-      <fieldset className="mt-5">
+      <Tabs defaultValue="style" className="mt-5">
+      <TabsList className="w-full sm:w-auto">
+        <TabsTrigger value="style" className="flex-1 gap-1.5 sm:flex-none">
+          <Palette className="size-4" aria-hidden />
+          Style
+        </TabsTrigger>
+        <TabsTrigger value="companion" className="flex-1 gap-1.5 sm:flex-none">
+          <Smile className="size-4" aria-hidden />
+          Companion
+        </TabsTrigger>
+      </TabsList>
+      <TabsContent value="companion" className="mt-4">
+        <CompanionCustomizer embedded />
+      </TabsContent>
+      <TabsContent value="style">
+      <fieldset>
         <legend className="text-sm font-medium">Color</legend>
         <div className="mt-2 flex flex-wrap items-center gap-2">
           {SWATCHES.map((sw) => (
@@ -157,6 +174,8 @@ export function Appearance() {
       </fieldset>
 
       <SaveButton saved={saved} onClick={flash} />
+      </TabsContent>
+      </Tabs>
       </div>
     </section>
   )

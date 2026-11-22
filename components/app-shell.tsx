@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useOnline, useStore } from '@/lib/store'
+import { activeProfile } from '@/lib/profile'
 import { ModeSwitcher } from '@/components/mode-switcher'
 import { ContactUpdates } from '@/components/contact-updates'
 
@@ -57,8 +58,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           ))}
         </nav>
         <div className="border-t p-4 text-xs text-muted-foreground">
-          <p className="font-medium text-foreground">{state.profile.name}</p>
-          <p>{state.profile.headline}</p>
+          <p className="font-medium text-foreground">{activeProfile(state).name}</p>
+          <p>{activeProfile(state).headline}</p>
         </div>
       </aside>
 

@@ -31,7 +31,7 @@ export function DigitalCard({
   customModeName?: string
   className?: string
 }) {
-  const v = visibleProfile(profile, mode)
+  const v = visibleProfile(profile)
   const initials = profile.name
     .split(' ')
     .map((p) => p[0])

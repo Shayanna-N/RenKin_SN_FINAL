@@ -5,6 +5,7 @@ import { ArrowRight, Bell } from 'lucide-react'
 import { toast } from 'sonner'
 import { publishProfile, resolveUpdate } from '@/app/actions/sync'
 import { useStore } from '@/lib/store'
+import { activeProfile } from '@/lib/profile'
 import { useAccount, usePendingUpdates } from '@/lib/use-account'
 import { applyRemoteCard, CHANNEL_LABEL, contactFromRemote, toPublishedCard } from '@/lib/remote-contact'
 import type { ContactChange, PendingUpdate, Priority } from '@/lib/types'
@@ -39,10 +40,10 @@ export function ContactUpdates() {
   const published = useMemo(
     () =>
       JSON.stringify({
-        card: toPublishedCard(state.profile, state.settings),
+        card: toPublishedCard(activeProfile(state), state.settings),
         channel: state.settings.priorities[0] ?? 'email',
       }),
-    [state.profile, state.settings],
+    [state.profiles, state.settings],
   )
   const lastPublished = useRef<string | null>(null)
   const handle = account?.handle

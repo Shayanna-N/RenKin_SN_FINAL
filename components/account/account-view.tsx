@@ -18,6 +18,7 @@ import {
 import type { Priority, PublishedCard } from '@/lib/types'
 import { signOut } from '@/lib/auth-client'
 import { useStore } from '@/lib/store'
+import { activeProfile } from '@/lib/profile'
 import { useAccount } from '@/lib/use-account'
 import { CHANNEL_LABEL, contactFromRemote, toPublishedCard } from '@/lib/remote-contact'
 import { PageHeader } from '@/components/page-header'
@@ -83,7 +84,7 @@ export function AccountView() {
   async function claimHandle(e: React.FormEvent) {
     e.preventDefault()
     setBusy('handle')
-    const res = await publishProfile({ handle, card: toPublishedCard(state.profile, state.settings), preferredChannel })
+    const res = await publishProfile({ handle, card: toPublishedCard(activeProfile(state), state.settings), preferredChannel })
     setBusy(null)
     if (!res.ok) return toast.error(res.error)
     toast.success('Your card is live on Renkin')

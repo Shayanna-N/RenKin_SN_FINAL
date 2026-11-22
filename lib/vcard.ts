@@ -1,13 +1,13 @@
-import type { CapturedPerson, ContactLink, LinkKind, Mode, Profile } from './types'
+import type { CapturedPerson, ContactLink, LinkKind, Profile } from './types'
 
-export function visibleProfile(profile: Profile, mode: Mode) {
+export function visibleProfile(profile: Profile) {
   return {
     name: profile.name,
     headline: profile.headline,
     company: profile.company,
-    email: profile.share.email.includes(mode) ? profile.email : undefined,
-    phone: profile.share.phone.includes(mode) ? profile.phone : undefined,
-    links: profile.links.filter((l) => l.modes.includes(mode)),
+    email: profile.email || undefined,
+    phone: profile.phone || undefined,
+    links: profile.links.filter((l) => l.url),
   }
 }
 
@@ -15,8 +15,8 @@ function escape(value: string) {
   return value.replace(/\\/g, '\\\\').replace(/,/g, '\\,').replace(/;/g, '\\;').replace(/\n/g, '\\n')
 }
 
-export function buildVCard(profile: Profile, mode: Mode) {
-  const v = visibleProfile(profile, mode)
+export function buildVCard(profile: Profile) {
+  const v = visibleProfile(profile)
   const lines = [
     'BEGIN:VCARD',
     'VERSION:3.0',

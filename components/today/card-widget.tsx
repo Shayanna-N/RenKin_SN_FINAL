@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { useStore } from '@/lib/store'
+import { activeProfile } from '@/lib/profile'
 import { buildVCard } from '@/lib/vcard'
 import { cn } from '@/lib/utils'
 import type { Contact } from '@/lib/types'
@@ -111,7 +112,7 @@ export function CardWidget({
   onToggleExpand?: () => void
 } = {}) {
   const { state, log } = useStore()
-  const vcard = buildVCard(state.profile, state.settings.mode)
+  const vcard = buildVCard(activeProfile(state))
 
   const [shareProgress, setShareProgress] = useState<ShareProgress | null>(null)
   const [readProgress, setReadProgress] = useState<ReadProgress | null>(null)
@@ -160,7 +161,7 @@ export function CardWidget({
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `${state.profile.name.replace(/\s+/g, '-').toLowerCase()}.vcf`
+      a.download = `${activeProfile(state).name.replace(/\s+/g, '-').toLowerCase()}.vcf`
       a.click()
       URL.revokeObjectURL(url)
       log(6, 'Exported card as vCard.')
@@ -235,11 +236,10 @@ export function CardWidget({
           <TabsContent value="my-card" className="p-5">
             <Link href="/card" aria-label="Customise my card" className="block rounded-2xl transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
               <DigitalCard
-                profile={state.profile}
+                profile={activeProfile(state)}
                 mode={state.settings.mode}
                 style={state.settings.cardStyle}
                 companion={state.settings.companion}
-                customQrUrl={state.settings.customQrUrl}
                 customQrStyle={state.settings.customQrStyle}
                 customQrColor={state.settings.customQrColor}
                 customCardFields={state.settings.customCardFields}

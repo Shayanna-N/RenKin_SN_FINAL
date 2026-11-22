@@ -234,7 +234,7 @@ export function insights(state: AppState) {
 
 export function statusLine(state: AppState) {
   const event = activeEvent(state.events)
-  const { name, company } = state.profile
+  const { name, company } = state.profiles[state.settings.mode]
   const first = name.split(' ')[0]
   switch (state.settings.mode) {
     case 'event':

@@ -58,9 +58,9 @@ export interface ProfileLink {
   kind: LinkKind
   label: string
   url: string
-  modes: Mode[]
 }
 
+/** The card details for a single mode. Each mode owns a complete, independent profile. */
 export interface Profile {
   name: string
   headline: string
@@ -69,7 +69,8 @@ export interface Profile {
   phone: string
   bio: string
   links: ProfileLink[]
-  share: { email: Mode[]; phone: Mode[] }
+  /** URL the card's QR code links to. */
+  qrUrl: string
 }
 
 export interface ContactLink {
@@ -222,8 +223,6 @@ export interface Settings {
   customModeName: string
   /** Up to 5 extra fields shown on the card in custom mode. */
   customCardFields: { label: string; value: string }[]
-  /** URL the card-page QR code links to. Editable without regenerating a new code. */
-  customQrUrl: string
   /** QR code dot style. */
   customQrStyle: 'squares' | 'dots' | 'rounded'
   /** QR code foreground color (hex). Defaults to white to show on card background. */
@@ -246,7 +245,8 @@ export interface ChatMessage {
 }
 
 export interface AppState {
-  profile: Profile
+  /** One full card profile per networking mode. */
+  profiles: Record<Mode, Profile>
   settings: Settings
   contacts: Contact[]
   events: CalendarEvent[]

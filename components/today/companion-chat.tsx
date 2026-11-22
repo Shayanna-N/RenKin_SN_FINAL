@@ -6,6 +6,7 @@ import { CompanionAvatar } from '@/components/companion-avatar'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { useOnline, useStore } from '@/lib/store'
+import { activeProfile } from '@/lib/profile'
 import { activeEvent } from '@/lib/agents'
 import { cn } from '@/lib/utils'
 import type { ChatMessage, Mode, Priority } from '@/lib/types'
@@ -72,7 +73,7 @@ export function CompanionChat() {
         body: JSON.stringify({
           messages: history.slice(-20).map(({ role, content }) => ({ role, content })),
           snapshot: {
-            name: state.profile.name,
+            name: activeProfile(state).name,
             mode: state.settings.mode,
             activeEvent: activeEvent(state.events)?.title ?? null,
             priorities: state.settings.priorities,
