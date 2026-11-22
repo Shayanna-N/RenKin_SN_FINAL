@@ -17,7 +17,7 @@ export function useSyncNow() {
   const run = useCallback(async () => {
     setSyncing(true)
     try {
-      const { synced } = await pushContacts(contactsRef.current)
+      const { synced } = await pushContacts(contactsRef.current.filter((c) => !c.demo))
       const remote = await pullContacts()
       const have = new Set(contactsRef.current.map((c) => c.id))
       const fresh = remote.filter((c) => !have.has(c.id))

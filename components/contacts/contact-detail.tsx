@@ -131,7 +131,7 @@ function FullNoteSheet({
 
 // ── Main component ────────────────────────────────────────────────────────────
 export function ContactDetail({ contact, onClose }: { contact: Contact | null; onClose: () => void }) {
-  const { state, updateContact, addNoteEntry, log } = useStore()
+  const { state, updateContact, removeContact, addNoteEntry, log } = useStore()
   const online = useOnline()
   const [drafting, setDrafting] = useState(false)
   const [recording, setRecording] = useState(false)
@@ -334,6 +334,26 @@ export function ContactDetail({ contact, onClose }: { contact: Contact | null; o
                     </a>
                   ))}
                 </div>
+
+                {contact.demo && (
+                  <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-dashed bg-muted/40 p-3">
+                    <p className="text-sm text-muted-foreground">
+                      <Badge variant="secondary" className="mr-2">Demo</Badge>
+                      Added by the tour. Not synced or exported.
+                    </p>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        removeContact(contact.id)
+                        onClose()
+                        toast.success('Demo contact removed')
+                      }}
+                    >
+                      <Trash2 className="size-4" aria-hidden /> Remove
+                    </Button>
+                  </div>
+                )}
 
                 <section aria-labelledby="why-h" className="rounded-xl border p-4">
                   <div className="flex items-center justify-between gap-2">

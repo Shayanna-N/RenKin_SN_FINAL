@@ -11,12 +11,13 @@ import {
 } from 'react'
 import { readableOn } from './companion'
 import { cloneProfile } from './profile'
-import { createSeedState } from './seed'
+import { createEmptyState, createSeedState } from './seed'
 import type {
   AgentLogEntry,
   AppState,
   CompanionConfig,
   Contact,
+  Onboarding,
   Mode,
   NoteEntry,
   OrphanNote,
@@ -138,6 +139,8 @@ function migrate(saved: Partial<AppState>): AppState {
     orphanNotes: saved.orphanNotes ?? [],
     suggestions: saved.suggestions ?? [],
     memories: saved.memories ?? [],
+    // Anyone who saved data before the tour existed has already found their way around.
+    onboarding: saved.onboarding ?? { status: 'done', step: 0 },
   } as AppState
 }
 
@@ -149,6 +152,9 @@ interface StoreValue {
   setMode: (mode: Mode, reason?: string) => void
   addContact: (contact: Contact) => void
   updateContact: (id: string, patch: Partial<Contact>) => void
+  removeContact: (id: string) => void
+  startFresh: (user: { name: string; email: string }) => void
+  setOnboarding: (patch: Partial<Onboarding>) => void
   addNoteEntry: (contactId: string, entry: NoteEntry) => void
   addOrphanNote: (note: OrphanNote) => void
   updateOrphanNote: (id: string, patch: Partial<OrphanNote>) => void
@@ -248,6 +254,18 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     }))
   }, [])
 
+  const removeContact = useCallback((id: string) => {
+    setState((s) => ({ ...s, contacts: s.contacts.filter((c) => c.id !== id) }))
+  }, [])
+
+  const startFresh = useCallback((user: { name: string; email: string }) => {
+    setState(createEmptyState(user))
+  }, [])
+
+  const setOnboarding = useCallback((patch: Partial<Onboarding>) => {
+    setState((s) => ({ ...s, onboarding: { ...s.onboarding, ...patch } }))
+  }, [])
+
   const addNoteEntry = useCallback((contactId: string, entry: NoteEntry) => {
     setState((s) => ({
       ...s,
@@ -275,8 +293,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const reset = useCallback(() => setState(createSeedState()), [])
 
   const value = useMemo(
-    () => ({ state, hydrated, update, log, setMode, addContact, updateContact, addNoteEntry, addOrphanNote, updateOrphanNote, deleteOrphanNote, reset }),
-    [state, hydrated, update, log, setMode, addContact, updateContact, addNoteEntry, addOrphanNote, updateOrphanNote, deleteOrphanNote, reset],
+    () => ({ state, hydrated, update, log, setMode, addContact, updateContact, removeContact, startFresh, setOnboarding, addNoteEntry, addOrphanNote, updateOrphanNote, deleteOrphanNote, reset }),
+    [state, hydrated, update, log, setMode, addContact, updateContact, removeContact, startFresh, setOnboarding, addNoteEntry, addOrphanNote, updateOrphanNote, deleteOrphanNote, reset],
   )
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>

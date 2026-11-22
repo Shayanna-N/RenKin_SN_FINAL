@@ -72,7 +72,7 @@ export function ContactsView() {
   return (
     <>
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-wrap items-center gap-2">
+        <div data-tour="contacts-filters" className="flex flex-wrap items-center gap-2">
           {/* Sort dropdown */}
           <div className="relative">
             <select
@@ -126,7 +126,7 @@ export function ContactsView() {
         </div>
 
         {/* View toggles — independent, both can be active */}
-        <div className="flex shrink-0 gap-4 text-sm">
+        <div data-tour="contacts-views" className="flex shrink-0 gap-4 text-sm">
           {VIEW_BUTTONS.map(({ id, label, tooltip }) => {
             const active = id === 'context' ? byEvent : pendingOnly
             const toggle = id === 'context'
@@ -162,7 +162,7 @@ export function ContactsView() {
         {groups.map(([group, list]) => (
           <section key={group || 'all'} aria-label={group || 'Contacts'}>
             {group && <h2 className="mb-2 text-sm font-medium text-muted-foreground">{group}</h2>}
-            <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            <ul data-tour="contacts-list" className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
               {list.map((c) => (
                 <li key={c.id}>
                   <button
@@ -177,6 +177,7 @@ export function ContactsView() {
                         {[c.headline, c.company].filter(Boolean).join(' · ')}
                       </span>
                       <span className="mt-2 flex flex-wrap gap-1">
+                        {c.demo && <Badge variant="secondary">Demo</Badge>}
                         {!c.why.confirmed && <Badge variant="outline">Confirm context</Badge>}
                         {c.pendingEnrichment && (
                           <Badge variant="secondary">

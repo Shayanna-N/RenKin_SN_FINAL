@@ -144,6 +144,8 @@ export interface Contact {
   remoteUserId?: string
   preferredChannel?: Priority
   avatar?: PublicAvatar
+  /** Example contact added during the guided tour. Never synced or exported. */
+  demo?: boolean
 }
 
 export interface PublishedCard {
@@ -274,6 +276,14 @@ export interface CompanionMemory {
   savedAt: string
 }
 
+export type OnboardingStatus = 'done' | 'offer' | 'active'
+
+export interface Onboarding {
+  /** `offer`: new account, tour not chosen yet. `active`: tour running. `done`: finished or skipped. */
+  status: OnboardingStatus
+  step: number
+}
+
 export interface AppState {
   /** One full card profile per networking mode. */
   profiles: Record<Mode, Profile>
@@ -287,6 +297,7 @@ export interface AppState {
   orphanNotes: OrphanNote[]
   suggestions: Suggestion[]
   memories: CompanionMemory[]
+  onboarding: Onboarding
 }
 
 export interface CapturedPerson {

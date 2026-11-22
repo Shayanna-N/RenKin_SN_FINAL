@@ -16,10 +16,14 @@ export function WelcomeSetup({
   open,
   onOpenChange,
   name,
+  tourOffered,
+  onStartTour,
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
   name: string
+  tourOffered: boolean
+  onStartTour: () => void
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -44,9 +48,20 @@ export function WelcomeSetup({
         </section>
 
         <DialogFooter>
-          <Button onClick={() => onOpenChange(false)} className="w-full sm:w-auto">
-            Done
-          </Button>
+          {tourOffered ? (
+            <>
+              <Button variant="outline" onClick={() => onOpenChange(false)} className="w-full sm:w-auto">
+                Skip the tour
+              </Button>
+              <Button onClick={onStartTour} className="w-full sm:w-auto">
+                Take a quick tour
+              </Button>
+            </>
+          ) : (
+            <Button onClick={() => onOpenChange(false)} className="w-full sm:w-auto">
+              Done
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

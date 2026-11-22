@@ -18,6 +18,7 @@ import { OfflineNotice } from '@/components/offline-notice'
 import { AutoSync } from '@/components/auto-sync'
 import { ModeSwitcher } from '@/components/mode-switcher'
 import { ContactUpdates } from '@/components/contact-updates'
+import { OnboardingTour } from '@/components/onboarding/tour'
 
 const NAV = [
   { href: '/', label: 'Today', icon: Home },
@@ -47,6 +48,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="min-h-dvh md:flex">
       <OfflineNotice />
       <AutoSync />
+      <OnboardingTour />
       <aside className="hidden md:flex md:w-60 md:shrink-0 md:flex-col md:border-r md:bg-sidebar">
         <div className="flex h-16 items-center gap-2 px-5">
           <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
@@ -84,7 +86,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </span>
             <span className="sr-only">Renkin</span>
           </div>
-          <ModeSwitcher className="[&_button]:px-2.5 [&_button]:py-1.5 [&_button]:text-xs [&_svg]:size-3.5 md:[&_button]:px-3.5 md:[&_button]:py-2 md:[&_button]:text-sm md:[&_svg]:size-4" />
+          <div data-tour="modes">
+            <ModeSwitcher className="[&_button]:px-2.5 [&_button]:py-1.5 [&_button]:text-xs [&_svg]:size-3.5 md:[&_button]:px-3.5 md:[&_button]:py-2 md:[&_button]:text-sm md:[&_svg]:size-4" />
+          </div>
           {/* Header ribbon */}
           <div className="flex shrink-0 items-center gap-1.5 md:gap-3">
             <ContactUpdates />
@@ -92,6 +96,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <button
               type="button"
               onClick={toggleOffline}
+              data-tour="offline"
               disabled={lostConnection}
               aria-pressed={!online}
               aria-label={
@@ -118,7 +123,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               aria-label="Account and sync"
               className="flex size-10 shrink-0 items-center justify-center rounded-2xl text-muted-foreground hover:bg-accent hover:text-foreground md:size-[6.75rem]"
             >
-              <UserCircle className="size-7 md:size-[3.75rem]" aria-hidden />
+              {state.settings.companion.photo ? (
+                // eslint-disable-next-line @next/next/no-img-element -- small inline data URL
+                <img
+                  src={state.settings.companion.photo}
+                  alt=""
+                  className="size-8 rounded-full border object-cover md:size-[4.5rem]"
+                />
+              ) : (
+                <UserCircle className="size-7 md:size-[3.75rem]" aria-hidden />
+              )}
             </Link>
           </div>
         </header>

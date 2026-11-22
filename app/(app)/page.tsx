@@ -97,7 +97,7 @@ export default function TodayPage() {
               <InsightsPanel />
             </div>
             <div className="order-3 min-w-0 lg:order-none">
-              <CaptureWidget />
+              <div data-tour="capture"><CaptureWidget /></div>
             </div>
           </div>
         </div>
@@ -126,7 +126,7 @@ export default function TodayPage() {
               <InsightsPanel />
             </div>
             <div className="order-3 min-w-0 lg:order-none">
-              <CaptureWidget />
+              <div data-tour="capture"><CaptureWidget /></div>
             </div>
           </div>
         </div>

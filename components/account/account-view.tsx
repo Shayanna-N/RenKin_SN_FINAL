@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Download, Loader2, LogOut, Trash2, UserPlus, Users } from 'lucide-react'
 import { toast } from 'sonner'
 import { connectByHandle, previewHandle, publishProfile } from '@/app/actions/sync'
@@ -43,9 +43,22 @@ function Section({ title, description, children }: { title: string; description?
 
 export function AccountView({ welcome = false }: { welcome?: boolean }) {
   const router = useRouter()
-  const { state, update, reset } = useStore()
+  const { state, update, reset, startFresh, setOnboarding } = useStore()
   const { data: account, mutate, session, sessionPending, isLoading } = useAccount()
   const [welcomeOpen, setWelcomeOpen] = useState(welcome)
+  const freshStarted = useRef(false)
+  const newUser = account?.user
+
+  // A brand-new account starts empty: replace the demo data once, before anything can sync.
+  useEffect(() => {
+    if (!welcome || !newUser || freshStarted.current) return
+    freshStarted.current = true
+    startFresh({ name: newUser.name, email: newUser.email })
+  }, [welcome, newUser, startFresh])
+
+  useEffect(() => {
+    if (welcome) router.replace('/account')
+  }, [welcome, router])
   const [clearOpen, setClearOpen] = useState(false)
   const [handle, setHandle] = useState('')
   const [connectHandle, setConnectHandle] = useState('')
@@ -136,7 +149,7 @@ export function AccountView({ welcome = false }: { welcome?: boolean }) {
 
   function downloadContacts() {
     if (!state.contacts.length) return toast.error('You have no contacts to download yet')
-    downloadTextFile('renkin-contacts.vcf', buildContactsVCard(state.contacts), 'text/vcard')
+    downloadTextFile('renkin-contacts.vcf', buildContactsVCard(state.contacts.filter((c) => !c.demo)), 'text/vcard')
     toast.success(`Downloaded ${state.contacts.length} contacts`)
   }
 
@@ -272,7 +285,20 @@ export function AccountView({ welcome = false }: { welcome?: boolean }) {
         </Button>
       </div>
 
-      <WelcomeSetup open={welcomeOpen} onOpenChange={setWelcomeOpen} name={account.user.name} />
+      <WelcomeSetup
+        open={welcomeOpen}
+        onOpenChange={(open) => {
+          setWelcomeOpen(open)
+          if (!open && state.onboarding.status === 'offer') setOnboarding({ status: 'done' })
+        }}
+        name={account.user.name}
+        tourOffered={state.onboarding.status === 'offer'}
+        onStartTour={() => {
+          setWelcomeOpen(false)
+          setOnboarding({ status: 'active', step: 0 })
+          router.push('/')
+        }}
+      />
 
       <Dialog open={clearOpen} onOpenChange={setClearOpen}>
         <DialogContent className="sm:max-w-sm">

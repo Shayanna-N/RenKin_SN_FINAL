@@ -20,6 +20,7 @@ export default function CardPage() {
       <div className="grid items-start gap-6 lg:grid-cols-[1fr_26rem]">
         <div className="flex min-w-0 flex-col gap-6 lg:order-2">
           <div className="flex flex-col gap-3">
+            <div data-tour="card-preview" className="mx-auto w-full max-w-md">
             <DigitalCard
               profile={activeProfile(state)}
               mode={state.settings.mode}
@@ -29,20 +30,23 @@ export default function CardPage() {
               customQrColor={state.settings.customQrColor}
               customCardFields={state.settings.customCardFields}
               customModeName={state.settings.customModeName}
-              className="mx-auto w-full max-w-md"
+              className="w-full"
             />
+            </div>
             <div className="flex justify-center">
               <ModeSwitcher />
             </div>
           </div>
-          <Appearance />
+          <div data-tour="appearance">
+            <Appearance />
+          </div>
         </div>
 
         <div className="flex min-w-0 flex-col gap-6 lg:order-1">
           {/* Tabbed widget: Card details (per mode) + Channels */}
           <div className="overflow-hidden rounded-2xl border bg-card">
             <Tabs defaultValue="card-details">
-              <div className="flex justify-center border-b px-5 pt-3">
+              <div data-tour="card-details" className="flex justify-center border-b px-5 pt-3">
                 <TabsList className="w-full sm:w-auto">
                     <TabsTrigger value="card-details" className="flex-1 gap-1.5 sm:flex-none">
                       <CreditCard className="size-4" aria-hidden />

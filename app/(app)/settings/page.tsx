@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowDown, ArrowUp, Activity, Check, RotateCcw } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { ArrowDown, ArrowUp, Activity, Check, PlayCircle, RotateCcw } from 'lucide-react'
 import { useCallback, useRef, useState } from 'react'
 import { PageHeader } from '@/components/page-header'
 import { Button } from '@/components/ui/button'
@@ -42,11 +43,11 @@ function SaveButton({ saved, onClick }: { saved: boolean; onClick: () => void })
   )
 }
 
-function Section({ id, title, desc, children, onSave }: { id: string; title: string; desc: string; children: React.ReactNode; onSave?: () => void; savedState?: boolean }) {
+function Section({ id, title, desc, children, onSave, tour }: { tour?: string; id: string; title: string; desc: string; children: React.ReactNode; onSave?: () => void; savedState?: boolean }) {
   const { saved, flash } = useSaved()
   function handleSave() { flash(); onSave?.() }
   return (
-    <section aria-labelledby={id} className="rounded-2xl border bg-card p-5 md:p-6">
+    <section aria-labelledby={id} data-tour={tour} className="rounded-2xl border bg-card p-5 md:p-6">
       <h2 id={id} className="font-semibold">
         {title}
       </h2>
@@ -70,7 +71,8 @@ function Row({ label, hint, checked, onChange }: { label: string; hint?: string;
 }
 
 export default function SettingsPage() {
-  const { state, update, log, reset } = useStore()
+  const { state, update, log, reset, setOnboarding } = useStore()
+  const router = useRouter()
   const s = state.settings
   const set = (patch: Partial<Settings>) => update((st) => ({ ...st, settings: { ...st.settings, ...patch } }))
 
@@ -86,8 +88,28 @@ export default function SettingsPage() {
   return (
     <>
       <PageHeader title="Settings" description="The Steward agent enforces everything here." />
+      <section
+        aria-labelledby="tour-h"
+        data-tour="settings-tour"
+        className="mb-6 flex flex-col gap-3 rounded-2xl border bg-card p-5 sm:flex-row sm:items-center sm:justify-between md:p-6"
+      >
+        <div>
+          <h2 id="tour-h" className="font-semibold">Guided tour</h2>
+          <p className="text-sm text-muted-foreground">A quick walkthrough of modes, your card, contacts and settings.</p>
+        </div>
+        <Button
+          variant="outline"
+          onClick={() => {
+            setOnboarding({ status: 'active', step: 0 })
+            router.push('/')
+          }}
+        >
+          <PlayCircle className="size-4" aria-hidden />
+          Replay the tour
+        </Button>
+      </section>
       <div className="grid gap-6 lg:grid-cols-2">
-        <Section id="mode-h" title="Networking mode" desc="How agents behave and which fields your card shares.">
+        <Section tour="settings-mode" id="mode-h" title="Networking mode" desc="How agents behave and which fields your card shares.">
           <Row
             label="Go offline automatically"
             hint="Switch to offline mode when your connection drops. Off means you tap Online in the header."

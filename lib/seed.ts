@@ -275,6 +275,7 @@ export function createSeedState(): AppState {
     orphanNotes: [],
     suggestions: [],
     memories: [],
+    onboarding: { status: 'done', step: 0 },
     log: [
       {
         id: 'g1',
@@ -295,5 +296,37 @@ export function createSeedState(): AppState {
         at: at(-1.2),
       },
     ],
+  }
+}
+
+/** A brand-new account starts with none of the demo data: just their name and email. */
+export function createEmptyState(user: { name: string; email: string }): AppState {
+  const seed = createSeedState()
+  const profile = (): Profile => ({
+    name: user.name,
+    headline: '',
+    company: '',
+    email: user.email,
+    phone: '',
+    bio: '',
+    qrUrl: '',
+    links: [],
+  })
+  return {
+    ...seed,
+    profiles: { everyday: profile(), event: profile(), custom: profile() },
+    settings: {
+      ...seed.settings,
+      mode: 'everyday',
+      goals: [],
+      learnedPreferences: [],
+      companion: { ...seed.settings.companion, photo: null },
+    },
+    contacts: [],
+    events: [],
+    todos: [],
+    jobs: [],
+    log: [],
+    onboarding: { status: 'offer', step: 0 },
   }
 }
