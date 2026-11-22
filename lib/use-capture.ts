@@ -15,7 +15,7 @@ interface CaptureInput {
 
 /**
  * Runs the capture pipeline: Agent 1 sets the policy, Agent 3 (online) or
- * Agent 7 (offline) extracts Who/What, and Agent 2 attaches the Why.
+ * the Companion (offline) extracts Who/What, and Agent 2 attaches the Why.
  */
 export function useCapture() {
   const { state, addContact, log } = useStore()
@@ -54,7 +54,7 @@ export function useCapture() {
           }
           person = offlineParse(input.text)
           pending = true
-          log(7, `Parsed "${person.name}" on-device and queued for enrichment.`)
+          log(6, `Parsed "${person.name}" on-device and queued for enrichment.`)
         } else {
           try {
             person = await scribe({ text: input.text, image: input.image })
@@ -66,7 +66,7 @@ export function useCapture() {
             }
             person = offlineParse(input.text)
             pending = true
-            log(7, `Scribe unavailable — saved "${person.name}" locally.`)
+            log(6, `Scribe unavailable — saved "${person.name}" locally.`)
           }
         }
       } else if (useAgent7) {

@@ -31,6 +31,8 @@ export function createSeedState(): AppState {
     settings: {
       mode: 'event' as const,
       autoMode: true,
+    autoOffline: true,
+    manualOffline: false,
       theme: 'light',
       brand: '#0f766e',
       cardStyle: 'gradient',

@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { ImagePlus, RotateCcw, Star, Trash2 } from 'lucide-react'
+import { ImagePlus, RotateCcw, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useStore } from '@/lib/store'
 import { cn } from '@/lib/utils'
@@ -208,46 +208,6 @@ export function CompanionCustomizer({ embedded }: { embedded?: boolean }) {
           to that mode.
         </p>
       </fieldset>
-
-      <section aria-labelledby="companion-memories-heading" className="mt-6">
-        <h3 id="companion-memories-heading" className="flex items-center gap-2 text-sm font-medium">
-          <Star className="size-4 text-primary" aria-hidden /> {c.name.trim() || 'Companion'}&apos;s memories
-        </h3>
-        {state.memories.length === 0 ? (
-          <p className="mt-1 text-xs text-muted-foreground">
-            Star a suggestion in your companion&apos;s Suggestions tab to keep it here.
-          </p>
-        ) : (
-          <ul className="mt-2 flex flex-col gap-1.5">
-            {state.memories.map((m) => (
-              <li key={m.id} className="flex items-start gap-2 rounded-lg bg-muted px-3 py-2 text-sm">
-                <div className="min-w-0 flex-1">
-                  <p>{m.text}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {m.kind === 'starter' ? 'Conversation starter' : 'Action'} · {m.reason}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() =>
-                    update((s) => ({
-                      ...s,
-                      memories: s.memories.filter((x) => x.id !== m.id),
-                      suggestions: s.suggestions.map((x) =>
-                        x.text.toLowerCase() === m.text.toLowerCase() ? { ...x, favorite: false } : x,
-                      ),
-                    }))
-                  }
-                  className="shrink-0 rounded-md p-1 text-muted-foreground hover:bg-background hover:text-foreground"
-                  aria-label={`Forget: ${m.text}`}
-                >
-                  <Trash2 className="size-4" aria-hidden />
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
 
       <div className="mt-6 flex items-center justify-between gap-4 rounded-xl bg-muted p-3">
         <div>

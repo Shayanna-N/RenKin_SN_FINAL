@@ -89,6 +89,15 @@ export default function SettingsPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         <Section id="mode-h" title="Networking mode" desc="How agents behave and which fields your card shares.">
           <Row
+            label="Go offline automatically"
+            hint="Switch to offline mode when your connection drops. Off means you tap Online in the header."
+            checked={s.autoOffline}
+            onChange={(v) => {
+              set({ autoOffline: v })
+              log(6, `Automatic offline mode ${v ? 'enabled' : 'disabled'}.`)
+            }}
+          />
+          <Row
             label="Switch modes automatically"
             hint="Based on location, calendar and tickets"
             checked={s.autoMode}

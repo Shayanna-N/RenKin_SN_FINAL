@@ -207,6 +207,10 @@ export interface ModeRule {
 export interface Settings {
   mode: Mode
   autoMode: boolean
+  /** Switch to offline mode on its own when the connection drops. */
+  autoOffline: boolean
+  /** The user tapped "Online" to take the app offline by hand. */
+  manualOffline: boolean
   theme: 'light' | 'dark'
   brand: string
   cardStyle: CardStyle

@@ -35,30 +35,30 @@ export default function WatchPage() {
 
   async function connectWatch() {
     setPairPhase('scanning')
-    log(7, 'Initiating Bluetooth pairing with smartwatch…')
+    log(6, 'Initiating Bluetooth pairing with smartwatch…')
     // Attempt Web Bluetooth if available; otherwise simulate
     if (typeof navigator !== 'undefined' && 'bluetooth' in navigator) {
       try {
         // @ts-expect-error Web Bluetooth API not yet in TS DOM lib
         await navigator.bluetooth.requestDevice({ acceptAllDevices: true })
         setPairPhase('connected')
-        log(7, 'Smartwatch paired via Bluetooth.')
+        log(6, 'Smartwatch paired via Bluetooth.')
       } catch {
         setPairPhase('failed')
-        log(7, 'Bluetooth pairing cancelled or failed.')
+        log(6, 'Bluetooth pairing cancelled or failed.')
       }
     } else {
       // Simulate pairing flow in browsers without Web Bluetooth
       await new Promise((r) => setTimeout(r, 2200))
       setPairPhase('connected')
-      log(7, 'Smartwatch paired (simulated).')
+      log(6, 'Smartwatch paired (simulated).')
     }
   }
 
   function save(card: Omit<SavedCard, 'id' | 'savedAt' | 'savedOn'>) {
     const saved: SavedCard = { ...card, id: crypto.randomUUID(), savedAt: new Date().toISOString(), savedOn: 'watch' }
     update((s) => ({ ...s, watchSaved: [saved, ...s.watchSaved] }))
-    log(7, `Saved ${card.name}'s card on watch${online ? '' : ' (offline — stored locally)'}.`)
+    log(6, `Saved ${card.name}'s card on watch${online ? '' : ' (offline — stored locally)'}.`)
     toast.success(`Saved ${card.name}`)
   }
 
@@ -129,7 +129,7 @@ export default function WatchPage() {
         ...s.contacts,
       ],
     }))
-    log(7, `Synced ${pending.length} watch card${pending.length === 1 ? '' : 's'} to phone contacts.`)
+    log(6, `Synced ${pending.length} watch card${pending.length === 1 ? '' : 's'} to phone contacts.`)
     toast.success('Synced to phone')
   }
 

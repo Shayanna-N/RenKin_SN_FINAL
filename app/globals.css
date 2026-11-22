@@ -154,6 +154,42 @@
   --sidebar-border: color-mix(in oklch, var(--brand) 25%, oklch(1 0 0 / 10%));
 }
 
+/* Offline mode: a diagonal ombre replaces the flat background. */
+.offline body {
+  background-image: linear-gradient(
+    135deg,
+    color-mix(in oklch, var(--brand) 30%, var(--background)) 0%,
+    color-mix(in oklch, var(--brand) 14%, var(--background)) 50%,
+    var(--background) 100%
+  );
+  background-attachment: fixed;
+}
+.offline.dark body {
+  background-image: linear-gradient(
+    135deg,
+    color-mix(in oklch, black 72%, var(--background)) 0%,
+    var(--background) 55%,
+    color-mix(in oklch, var(--brand) 16%, black) 100%
+  );
+}
+
+@keyframes status-bar-fade {
+  0% { opacity: 0; transform: translateY(-0.5rem); }
+  10% { opacity: 1; transform: translateY(0); }
+  75% { opacity: 1; }
+  100% { opacity: 0; }
+}
+.status-bar-fade {
+  animation: status-bar-fade 4s ease forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .status-bar-fade { animation-name: status-bar-fade-reduced; }
+  @keyframes status-bar-fade-reduced {
+    0%, 75% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+}
+
 /* Digital card textures */
 .card-tex-solid {
   background: var(--brand);

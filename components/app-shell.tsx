@@ -12,8 +12,9 @@ import {
   WifiOff,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useOnline, useStore } from '@/lib/store'
+import { useBrowserOnline, useOnline, useStore } from '@/lib/store'
 import { activeProfile } from '@/lib/profile'
+import { OfflineNotice } from '@/components/offline-notice'
 import { ModeSwitcher } from '@/components/mode-switcher'
 import { ContactUpdates } from '@/components/contact-updates'
 
@@ -29,11 +30,21 @@ const MOBILE_NAV = NAV.filter((n) => n.href !== '/agents' && n.href !== '/accoun
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const online = useOnline()
-  const { state } = useStore()
+  const browserOnline = useBrowserOnline()
+  const { state, update, log } = useStore()
+  const { manualOffline, autoOffline } = state.settings
+  const lostConnection = !browserOnline && autoOffline && !manualOffline
+
+  function toggleOffline() {
+    const next = !manualOffline
+    update((s) => ({ ...s, settings: { ...s.settings, manualOffline: next } }))
+    log(6, next ? 'Offline mode on. Capturing and storing on this device.' : 'Back online. Queued cards are ready to enrich.')
+  }
   const isActive = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href))
 
   return (
     <div className="min-h-dvh md:flex">
+      <OfflineNotice />
       <aside className="hidden md:flex md:w-60 md:shrink-0 md:flex-col md:border-r md:bg-sidebar">
         <div className="flex h-16 items-center gap-2 px-5">
           <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
@@ -76,17 +87,29 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-3">
             <ContactUpdates />
             {/* Online / Offline pill */}
-            <div
+            <button
+              type="button"
+              onClick={toggleOffline}
+              disabled={lostConnection}
+              aria-pressed={!online}
+              aria-label={
+                lostConnection
+                  ? 'Offline: no connection'
+                  : online
+                    ? 'Online. Tap to go offline'
+                    : 'Offline. Tap to go back online'
+              }
+              title={lostConnection ? 'No connection. Reconnects automatically.' : online ? 'Tap to go offline' : 'Tap to go back online'}
               className={cn(
-                'flex items-center gap-3 rounded-full border px-6 py-2.5 text-base',
-                online ? 'text-muted-foreground' : 'border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-400',
+                'flex items-center gap-3 rounded-full border px-6 py-2.5 text-base transition-colors disabled:cursor-not-allowed',
+                online
+                  ? 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                  : 'border-amber-500/40 bg-amber-500/10 text-amber-700 hover:bg-amber-500/20 dark:text-amber-400',
               )}
-              role="status"
             >
               {online ? <Wifi className="size-[1.75rem]" aria-hidden /> : <WifiOff className="size-[1.75rem]" aria-hidden />}
               <span className="hidden sm:inline">{online ? 'Online' : 'Offline · saving locally'}</span>
-              <span className="sr-only sm:hidden">{online ? 'Online' : 'Offline, saving locally'}</span>
-            </div>
+            </button>
             {/* Account & sync button — 3× original (36px → 108px) */}
             <Link
               href="/account"

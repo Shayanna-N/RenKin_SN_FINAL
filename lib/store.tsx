@@ -167,7 +167,8 @@ function subscribeOnline(cb: () => void) {
   }
 }
 
-export function useOnline() {
+/** The device's real network state, ignoring the app's offline setting. */
+export function useBrowserOnline() {
   return useSyncExternalStore(
     subscribeOnline,
     () => navigator.onLine,
@@ -175,10 +176,20 @@ export function useOnline() {
   )
 }
 
+/** Whether the app is working online: false when taken offline by hand or (if enabled) when the connection drops. */
+export function useOnline() {
+  const browserOnline = useBrowserOnline()
+  const ctx = useContext(StoreContext)
+  if (!ctx) return browserOnline
+  const { manualOffline, autoOffline } = ctx.state.settings
+  return !manualOffline && (browserOnline || !autoOffline)
+}
+
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<AppState>(createSeedState)
   const [hydrated, setHydrated] = useState(false)
-  const online = useOnline()
+  const browserOnline = useBrowserOnline()
+  const offlineMode = state.settings.manualOffline || (state.settings.autoOffline && !browserOnline)
 
   useEffect(() => {
     try {
@@ -202,7 +213,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     root.classList.toggle('tinted', state.settings.matchUiToCard)
     root.style.setProperty('--brand', state.settings.brand)
     root.style.setProperty('--brand-foreground', readableOn(state.settings.brand))
-  }, [state.settings.theme, state.settings.brand, state.settings.matchUiToCard])
+    root.classList.toggle('offline', offlineMode)
+  }, [state.settings.theme, state.settings.brand, state.settings.matchUiToCard, offlineMode])
 
   const update = useCallback((fn: (s: AppState) => AppState) => setState(fn), [])
 

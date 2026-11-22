@@ -51,14 +51,7 @@ export const AGENTS = [
     name: 'Companion',
     role: 'Your buddy',
     description:
-      'Switches modes and broadcasts your status to other apps.',
-  },
-  {
-    id: 7,
-    name: 'Offline',
-    role: 'Careful recorder',
-    description:
-      'Takes over without a connection: parses cards on-device, stores everything locally and queues enrichment.',
+      'Switches modes and broadcasts your status to other apps. Without a connection it parses cards on-device, stores everything locally and queues enrichment.',
   },
 ] as const
 
@@ -119,7 +112,7 @@ export function contextWhy(state: AppState, now = Date.now()): WhyEntry {
   }
 }
 
-/** Agent 7: on-device parsing for offline or low-tech capture. */
+/** Companion (offline): on-device parsing for offline or low-tech capture. */
 export function offlineParse(text: string): CapturedPerson {
   const email = text.match(/[\w.+-]+@[\w-]+\.[\w.-]+/)?.[0]
   const phone = text.match(/\+?\d[\d\s().-]{7,}\d/)?.[0]?.trim()
