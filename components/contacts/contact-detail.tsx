@@ -554,6 +554,7 @@ function ManualNoteInput({ onSave }: { onSave: (text: string) => void }) {
         value={text}
         onChange={(e) => setText(e.target.value)}
         placeholder="Add a new note…"
+        className="rounded-[11px] pb-28"
       />
       <Button size="sm" onClick={submit} disabled={!text.trim()}>
         Save note
