@@ -45,6 +45,9 @@ export const auth = betterAuth({
           defaultCookieAttributes: {
             sameSite: 'none' as const,
             secure: true,
+            // Partitioned (CHIPS) keeps the cookie usable when the browser
+            // blocks third-party cookies inside the preview iframe.
+            partitioned: true,
           },
         },
       }
