@@ -65,6 +65,10 @@ Notes: ${contact.notes || 'none'}.`,
     return Response.json({ followUp: output })
   } catch (error) {
     console.error('[watsonx] doer agent failed', error)
-    return Response.json({ error: 'Doer agent failed.' }, { status: 502 })
+    const message =
+      error instanceof Error && error.message.startsWith('Missing watsonx.ai environment variables')
+        ? error.message
+        : 'Doer agent failed.'
+    return Response.json({ error: message }, { status: 502 })
   }
 }
