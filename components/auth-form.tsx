@@ -27,7 +27,16 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
       : await authClient.signIn.email({ email, password })
     setPending(false)
     if (error) {
-      setError(isSignUp ? 'Could not create that account. Try a different email.' : 'Email or password is incorrect.')
+      const code = error.code ?? ''
+  if (code === 'INVALID_ORIGIN') {
+  setError('This page is not an allowed origin for sign-in. Reload and try again.')
+  } else if (code.includes('ALREADY_EXISTS')) {
+  setError('An account with that email already exists. Try signing in instead.')
+  } else if (code.includes('PASSWORD')) {
+  setError(error.message ?? 'Choose a different password.')
+  } else {
+  setError(isSignUp ? 'Could not create that account. Please try again in a moment.' : 'Email or password is incorrect.')
+  }
       return
     }
     router.push('/account')
