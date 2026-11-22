@@ -15,9 +15,9 @@ import type { Contact, Mode, SavedCard } from '@/lib/types'
 const MODES = Object.keys(MODE_META) as Mode[]
 
 const DEMO_TAPS: Omit<SavedCard, 'id' | 'savedAt' | 'savedOn'>[] = [
-  { name: 'Ines Okafor', headline: 'Product Lead', company: 'Lumen Labs', email: 'ines@lumenlabs.io' },
-  { name: 'Dev Ramaswamy', headline: 'Recruiter', company: 'Northwind', phone: '+1 415 555 0182' },
-  { name: 'Hana Sato', headline: 'Design Engineer', company: 'Fieldwork', email: 'hana@fieldwork.dev' },
+  { name: 'Ines Okafor', headline: 'University Recruiter', company: 'Lumen Labs', email: 'ines@lumenlabs.io' },
+  { name: 'Dev Ramaswamy', headline: 'Engineering Intern Recruiter', company: 'Northwind', phone: '+1 415 555 0182' },
+  { name: 'Hana Sato', headline: 'Design Engineer (alum)', company: 'Fieldwork', email: 'hana@fieldwork.dev' },
 ]
 
 type Screen = 'home' | 'recent' | 'saved'

@@ -1,4 +1,4 @@
-import type { AppState, Profile } from './types'
+import type { AppState, Contact, Profile } from './types'
 import { createDemoContact } from './onboarding'
 
 const HOUR = 60 * 60 * 1000
@@ -10,19 +10,115 @@ function at(offsetHours: number) {
 function seedProfile(): Profile {
   return {
     name: 'Jordan Rivera',
-    headline: 'Product Designer',
-    company: 'Northwind Labs',
-    email: 'jordan@northwind.dev',
+    headline: 'Information Science Student',
+    company: 'State University, Class of 2027',
+    email: 'jordan.rivera@stateu.edu',
     phone: '+1 (415) 555-0142',
-    bio: 'Designing calm tools for busy people. Currently exploring design lead roles.',
+    bio: 'Junior studying information science and design. Looking for a summer 2027 UX or product design internship.',
     qrUrl: '',
     links: [
       { id: 'l1', kind: 'linkedin', label: 'LinkedIn', url: 'https://linkedin.com/in/jordanrivera' },
       { id: 'l2', kind: 'portfolio', label: 'Portfolio', url: 'https://jordanrivera.design' },
-      { id: 'l3', kind: 'instagram', label: 'Instagram', url: 'https://instagram.com/jordan.makes' },
+      { id: 'l3', kind: 'github', label: 'GitHub', url: 'https://github.com/jordanrivera' },
       { id: 'l4', kind: 'calendly', label: 'Book a chat', url: 'https://cal.com/jordanrivera' },
     ],
   }
+}
+
+const FAIR = 'Spring Career & Internship Fair 2026'
+const FAIR_EVIDENCE = ['Location matched Student Union Ballroom', 'Ticket confirmed via Eventbrite']
+const HACK = 'HackState 2026'
+const HACK_EVIDENCE = ['Location matched Engineering Hall']
+const DESIGN_CLUB = 'Design Club Portfolio Night'
+const DESIGN_CLUB_EVIDENCE = ['Location matched Arts Building', 'Google Calendar invite']
+
+interface ContactInput {
+  id: string
+  name: string
+  headline: string
+  company: string
+  email?: string
+  phone?: string
+  links?: Contact['links']
+  source: Contact['source']
+  hoursAgo: number
+  mode: Contact['mode']
+  what: string[]
+  context: string
+  evidence: string[]
+  confidence: number
+  confirmed?: boolean
+  alternatives?: string[]
+  note?: string
+  tags: string[]
+  followedUp?: boolean
+}
+
+function contact(c: ContactInput): Contact {
+  return {
+    id: c.id,
+    name: c.name,
+    headline: c.headline,
+    company: c.company,
+    email: c.email,
+    phone: c.phone,
+    links: c.links ?? [],
+    source: c.source,
+    capturedAt: at(-c.hoursAgo),
+    mode: c.mode,
+    what: c.what,
+    why: {
+      context: c.context,
+      evidence: c.evidence,
+      confidence: c.confidence,
+      confirmed: c.confirmed ?? true,
+      alternatives: c.alternatives ?? [],
+    },
+    noteEntries: c.note
+      ? [{ id: `ne-${c.id}`, at: at(-c.hoursAgo), location: c.context, body: c.note, photos: [] }]
+      : [],
+    tags: c.tags,
+    followedUp: c.followedUp ?? false,
+    pendingEnrichment: false,
+  }
+}
+
+function seedContacts(): Contact[] {
+  return [
+    // Career fair: recruiters and hiring managers
+    contact({ id: 'c1', name: 'Priya Natarajan', headline: 'University Recruiter', company: 'Lumen Health', email: 'priya@lumenhealth.com', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/priyan' }], source: 'nfc', hoursAgo: 1.2, mode: 'event', what: ['Hiring six UX and product design interns for summer 2027', 'Wants a portfolio link with two case studies', 'Suggested applying before Friday'], context: FAIR, evidence: FAIR_EVIDENCE, confidence: 0.94, tags: ['recruiter', 'internship', 'ux'] }),
+    contact({ id: 'c2', name: 'Marcus Chen', headline: 'Founder', company: 'Fieldnote', email: 'marcus@fieldnote.app', phone: '+1 (628) 555-0199', links: [{ kind: 'x', url: 'https://x.com/marcuschen' }], source: 'qr', hoursAgo: 0.6, mode: 'event', what: ['Early-stage startup building a note-taking app for field researchers', 'Looking for a part-time design intern'], context: FAIR, evidence: ['Location matched Student Union Ballroom'], confidence: 0.71, confirmed: false, alternatives: ['Hallway chat (unrelated to the fair)', 'Mutual friend intro'], tags: ['startup', 'founder', 'part-time'] }),
+    contact({ id: 'c3', name: 'Sam Okafor', headline: 'Software Engineer', company: 'Independent', phone: '+1 (510) 555-0117', links: [{ kind: 'github', url: 'https://github.com/samokafor' }], source: 'manual', hoursAgo: 26, mode: 'everyday', what: ['Senior in computer science, into climbing and open-source hardware', 'Offered to share his internship offer-letter checklist'], context: 'Study group at Main Library', evidence: ['Google Maps visit'], confidence: 0.82, note: 'Friend of Alex. Interviewing at three startups.', tags: ['peer', 'study-group'], followedUp: true }),
+    contact({ id: 'c4', name: 'Aisha Okonkwo', headline: 'Product Design Manager', company: 'Strada', email: 'aisha@strada.io', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/aishaokonkwo' }], source: 'nfc', hoursAgo: 2, mode: 'event', what: ['Runs the summer design internship program', 'Wants to see how you explain your process, not just final screens'], context: FAIR, evidence: ['Location matched Student Union Ballroom'], confidence: 0.91, tags: ['hiring-manager', 'internship', 'design'] }),
+    contact({ id: 'c5', name: 'Devon Mercer', headline: 'UX Research Intern (alum)', company: 'Halo Labs', email: 'devon@halolabs.com', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/devonmercer' }], source: 'qr', hoursAgo: 1.5, mode: 'event', what: ['Interned there last summer and offered to refer you', 'Shared how his team runs intern project demos'], context: FAIR, evidence: ['Ticket confirmed via Eventbrite'], confidence: 0.88, tags: ['alumni', 'referral', 'research'], followedUp: true }),
+    contact({ id: 'c6', name: 'Tariq Bashir', headline: 'CTO', company: 'Inkline', email: 'tariq@inkline.dev', links: [{ kind: 'github', url: 'https://github.com/tariqbashir' }], source: 'nfc', hoursAgo: 3, mode: 'event', what: ['Building design tooling for engineers', 'Takes two interns each summer and pays them'], context: FAIR, evidence: ['Location matched Student Union Ballroom'], confidence: 0.85, note: 'Asked me to send a link to my GitHub and portfolio.', tags: ['startup', 'internship', 'engineering'] }),
+    contact({ id: 'c7', name: 'Mei-Lin Tsai', headline: 'Brand Strategist', company: 'Meridian Studio', email: 'meilin@meridianstudio.com', links: [{ kind: 'website', url: 'https://meridianstudio.com' }], source: 'manual', hoursAgo: 8, mode: 'everyday', what: ['Offered to review your portfolio over coffee', 'Hires freelance students for branding projects'], context: 'Coffee at Brew Lab', evidence: ['Google Maps visit'], confidence: 0.79, note: 'Met through Nadia from Design Club.', tags: ['mentor', 'portfolio', 'creative'], followedUp: true }),
+    contact({ id: 'c8', name: 'Jonah Reyes', headline: 'Startup Founder', company: 'Plume', email: 'jonah@plume.app', phone: '+1 (646) 555-0188', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/jonahreyes' }], source: 'qr', hoursAgo: 15, mode: 'everyday', what: ['Consumer social app for niche hobbies', 'Looking for a growth intern for the fall'], context: 'Founders Meetup on campus', evidence: ['Google Calendar invite'], confidence: 0.93, tags: ['founder', 'internship', 'growth'] }),
+    contact({ id: 'c9', name: 'Cleo Fontaine', headline: 'Content Strategist', company: 'Openfield', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/cleofontaine' }], source: 'manual', hoursAgo: 20, mode: 'everyday', what: ['Hires student writers for the company blog', 'Likes case studies written in plain language'], context: 'Student Media mixer', evidence: ['Location matched Student Union'], confidence: 0.76, confirmed: false, alternatives: ['Mutual acquaintance intro'], tags: ['content', 'writing'] }),
+    contact({ id: 'c10', name: 'Ravi Subramanian', headline: 'Data Analyst (alum)', company: 'Nexus Analytics', email: 'ravi@nexusanalytics.com', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/ravisub' }, { kind: 'github', url: 'https://github.com/ravisub' }], source: 'nfc', hoursAgo: 5, mode: 'event', what: ['Class of 2024, now hiring data interns', 'Happy to do a mock technical interview'], context: FAIR, evidence: ['Location matched Student Union Ballroom'], confidence: 0.82, tags: ['alumni', 'data', 'mock-interview'], followedUp: true }),
+    contact({ id: 'c11', name: 'Zoe Harrington', headline: 'Product Designer', company: 'Bloom', email: 'zoe@bloom.design', links: [{ kind: 'website', url: 'https://zoeharrington.com' }], source: 'qr', hoursAgo: 4, mode: 'event', what: ['Accessibility-first design systems', 'Mentors student designers on the side'], context: FAIR, evidence: ['Ticket confirmed via Eventbrite'], confidence: 0.9, tags: ['mentor', 'design-systems', 'accessibility'] }),
+    contact({ id: 'c12', name: 'Omar El-Amin', headline: 'Engineering Manager', company: 'Cascade', email: 'omar@cascade.com', phone: '+1 (213) 555-0176', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/omarelamin' }], source: 'nfc', hoursAgo: 7, mode: 'event', what: ['Manages a team of 12 front-end engineers', 'Runs a 10-week paid internship with a conversion path'], context: FAIR, evidence: ['Location matched Student Union Ballroom'], confidence: 0.84, note: 'Said strong intern projects turn into full-time offers.', tags: ['internship', 'engineering', 'full-time'], followedUp: true }),
+
+    // HackState hackathon
+    contact({ id: 'c13', name: 'Ingrid Lund', headline: 'Hackathon Judge', company: 'Greenline Capital', email: 'ingrid@greenlinecap.com', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/ingridlund' }], source: 'qr', hoursAgo: 10, mode: 'event', what: ['Judged our demo and liked the onboarding flow', 'Introduces student teams to portfolio companies'], context: HACK, evidence: [...HACK_EVIDENCE, 'Google Calendar invite'], confidence: 0.96, tags: ['judge', 'investor', 'introductions'] }),
+    contact({ id: 'c14', name: 'Kwame Asante', headline: 'Motion Designer', company: 'Freelance', email: 'kwame@kwameasante.com', links: [{ kind: 'website', url: 'https://kwameasante.com' }], source: 'manual', hoursAgo: 14, mode: 'event', what: ['Teammate who built our product reveal animation', 'Open to working together on a portfolio piece'], context: HACK, evidence: HACK_EVIDENCE, confidence: 0.87, note: 'Incredible reel. Ask him to share his Figma file.', tags: ['teammate', 'motion', 'portfolio'], followedUp: true }),
+    contact({ id: 'c15', name: 'Natasha Volkov', headline: 'Head of Growth', company: 'Beacon', email: 'natasha@beacon.co', phone: '+1 (929) 555-0133', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/natashavolkov' }], source: 'nfc', hoursAgo: 11, mode: 'event', what: ['Sponsor booth at the hackathon', 'Hiring a marketing and growth intern'], context: HACK, evidence: HACK_EVIDENCE, confidence: 0.89, tags: ['sponsor', 'internship', 'growth'] }),
+    contact({ id: 'c16', name: 'Felix Wagner', headline: 'Industrial Designer', company: 'Aura Hardware', email: 'felix@aurahardware.com', links: [{ kind: 'website', url: 'https://aurahardware.com' }], source: 'qr', hoursAgo: 18, mode: 'event', what: ['Mentor at the hardware track', 'Looking for interns who can prototype quickly'], context: HACK, evidence: HACK_EVIDENCE, confidence: 0.81, note: 'Brought a working prototype to the mentor table.', tags: ['mentor', 'hardware', 'internship'] }),
+    contact({ id: 'c17', name: 'Amara Diallo', headline: 'People Ops Lead', company: 'Verve', email: 'amara@verve.com', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/amaradiallo' }], source: 'manual', hoursAgo: 22, mode: 'everyday', what: ['Explained how to ask for a referral without feeling awkward', 'Interested in HR tech tools'], context: 'Morning run club', evidence: ['Location matched Campus Loop'], confidence: 0.7, confirmed: false, alternatives: ['Mutual friend in run club'], tags: ['advice', 'people-ops'] }),
+    contact({ id: 'c18', name: 'Leo Castillo', headline: 'iOS Engineer', company: 'Tonal', email: 'leo@tonal.com', phone: '+1 (415) 555-0109', links: [{ kind: 'github', url: 'https://github.com/leocastillo' }, { kind: 'linkedin', url: 'https://linkedin.com/in/leocastillo' }], source: 'nfc', hoursAgo: 6, mode: 'event', what: ['Mentored our team on SwiftUI performance', 'Offered to look over your resume'], context: HACK, evidence: HACK_EVIDENCE, confidence: 0.86, tags: ['mentor', 'ios', 'resume'], followedUp: true }),
+
+    // Design Club portfolio night
+    contact({ id: 'c19', name: 'Simone Adler', headline: 'Creative Director', company: 'Studio Lumière', email: 'simone@studiolumiere.com', links: [{ kind: 'website', url: 'https://studiolumiere.com' }], source: 'manual', hoursAgo: 30, mode: 'event', what: ['Guest reviewer who gave sharp portfolio feedback', 'Only takes two student interns a year'], context: DESIGN_CLUB, evidence: DESIGN_CLUB_EVIDENCE, confidence: 0.78, note: 'Suggested leading with the strongest case study, not the oldest.', tags: ['reviewer', 'portfolio', 'internship'] }),
+    contact({ id: 'c20', name: 'Tobias Krentz', headline: 'Backend Engineer', company: 'Orbit', email: 'tobias@orbit.dev', links: [{ kind: 'github', url: 'https://github.com/tobiaskrentz' }], source: 'qr', hoursAgo: 9, mode: 'event', what: ['Recent grad who took the same capstone course', 'Offered to share his interview prep notes'], context: FAIR, evidence: ['Location matched Student Union Ballroom'], confidence: 0.83, tags: ['alumni', 'backend', 'interview-prep'] }),
+    contact({ id: 'c21', name: 'Yuki Tanaka', headline: 'Associate Product Manager', company: 'Sola', email: 'yuki@solaapp.com', phone: '+1 (510) 555-0166', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/yukitanaka' }], source: 'nfc', hoursAgo: 12, mode: 'event', what: ['Started as an intern and converted to full-time', 'Explained how APM internships are evaluated'], context: FAIR, evidence: ['Google Calendar invite'], confidence: 0.91, tags: ['product', 'alumni', 'internship'], followedUp: true }),
+    contact({ id: 'c22', name: 'Hana Kobayashi', headline: 'UI Engineer', company: 'Lattice', email: 'hana@lattice.com', links: [{ kind: 'github', url: 'https://github.com/hanakobayashi' }, { kind: 'website', url: 'https://hanakobayashi.dev' }], source: 'qr', hoursAgo: 4.5, mode: 'event', what: ['Design tokens at scale', 'Contributes to open-source component libraries'], context: DESIGN_CLUB, evidence: DESIGN_CLUB_EVIDENCE, confidence: 0.9, tags: ['ui-engineering', 'open-source', 'mentor'] }),
+    contact({ id: 'c23', name: 'Caleb Osei', headline: 'Illustrator', company: 'Freelance', email: 'caleb@caleboa.com', links: [{ kind: 'website', url: 'https://caleboa.com' }], source: 'manual', hoursAgo: 35, mode: 'everyday', what: ['Fellow student with an editorial illustration side business', 'Looking for long-term brand clients'], context: 'Art walk on campus', evidence: ['Location matched Arts Quad'], confidence: 0.74, note: 'Really distinct style. Might collaborate on a case study.', tags: ['peer', 'illustration', 'freelance'], followedUp: true }),
+    contact({ id: 'c24', name: 'Pritha Menon', headline: 'Professor, Human-Computer Interaction', company: 'State University', email: 'pritha@stateu.edu', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/prithamenon' }], source: 'nfc', hoursAgo: 2.5, mode: 'everyday', what: ['Offered to write a recommendation letter', 'Keeps a list of local companies that hire HCI students'], context: 'Office hours, Ritter Hall', evidence: ['Location matched Ritter Hall'], confidence: 0.88, tags: ['professor', 'recommendation', 'hci'] }),
+    contact({ id: 'c25', name: 'Elliot Marsh', headline: 'Alumni Mentor', company: 'Sequoia Scout', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/elliotmarsh' }], source: 'qr', hoursAgo: 13, mode: 'event', what: ['Mentors three students each semester through the alumni network', 'Replies to messages the same day'], context: FAIR, evidence: ['Google Calendar invite', 'Location matched Student Union Ballroom'], confidence: 0.95, note: 'Follows up fast. Send a short thank-you today.', tags: ['alumni', 'mentor', 'network'], followedUp: true }),
+    contact({ id: 'c26', name: 'Fatima Al-Rashid', headline: 'Marketing Lead', company: 'Cobalt', email: 'fatima@cobalt.io', phone: '+1 (312) 555-0154', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/fatimaalrashid' }], source: 'manual', hoursAgo: 17, mode: 'everyday', what: ['Hiring a marketing intern for the fall', 'Likes applicants who send a short one-page plan'], context: 'Alumni Coffee Chat', evidence: ['Google Maps visit'], confidence: 0.8, tags: ['alumni', 'marketing', 'internship'] }),
+    contact({ id: 'c27', name: 'Santiago Vega', headline: 'Spatial Designer', company: 'Volumetric Co', email: 'santiago@volumetric.co', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/santiagov' }], source: 'nfc', hoursAgo: 3.5, mode: 'event', what: ['AR and VR experience design', 'Taking one design intern for the summer'], context: FAIR, evidence: ['Location matched Student Union Ballroom'], confidence: 0.87, tags: ['design', 'internship', 'spatial'] }),
+    contact({ id: 'c28', name: 'Imogen Clarke', headline: 'Career Advisor', company: 'State University Career Center', email: 'imogen@stateu.edu', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/imogenclarke' }], source: 'manual', hoursAgo: 24, mode: 'everyday', what: ['Books resume reviews and mock interviews', 'Knows which employers are visiting campus this spring'], context: 'Career Center drop-in', evidence: ['Location matched Career Center'], confidence: 0.72, confirmed: false, alternatives: ['Workshop on resumes'], note: 'Introduced by Chris from the Design Club.', tags: ['career-center', 'resume', 'advisor'] }),
+  ]
 }
 
 export function createSeedState(): AppState {
@@ -32,8 +128,8 @@ export function createSeedState(): AppState {
     settings: {
       mode: 'event' as const,
       autoMode: true,
-    autoOffline: true,
-    manualOffline: false,
+      autoOffline: true,
+      manualOffline: false,
       autoSync: false,
       theme: 'light',
       brand: '#0f766e',
@@ -64,19 +160,23 @@ export function createSeedState(): AppState {
         'Google Maps': true,
         Zoom: false,
         Slack: false,
-        'Canvas (syllabus)': false,
+        'Canvas (syllabus)': true,
       },
-      goals: ['Meet 3 design leaders', 'Ask about hiring for senior design roles'],
+      goals: [
+        'Land a summer 2027 UX or product design internship',
+        'Meet 3 recruiters at the career fair',
+        'Find an alumni mentor in product design',
+      ],
       broadcastMessages: {
         everyday: 'Out and about — happy to connect!',
-        event: 'At a conference — open to chat.',
-        custom: 'Available for professional conversations.',
+        event: 'At the career fair — open to chat about internships.',
+        custom: 'Open to coffee chats and informational interviews.',
       },
       rules: [
         {
           id: 'r3',
           mode: 'everyday' as const,
-          trigger: 'At bars, restaurants or hangouts',
+          trigger: 'At cafes, the library or hangouts',
           enabled: true,
         },
         {
@@ -97,7 +197,7 @@ export function createSeedState(): AppState {
       ],
       learnedPreferences: [
         'Prefers email over LinkedIn for follow-ups',
-        'Tends to forget end-of-day follow-ups',
+        'Tends to forget thank-you notes after a busy fair',
       ],
       defaultShareMethod: null,
       defaultReadMethod: null,
@@ -107,146 +207,12 @@ export function createSeedState(): AppState {
       customQrColor: '',
       defaultContactSort: 'az' as const,
     },
-    contacts: [
-      {
-        id: 'c1',
-        name: 'Priya Natarajan',
-        headline: 'Head of Design',
-        company: 'Lumen Health',
-        email: 'priya@lumenhealth.com',
-        links: [
-          { kind: 'linkedin', url: 'https://linkedin.com/in/priyan' },
-          { kind: 'website', url: 'https://lumenhealth.com' },
-        ],
-        source: 'nfc',
-        capturedAt: at(-1.2),
-        mode: 'event',
-        what: [
-          'Hiring two senior product designers in Q3',
-          'Interested in design systems for clinical apps',
-          'Suggested connecting after the keynote',
-        ],
-        why: {
-          context: 'Design Forward Summit 2026',
-          evidence: [
-            'Location matched Moscone West',
-            'Ticket confirmed via Eventbrite',
-          ],
-          confidence: 0.94,
-          confirmed: true,
-          alternatives: [],
-        },
-        noteEntries: [],
-        tags: ['hiring', 'design-leadership'],
-        followedUp: false,
-        pendingEnrichment: false,
-      },
-      {
-        id: 'c2',
-        name: 'Marcus Chen',
-        headline: 'Founder',
-        company: 'Fieldnote',
-        email: 'marcus@fieldnote.app',
-        phone: '+1 (628) 555-0199',
-        links: [{ kind: 'x', url: 'https://x.com/marcuschen' }],
-        source: 'qr',
-        capturedAt: at(-0.6),
-        mode: 'event',
-        what: [
-          'Building a note-taking app for field researchers',
-          'Looking for a design advisor',
-        ],
-        why: {
-          context: 'Design Forward Summit 2026',
-          evidence: ['Location matched Moscone West'],
-          confidence: 0.71,
-          confirmed: false,
-          alternatives: ['Hallway chat (unrelated to event)', 'Mutual friend intro'],
-        },
-        noteEntries: [],
-        tags: ['founder', 'advisor'],
-        followedUp: false,
-        pendingEnrichment: false,
-      },
-      {
-        id: 'c3',
-        name: 'Sam Okafor',
-        headline: 'Engineer',
-        company: 'Independent',
-        links: [{ kind: 'github', url: 'https://github.com/samokafor' }],
-        phone: '+1 (510) 555-0117',
-        source: 'manual',
-        capturedAt: at(-26),
-        mode: 'everyday',
-        what: ['Into climbing and open-source hardware'],
-        why: {
-          context: 'Dinner at Lazy Bear',
-          evidence: ['Google Maps visit'],
-          confidence: 0.82,
-          confirmed: true,
-          alternatives: [],
-        },
-        noteEntries: [{ id: 'ne-c3', at: at(-26), location: 'Dinner at Lazy Bear', body: 'Friend of Alex.', photos: [] }],
-        tags: ['friend-of-friend'],
-        followedUp: true,
-        pendingEnrichment: false,
-      },
-      { id: 'c4', name: 'Aisha Okonkwo', headline: 'VP of Product', company: 'Strada', email: 'aisha@strada.io', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/aishaokonkwo' }], source: 'nfc' as const, capturedAt: at(-2), mode: 'event' as const, what: ['Scaling product org from 8 to 25', 'Keen on async-first workflows'], why: { context: 'Design Forward Summit 2026', evidence: ['Location matched Moscone West'], confidence: 0.91, confirmed: true, alternatives: [] }, noteEntries: [], tags: ['product', 'leadership'], followedUp: false, pendingEnrichment: false },
-      { id: 'c5', name: 'Devon Mercer', headline: 'UX Researcher', company: 'Halo Labs', email: 'devon@halolabs.com', phone: '+1 (415) 555-0142', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/devonmercer' }], source: 'qr' as const, capturedAt: at(-1.5), mode: 'event' as const, what: ['Running a study on friction in onboarding flows', 'Open to collaboration'], why: { context: 'Design Forward Summit 2026', evidence: ['Ticket confirmed via Eventbrite'], confidence: 0.88, confirmed: true, alternatives: [] }, noteEntries: [], tags: ['research', 'ux'], followedUp: true, pendingEnrichment: false },
-      { id: 'c6', name: 'Tariq Bashir', headline: 'CTO', company: 'Inkline', email: 'tariq@inkline.dev', links: [{ kind: 'github', url: 'https://github.com/tariqbashir' }, { kind: 'x', url: 'https://x.com/tariqbashir' }], source: 'nfc' as const, capturedAt: at(-3), mode: 'event' as const, what: ['Building design tooling for engineers', 'Looking for beta design partners'], why: { context: 'Design Forward Summit 2026', evidence: ['Location matched Moscone West'], confidence: 0.85, confirmed: true, alternatives: [] }, noteEntries: [{ id: 'ne-c6', at: at(-3), location: 'Design Forward Summit 2026', body: 'Mentioned potentially demoing at next summit.', photos: [] }], tags: ['engineering', 'tooling', 'partnership'], followedUp: false, pendingEnrichment: false },
-      { id: 'c7', name: 'Mei-Lin Tsai', headline: 'Brand Strategist', company: 'Meridian Studio', email: 'meilin@meridianstudio.com', links: [{ kind: 'instagram', url: 'https://instagram.com/meilintsai' }, { kind: 'website', url: 'https://meridianstudio.com' }], source: 'manual' as const, capturedAt: at(-8), mode: 'everyday' as const, what: ['Rebranding mid-size B2B companies', 'Into typography and motion'], why: { context: 'Coffee at Sightglass', evidence: ['Google Maps visit'], confidence: 0.79, confirmed: true, alternatives: [] }, noteEntries: [{ id: 'ne-c7', at: at(-8), location: 'Coffee at Sightglass', body: 'Met through Nadia.', photos: [] }], tags: ['branding', 'creative'], followedUp: true, pendingEnrichment: false },
-      { id: 'c8', name: 'Jonah Reyes', headline: 'Startup Founder', company: 'Plume', email: 'jonah@plume.app', phone: '+1 (646) 555-0188', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/jonahreyes' }], source: 'qr' as const, capturedAt: at(-15), mode: 'everyday' as const, what: ['Consumer social for niche hobbies', 'Raised $1.2M pre-seed'], why: { context: 'Founders Brunch SF', evidence: ['Google Calendar invite'], confidence: 0.93, confirmed: true, alternatives: [] }, noteEntries: [], tags: ['founder', 'consumer', 'social'], followedUp: false, pendingEnrichment: false },
-      { id: 'c9', name: 'Cleo Fontaine', headline: 'Content Strategist', company: 'Openfield', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/cleofontaine' }], source: 'manual' as const, capturedAt: at(-20), mode: 'everyday' as const, what: ['Documenting product decisions as public content', 'Looking for writers to collaborate with'], why: { context: 'Rooftop drinks at Proper Hotel', evidence: ['Location matched Proper Hotel'], confidence: 0.76, confirmed: false, alternatives: ['Mutual acquaintance intro'] }, noteEntries: [], tags: ['content', 'writing'], followedUp: false, pendingEnrichment: false },
-      { id: 'c10', name: 'Ravi Subramanian', headline: 'Data Scientist', company: 'Nexus Analytics', email: 'ravi@nexusanalytics.com', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/ravisub' }, { kind: 'github', url: 'https://github.com/ravisub' }], source: 'nfc' as const, capturedAt: at(-5), mode: 'event' as const, what: ['Predictive models for user churn', 'Interested in design-data collaboration'], why: { context: 'Design Forward Summit 2026', evidence: ['Location matched Moscone West'], confidence: 0.82, confirmed: true, alternatives: [] }, noteEntries: [], tags: ['data', 'analytics'], followedUp: true, pendingEnrichment: false },
-      { id: 'c11', name: 'Zoe Harrington', headline: 'Product Designer', company: 'Bloom', email: 'zoe@bloom.design', links: [{ kind: 'website', url: 'https://zoeharrington.com' }, { kind: 'instagram', url: 'https://instagram.com/zoeharrington.design' }], source: 'qr' as const, capturedAt: at(-4), mode: 'event' as const, what: ['Accessibility-first design systems', 'Mentors junior designers on the side'], why: { context: 'Design Forward Summit 2026', evidence: ['Ticket confirmed via Eventbrite'], confidence: 0.9, confirmed: true, alternatives: [] }, noteEntries: [], tags: ['design-systems', 'accessibility', 'mentorship'], followedUp: false, pendingEnrichment: false },
-      { id: 'c12', name: 'Omar El-Amin', headline: 'Engineering Manager', company: 'Cascade', email: 'omar@cascade.com', phone: '+1 (213) 555-0176', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/omarelamin' }], source: 'nfc' as const, capturedAt: at(-7), mode: 'everyday' as const, what: ['Managing a team of 12 FEs', 'Into developer experience and inner-source'], why: { context: 'Happy hour at The Battery', evidence: ['Location matched The Battery SF'], confidence: 0.84, confirmed: true, alternatives: [] }, noteEntries: [{ id: 'ne-c12', at: at(-7), location: 'Happy hour at The Battery', body: 'Very well networked in the fintech space.', photos: [] }], tags: ['engineering', 'management'], followedUp: true, pendingEnrichment: false },
-      { id: 'c13', name: 'Ingrid Lund', headline: 'Venture Associate', company: 'Greenline Capital', email: 'ingrid@greenlinecap.com', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/ingridlund' }], source: 'qr' as const, capturedAt: at(-10), mode: 'event' as const, what: ['Investing in early-stage climate and health tech', 'Looking for deal flow referrals'], why: { context: 'TechCrunch Disrupt SF', evidence: ['Google Calendar invite', 'Location matched Moscone'], confidence: 0.96, confirmed: true, alternatives: [] }, noteEntries: [], tags: ['vc', 'investing', 'climate'], followedUp: false, pendingEnrichment: false },
-      { id: 'c14', name: 'Kwame Asante', headline: 'Motion Designer', company: 'Freelance', email: 'kwame@kwameasante.com', links: [{ kind: 'instagram', url: 'https://instagram.com/kwameasante' }, { kind: 'website', url: 'https://kwameasante.com' }], source: 'manual' as const, capturedAt: at(-14), mode: 'everyday' as const, what: ['Brand films and product reveal animations', 'Open to short-term contracts'], why: { context: 'Portfolio show at Gray Area', evidence: ['Location matched Gray Area SF'], confidence: 0.87, confirmed: true, alternatives: [] }, noteEntries: [{ id: 'ne-c14', at: at(-14), location: 'Portfolio show at Gray Area', body: 'Incredible reel.', photos: [] }], tags: ['motion', 'freelance', 'creative'], followedUp: true, pendingEnrichment: false },
-      { id: 'c15', name: 'Natasha Volkov', headline: 'Head of Growth', company: 'Beacon', email: 'natasha@beacon.co', phone: '+1 (929) 555-0133', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/natashavolkov' }], source: 'nfc' as const, capturedAt: at(-11), mode: 'event' as const, what: ['PLG motion for B2B SaaS', '0→1 growth playbooks'], why: { context: 'TechCrunch Disrupt SF', evidence: ['Location matched Moscone'], confidence: 0.89, confirmed: true, alternatives: [] }, noteEntries: [], tags: ['growth', 'plg', 'saas'], followedUp: false, pendingEnrichment: false },
-      { id: 'c16', name: 'Felix Wagner', headline: 'Industrial Designer', company: 'Aura Hardware', email: 'felix@aurahardware.com', links: [{ kind: 'website', url: 'https://aurahardware.com' }, { kind: 'linkedin', url: 'https://linkedin.com/in/felixwagner' }], source: 'qr' as const, capturedAt: at(-18), mode: 'everyday' as const, what: ['Consumer wearables designed for longevity', 'Into material sustainability'], why: { context: 'Dinner at Saison', evidence: ['Location matched Saison SF'], confidence: 0.81, confirmed: true, alternatives: [] }, noteEntries: [{ id: 'ne-c16', at: at(-18), location: 'Dinner at Saison', body: 'Brought a prototype.', photos: [] }], tags: ['hardware', 'industrial-design', 'sustainability'], followedUp: false, pendingEnrichment: false },
-      { id: 'c17', name: 'Amara Diallo', headline: 'People Ops Lead', company: 'Verve', email: 'amara@verve.com', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/amaradiallo' }], source: 'manual' as const, capturedAt: at(-22), mode: 'everyday' as const, what: ['Building culture frameworks for remote-first teams', 'Interested in HR tech tools'], why: { context: 'Morning jog at Crissy Field', evidence: ['Location matched Crissy Field'], confidence: 0.7, confirmed: false, alternatives: ['Mutual friend run club'] }, noteEntries: [], tags: ['people-ops', 'hr', 'remote'], followedUp: false, pendingEnrichment: false },
-      { id: 'c18', name: 'Leo Castillo', headline: 'iOS Engineer', company: 'Tonal', email: 'leo@tonal.com', phone: '+1 (415) 555-0109', links: [{ kind: 'github', url: 'https://github.com/leocastillo' }, { kind: 'linkedin', url: 'https://linkedin.com/in/leocastillo' }], source: 'nfc' as const, capturedAt: at(-6), mode: 'event' as const, what: ['SwiftUI performance optimisation', 'Side project in spatial computing'], why: { context: 'Design Forward Summit 2026', evidence: ['Location matched Moscone West'], confidence: 0.86, confirmed: true, alternatives: [] }, noteEntries: [], tags: ['ios', 'engineering', 'swiftui'], followedUp: true, pendingEnrichment: false },
-      { id: 'c19', name: 'Simone Adler', headline: 'Creative Director', company: 'Studio Lumière', email: 'simone@studiolumiere.com', links: [{ kind: 'instagram', url: 'https://instagram.com/studiolumiere' }, { kind: 'website', url: 'https://studiolumiere.com' }], source: 'manual' as const, capturedAt: at(-30), mode: 'everyday' as const, what: ['Luxury brand identity and packaging', 'Selective with clients'], why: { context: 'Opening at Gagosian', evidence: ['Location matched Gagosian SF'], confidence: 0.78, confirmed: true, alternatives: [] }, noteEntries: [{ id: 'ne-c19', at: at(-30), location: 'Opening at Gagosian', body: 'Only takes 3 projects a year.', photos: [] }], tags: ['creative-direction', 'luxury', 'branding'], followedUp: false, pendingEnrichment: false },
-      { id: 'c20', name: 'Tobias Krentz', headline: 'Backend Engineer', company: 'Orbit', email: 'tobias@orbit.dev', links: [{ kind: 'github', url: 'https://github.com/tobiaskrentz' }], source: 'qr' as const, capturedAt: at(-9), mode: 'event' as const, what: ['Distributed systems and event sourcing', 'Open to staff-level opportunities'], why: { context: 'TechCrunch Disrupt SF', evidence: ['Location matched Moscone'], confidence: 0.83, confirmed: true, alternatives: [] }, noteEntries: [], tags: ['backend', 'distributed-systems'], followedUp: false, pendingEnrichment: false },
-      { id: 'c21', name: 'Yuki Tanaka', headline: 'Product Manager', company: 'Sola', email: 'yuki@solaapp.com', phone: '+1 (510) 555-0166', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/yukitanaka' }], source: 'nfc' as const, capturedAt: at(-12), mode: 'event' as const, what: ['Roadmapping for AI-native products', 'Advocates for continuous discovery'], why: { context: 'TechCrunch Disrupt SF', evidence: ['Google Calendar invite'], confidence: 0.91, confirmed: true, alternatives: [] }, noteEntries: [], tags: ['product', 'ai', 'discovery'], followedUp: true, pendingEnrichment: false },
-      { id: 'c22', name: 'Hana Kobayashi', headline: 'UI Engineer', company: 'Lattice', email: 'hana@lattice.com', links: [{ kind: 'github', url: 'https://github.com/hanakobayashi' }, { kind: 'website', url: 'https://hanakobayashi.dev' }], source: 'qr' as const, capturedAt: at(-4.5), mode: 'event' as const, what: ['Design tokens at scale', 'Contributing to open-source component libs'], why: { context: 'Design Forward Summit 2026', evidence: ['Ticket confirmed via Eventbrite'], confidence: 0.9, confirmed: true, alternatives: [] }, noteEntries: [], tags: ['ui-engineering', 'design-systems', 'open-source'], followedUp: false, pendingEnrichment: false },
-      { id: 'c23', name: 'Caleb Osei', headline: 'Illustrator', company: 'Freelance', email: 'caleb@caleboa.com', links: [{ kind: 'instagram', url: 'https://instagram.com/calebosei_art' }, { kind: 'website', url: 'https://caleboa.com' }], source: 'manual' as const, capturedAt: at(-35), mode: 'everyday' as const, what: ['Editorial and brand illustration', 'Looking for long-term brand clients'], why: { context: 'Art walk SoMa', evidence: ['Location matched SoMa SF'], confidence: 0.74, confirmed: true, alternatives: [] }, noteEntries: [{ id: 'ne-c23', at: at(-35), location: 'Art walk SoMa', body: 'Really distinct style.', photos: [] }], tags: ['illustration', 'freelance', 'creative'], followedUp: true, pendingEnrichment: false },
-      { id: 'c24', name: 'Pritha Menon', headline: 'Clinical Informatics', company: 'UCSF Health', email: 'pritha@ucsf.edu', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/prithamenon' }], source: 'nfc' as const, capturedAt: at(-2.5), mode: 'event' as const, what: ['EHR UX and clinician workflow design', 'Bridge between clinical staff and product teams'], why: { context: 'Design Forward Summit 2026', evidence: ['Location matched Moscone West'], confidence: 0.88, confirmed: true, alternatives: [] }, noteEntries: [], tags: ['healthtech', 'ux', 'clinical'], followedUp: false, pendingEnrichment: false },
-      { id: 'c25', name: 'Elliot Marsh', headline: 'Investor', company: 'Sequoia Scout', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/elliotmarsh' }], source: 'qr' as const, capturedAt: at(-13), mode: 'event' as const, what: ['Scouting consumer and creator economy deals', 'Warm intros only'], why: { context: 'TechCrunch Disrupt SF', evidence: ['Google Calendar invite', 'Location matched Moscone'], confidence: 0.95, confirmed: true, alternatives: [] }, noteEntries: [{ id: 'ne-c25', at: at(-13), location: 'TechCrunch Disrupt SF', body: 'Follows up fast.', photos: [] }], tags: ['investing', 'consumer', 'creator-economy'], followedUp: true, pendingEnrichment: false },
-      { id: 'c26', name: 'Fatima Al-Rashid', headline: 'Marketing Lead', company: 'Cobalt', email: 'fatima@cobalt.io', phone: '+1 (312) 555-0154', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/fatimaalrashid' }], source: 'manual' as const, capturedAt: at(-17), mode: 'everyday' as const, what: ['Category creation for security tools', 'Content-led demand gen'], why: { context: 'Dinner at Zuni Café', evidence: ['Location matched Zuni Café SF'], confidence: 0.8, confirmed: true, alternatives: [] }, noteEntries: [], tags: ['marketing', 'security', 'content'], followedUp: false, pendingEnrichment: false },
-      { id: 'c27', name: 'Santiago Vega', headline: 'Spatial Designer', company: 'Volumetric Co', email: 'santiago@volumetric.co', links: [{ kind: 'website', url: 'https://volumetric.co' }, { kind: 'linkedin', url: 'https://linkedin.com/in/santiagov' }], source: 'nfc' as const, capturedAt: at(-3.5), mode: 'event' as const, what: ['AR/VR experience design', 'Working on a visionOS product'], why: { context: 'Design Forward Summit 2026', evidence: ['Location matched Moscone West'], confidence: 0.87, confirmed: true, alternatives: [] }, noteEntries: [], tags: ['spatial', 'ar', 'visionos'], followedUp: false, pendingEnrichment: false },
-      { id: 'c28', name: 'Imogen Clarke', headline: 'Operations Manager', company: 'Ridgeline', email: 'imogen@ridgeline.com', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/imogenclarke' }], source: 'manual' as const, capturedAt: at(-24), mode: 'everyday' as const, what: ['Scaling ops for 200-person companies', 'Process-obsessed'], why: { context: 'Book club at Green Apple', evidence: ['Location matched Green Apple Books'], confidence: 0.72, confirmed: false, alternatives: ['Neighbourhood regular'] }, noteEntries: [{ id: 'ne-c28', at: at(-24), location: 'Book club at Green Apple', body: 'Introduced by Chris.', photos: [] }], tags: ['operations', 'scaling'], followedUp: false, pendingEnrichment: false },
-      { id: 'c29', name: 'Nico Ferreira', headline: 'Photographer', company: 'Freelance', email: 'nico@nicoferreira.com', links: [{ kind: 'instagram', url: 'https://instagram.com/nicoferreira' }, { kind: 'website', url: 'https://nicoferreira.com' }], source: 'qr' as const, capturedAt: at(-40), mode: 'everyday' as const, what: ['Documentary and brand photography', 'Available for editorial retainers'], why: { context: 'Gallery opening Tenderloin', evidence: ['Location matched Tenderloin SF'], confidence: 0.77, confirmed: true, alternatives: [] }, noteEntries: [], tags: ['photography', 'freelance', 'editorial'], followedUp: true, pendingEnrichment: false },
-      { id: 'c30', name: 'Dahlia Stern', headline: 'Head of Customer Success', company: 'Ramp', email: 'dahlia@ramp.com', phone: '+1 (917) 555-0121', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/dahliastern' }], source: 'nfc' as const, capturedAt: at(-11.5), mode: 'event' as const, what: ['CS org design for fintech', 'Churn reduction playbooks'], why: { context: 'TechCrunch Disrupt SF', evidence: ['Google Calendar invite'], confidence: 0.92, confirmed: true, alternatives: [] }, noteEntries: [], tags: ['customer-success', 'fintech'], followedUp: false, pendingEnrichment: false },
-      { id: 'c31', name: 'Bram De Vries', headline: 'Design Engineer', company: 'Craft', email: 'bram@craft.do', links: [{ kind: 'github', url: 'https://github.com/bramdevries' }, { kind: 'website', url: 'https://bramdevries.dev' }], source: 'qr' as const, capturedAt: at(-1.8), mode: 'event' as const, what: ['Bridging design and engineering at the component level', 'Loves Framer and Swift'], why: { context: 'Design Forward Summit 2026', evidence: ['Ticket confirmed via Eventbrite'], confidence: 0.93, confirmed: true, alternatives: [] }, noteEntries: [], tags: ['design-engineering', 'framer', 'swift'], followedUp: true, pendingEnrichment: false },
-      { id: 'c32', name: 'Adaeze Nwachukwu', headline: 'Legal Counsel', company: 'Stripe', email: 'adaeze@stripe.com', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/adaezenwachukwu' }], source: 'manual' as const, capturedAt: at(-28), mode: 'everyday' as const, what: ['Fintech regulation and privacy law', 'Board advisor for two startups'], why: { context: 'Charity gala Fairmont', evidence: ['Location matched Fairmont SF'], confidence: 0.85, confirmed: true, alternatives: [] }, noteEntries: [{ id: 'ne-c32', at: at(-28), location: 'Charity gala Fairmont', body: 'Knows everyone in fintech law.', photos: [] }], tags: ['legal', 'fintech', 'privacy'], followedUp: false, pendingEnrichment: false },
-      { id: 'c33', name: 'Hector Ruiz', headline: 'Podcast Host', company: 'Build in Public FM', email: 'hector@buildinpublic.fm', links: [{ kind: 'x', url: 'https://x.com/hectorruizfm' }, { kind: 'website', url: 'https://buildinpublic.fm' }], source: 'qr' as const, capturedAt: at(-16), mode: 'event' as const, what: ['Interviewing founders building in public', 'Looking for product-led companies to feature'], why: { context: 'Founders Brunch SF', evidence: ['Google Calendar invite'], confidence: 0.88, confirmed: true, alternatives: [] }, noteEntries: [], tags: ['media', 'podcast', 'founder'], followedUp: false, pendingEnrichment: false },
-      { id: 'c34', name: 'Vera Popescu', headline: 'ML Engineer', company: 'Anthropic', email: 'vera@anthropic.com', links: [{ kind: 'github', url: 'https://github.com/verapopescu' }, { kind: 'linkedin', url: 'https://linkedin.com/in/verapopescu' }], source: 'nfc' as const, capturedAt: at(-12.5), mode: 'event' as const, what: ['Alignment and interpretability research', 'Side interest in generative art'], why: { context: 'TechCrunch Disrupt SF', evidence: ['Location matched Moscone'], confidence: 0.86, confirmed: true, alternatives: [] }, noteEntries: [], tags: ['ml', 'ai', 'alignment'], followedUp: true, pendingEnrichment: false },
-      { id: 'c35', name: 'Joss Kimani', headline: 'Community Builder', company: 'Creator Guild', email: 'joss@creatorguild.co', links: [{ kind: 'instagram', url: 'https://instagram.com/josskimani' }, { kind: 'linkedin', url: 'https://linkedin.com/in/josskimani' }], source: 'manual' as const, capturedAt: at(-33), mode: 'everyday' as const, what: ['Running a 3k-member creative community', 'Looking for sponsors and speakers'], why: { context: 'Networking brunch Dogpatch', evidence: ['Location matched Dogpatch SF'], confidence: 0.79, confirmed: true, alternatives: [] }, noteEntries: [{ id: 'ne-c35', at: at(-33), location: 'Networking brunch Dogpatch', body: 'Very well connected with creators.', photos: [] }], tags: ['community', 'creator', 'events'], followedUp: false, pendingEnrichment: false },
-      { id: 'c36', name: 'Nina Walters', headline: 'Head of Brand', company: 'Fable', email: 'nina@fable.app', phone: '+1 (503) 555-0198', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/ninawalters' }, { kind: 'instagram', url: 'https://instagram.com/ninawaltersbrand' }], source: 'nfc' as const, capturedAt: at(-2.2), mode: 'event' as const, what: ['Brand voice and visual identity for consumer apps', 'Moving from agency to in-house'], why: { context: 'Design Forward Summit 2026', evidence: ['Location matched Moscone West'], confidence: 0.9, confirmed: true, alternatives: [] }, noteEntries: [], tags: ['brand', 'consumer', 'design'], followedUp: false, pendingEnrichment: false },
-      { id: 'c37', name: 'Arjun Kapoor', headline: 'Platform Engineer', company: 'Cloudflare', email: 'arjun@cloudflare.com', links: [{ kind: 'github', url: 'https://github.com/arjunkapoor' }], source: 'qr' as const, capturedAt: at(-9.5), mode: 'event' as const, what: ['Edge computing and Workers platform', 'Open-source contributor'], why: { context: 'TechCrunch Disrupt SF', evidence: ['Location matched Moscone'], confidence: 0.84, confirmed: true, alternatives: [] }, noteEntries: [], tags: ['platform', 'edge', 'open-source'], followedUp: true, pendingEnrichment: false },
-      { id: 'c38', name: 'Celeste Huang', headline: 'Impact Investor', company: 'Rise Capital', email: 'celeste@risecapital.vc', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/celestehuang' }], source: 'manual' as const, capturedAt: at(-45), mode: 'everyday' as const, what: ['Impact-first seed investments', 'Particularly interested in ed-tech and health equity'], why: { context: 'Panel at Yerba Buena', evidence: ['Location matched Yerba Buena SF'], confidence: 0.88, confirmed: true, alternatives: [] }, noteEntries: [{ id: 'ne-c38', at: at(-45), location: 'Panel at Yerba Buena', body: 'Met at the post-panel dinner.', photos: [] }], tags: ['investing', 'impact', 'edtech'], followedUp: false, pendingEnrichment: false },
-      { id: 'c39', name: 'Matteo Gallo', headline: 'Product Designer', company: 'Linear', email: 'matteo@linear.app', links: [{ kind: 'website', url: 'https://matteogallo.com' }, { kind: 'x', url: 'https://x.com/matteogallo' }], source: 'nfc' as const, capturedAt: at(-1), mode: 'event' as const, what: ['Minimal product design for developer tools', 'Writes about craft publicly'], why: { context: 'Design Forward Summit 2026', evidence: ['Ticket confirmed via Eventbrite'], confidence: 0.95, confirmed: true, alternatives: [] }, noteEntries: [], tags: ['product-design', 'developer-tools', 'writing'], followedUp: false, pendingEnrichment: false },
-      { id: 'c40', name: 'Priya Goyal', headline: 'Startup Lawyer', company: 'Gunderson Dettmer', email: 'pgoyal@gunderson.com', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/priyagoyal' }], source: 'qr' as const, capturedAt: at(-19), mode: 'everyday' as const, what: ['Startup formation, SAFEs, and Series A docs', 'Works with early-stage founders'], why: { context: 'Founders Brunch SF', evidence: ['Google Calendar invite'], confidence: 0.91, confirmed: true, alternatives: [] }, noteEntries: [], tags: ['legal', 'startups', 'fundraising'], followedUp: true, pendingEnrichment: false },
-      { id: 'c41', name: 'Reuben Clarke', headline: 'Audio Engineer', company: 'Splice', email: 'reuben@splice.com', links: [{ kind: 'instagram', url: 'https://instagram.com/reubenclarke' }], source: 'manual' as const, capturedAt: at(-50), mode: 'everyday' as const, what: ['Sound design for games and film', 'Fascinated by AI audio generation'], why: { context: 'Music tech meetup SOMA', evidence: ['Location matched SOMA SF'], confidence: 0.75, confirmed: true, alternatives: [] }, noteEntries: [], tags: ['audio', 'music-tech', 'games'], followedUp: false, pendingEnrichment: false },
-      { id: 'c42', name: 'Linh Pham', headline: 'Operations Lead', company: 'Gusto', email: 'linh@gusto.com', phone: '+1 (408) 555-0144', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/linhpham' }], source: 'nfc' as const, capturedAt: at(-10.5), mode: 'event' as const, what: ['Payroll automation and compliance workflows', 'Interested in no-code tooling'], why: { context: 'TechCrunch Disrupt SF', evidence: ['Google Calendar invite'], confidence: 0.88, confirmed: true, alternatives: [] }, noteEntries: [], tags: ['operations', 'hr-tech', 'no-code'], followedUp: false, pendingEnrichment: false },
-      { id: 'c43', name: 'Erik Sorensen', headline: 'Climate Tech Founder', company: 'Terramo', email: 'erik@terramo.earth', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/eriksorensen' }, { kind: 'website', url: 'https://terramo.earth' }], source: 'qr' as const, capturedAt: at(-14.5), mode: 'event' as const, what: ['Carbon removal and soil health monitoring', 'Pre-seed, looking for lead investor'], why: { context: 'TechCrunch Disrupt SF', evidence: ['Google Calendar invite'], confidence: 0.89, confirmed: true, alternatives: [] }, noteEntries: [{ id: 'ne-c43', at: at(-14.5), location: 'TechCrunch Disrupt SF', body: 'Compelling pitch.', photos: [] }], tags: ['climate', 'founder', 'hardware'], followedUp: true, pendingEnrichment: false },
-      { id: 'c44', name: 'Maya Johansson', headline: 'Copywriter', company: 'Freelance', email: 'maya@mayajohansson.com', links: [{ kind: 'website', url: 'https://mayajohansson.com' }, { kind: 'x', url: 'https://x.com/mayajohnsson' }], source: 'manual' as const, capturedAt: at(-38), mode: 'everyday' as const, what: ['SaaS and fintech UX copy', 'Into tone-of-voice systems'], why: { context: 'Copy Nite SF', evidence: ['Location matched Fort Mason'], confidence: 0.82, confirmed: true, alternatives: [] }, noteEntries: [], tags: ['copywriting', 'ux-writing', 'saas'], followedUp: false, pendingEnrichment: false },
-      { id: 'c45', name: 'Daniel Obi', headline: 'Growth Engineer', company: 'Figma', email: 'daniel@figma.com', links: [{ kind: 'github', url: 'https://github.com/danielobi' }, { kind: 'linkedin', url: 'https://linkedin.com/in/danielobi' }], source: 'nfc' as const, capturedAt: at(-1.3), mode: 'event' as const, what: ['Activation and expansion experiments', 'Building data pipelines for PLG'], why: { context: 'Design Forward Summit 2026', evidence: ['Location matched Moscone West'], confidence: 0.94, confirmed: true, alternatives: [] }, noteEntries: [], tags: ['growth', 'engineering', 'plg'], followedUp: false, pendingEnrichment: false },
-      { id: 'c46', name: 'Tessa Kovač', headline: 'Head of Design Research', company: 'Duolingo', email: 'tessa@duolingo.com', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/tessakovac' }], source: 'qr' as const, capturedAt: at(-3.8), mode: 'event' as const, what: ['Mixed-methods research for consumer engagement', 'Gamification and habit formation'], why: { context: 'Design Forward Summit 2026', evidence: ['Ticket confirmed via Eventbrite'], confidence: 0.91, confirmed: true, alternatives: [] }, noteEntries: [], tags: ['research', 'consumer', 'gamification'], followedUp: true, pendingEnrichment: false },
-      { id: 'c47', name: 'Jasper Moon', headline: 'Generative Artist', company: 'Independent', email: 'jasper@jaspermoon.xyz', links: [{ kind: 'website', url: 'https://jaspermoon.xyz' }, { kind: 'instagram', url: 'https://instagram.com/jaspermoonxyz' }], source: 'manual' as const, capturedAt: at(-42), mode: 'everyday' as const, what: ['Code-based generative art and NFTs', 'Looking for gallery collabs'], why: { context: 'Art Basel side event', evidence: ['Location matched SFMOMA'], confidence: 0.76, confirmed: true, alternatives: [] }, noteEntries: [{ id: 'ne-c47', at: at(-42), location: 'Art Basel side event', body: 'Incredible output.', photos: [] }], tags: ['generative-art', 'web3', 'creative'], followedUp: false, pendingEnrichment: false },
-      { id: 'c48', name: 'Keiko Sato', headline: 'Localization Lead', company: 'Notion', email: 'keiko@notion.so', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/keikosato' }], source: 'nfc' as const, capturedAt: at(-5.5), mode: 'event' as const, what: ['Scaling products to 20+ languages', 'Culturally-adapted UX patterns'], why: { context: 'Design Forward Summit 2026', evidence: ['Location matched Moscone West'], confidence: 0.85, confirmed: true, alternatives: [] }, noteEntries: [], tags: ['localization', 'internationalisation', 'ux'], followedUp: false, pendingEnrichment: false },
-      { id: 'c49', name: 'Owen Price', headline: 'Staff Engineer', company: 'Vercel', email: 'owen@vercel.com', links: [{ kind: 'github', url: 'https://github.com/owenprice' }, { kind: 'x', url: 'https://x.com/owenprice' }], source: 'qr' as const, capturedAt: at(-2.8), mode: 'event' as const, what: ['Edge runtime and caching architecture', 'Core contributor to Next.js'], why: { context: 'Design Forward Summit 2026', evidence: ['Ticket confirmed via Eventbrite'], confidence: 0.9, confirmed: true, alternatives: [] }, noteEntries: [], tags: ['engineering', 'nextjs', 'edge'], followedUp: true, pendingEnrichment: false },
-      { id: 'c50', name: 'Camille Tremblay', headline: 'Social Impact Lead', company: 'Salesforce', email: 'camille@salesforce.com', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/camilletremblay' }], source: 'manual' as const, capturedAt: at(-21), mode: 'everyday' as const, what: ['CSR and tech for good initiatives', 'Building nonprofit tech partnerships'], why: { context: 'Volunteer day Tenderloin', evidence: ['Location matched Tenderloin'], confidence: 0.8, confirmed: true, alternatives: [] }, noteEntries: [{ id: 'ne-c50', at: at(-21), location: 'Volunteer day Tenderloin', body: 'Incredibly warm connector.', photos: [] }], tags: ['social-impact', 'nonprofit', 'partnerships'], followedUp: false, pendingEnrichment: false },
-      { id: 'c51', name: 'Rashida Monroe', headline: 'Creative Technologist', company: 'R/GA', email: 'rashida@rga.com', links: [{ kind: 'website', url: 'https://rashidamonroe.com' }, { kind: 'instagram', url: 'https://instagram.com/rashidamonroe' }], source: 'nfc' as const, capturedAt: at(-4.2), mode: 'event' as const, what: ['Interactive brand experiences', 'Physical-digital hybrids'], why: { context: 'Design Forward Summit 2026', evidence: ['Location matched Moscone West'], confidence: 0.87, confirmed: true, alternatives: [] }, noteEntries: [], tags: ['creative-tech', 'advertising', 'experiential'], followedUp: false, pendingEnrichment: false },
-      { id: 'c52', name: 'Pavel Novak', headline: 'Security Researcher', company: 'Trail of Bits', email: 'pavel@trailofbits.com', links: [{ kind: 'github', url: 'https://github.com/pavelnovak' }], source: 'qr' as const, capturedAt: at(-11), mode: 'event' as const, what: ['Smart contract audits and blockchain security', 'Speaker at DEF CON'], why: { context: 'TechCrunch Disrupt SF', evidence: ['Location matched Moscone'], confidence: 0.83, confirmed: true, alternatives: [] }, noteEntries: [], tags: ['security', 'blockchain', 'research'], followedUp: false, pendingEnrichment: false },
-      { id: 'c53', name: 'Alicia Barros', headline: 'EdTech Designer', company: 'Khan Academy', email: 'alicia@khanacademy.org', links: [{ kind: 'linkedin', url: 'https://linkedin.com/in/aliciabarros' }, { kind: 'website', url: 'https://aliciabarros.design' }], source: 'manual' as const, capturedAt: at(-32), mode: 'everyday' as const, what: ['Learning design for K-12', 'Curious about AI tutoring tools'], why: { context: 'EdTech mixer Mission District', evidence: ['Location matched Mission District SF'], confidence: 0.81, confirmed: true, alternatives: [] }, noteEntries: [], tags: ['edtech', 'design', 'k12'], followedUp: true, pendingEnrichment: false },
-    ],
+    contacts: seedContacts(),
     events: [
       {
         id: 'e1',
-        title: 'Design Forward Summit 2026',
-        venue: 'Moscone West, San Francisco',
+        title: FAIR,
+        venue: 'Student Union Ballroom, State University',
         start: at(-3),
         end: at(5),
         source: 'Eventbrite',
@@ -254,7 +220,7 @@ export function createSeedState(): AppState {
       },
       {
         id: 'e2',
-        title: 'Portfolio review with Dana',
+        title: 'Informational interview with Dana (alumna)',
         venue: 'Zoom',
         start: at(20),
         end: at(21),
@@ -263,14 +229,14 @@ export function createSeedState(): AppState {
       },
     ],
     todos: [
-      { id: 't1', text: 'Get feedback on case study deck', done: false, source: 'Todoist' },
-      { id: 't2', text: 'Find a mentor for leadership track', done: false, source: 'Todoist' },
-      { id: 't3', text: 'Collect 5 new contacts for newsletter', done: true, source: 'Todoist' },
+      { id: 't1', text: 'Send thank-you emails to career fair recruiters', done: false, source: 'Todoist' },
+      { id: 't2', text: 'Apply to the Lumen Health UX internship by Friday', done: false, source: 'Todoist' },
+      { id: 't3', text: 'Update resume with the spring capstone project', done: true, source: 'Todoist' },
     ],
     jobs: [
-      { id: 'j1', role: 'Design Lead', company: 'Lumen Health', source: 'Indeed' },
-      { id: 'j2', role: 'Senior Product Designer', company: 'Stripe', source: 'Indeed' },
-      { id: 'j3', role: 'Staff Designer', company: 'Figma', source: 'Indeed' },
+      { id: 'j1', role: 'UX Design Intern', company: 'Lumen Health', source: 'Indeed' },
+      { id: 'j2', role: 'Product Design Intern', company: 'Strada', source: 'Indeed' },
+      { id: 'j3', role: 'Associate Product Manager Intern', company: 'Sola', source: 'Indeed' },
     ],
     watchSaved: [],
     orphanNotes: [],
@@ -281,19 +247,19 @@ export function createSeedState(): AppState {
       {
         id: 'g1',
         agent: 2,
-        message: 'Matched location to Design Forward Summit 2026 (Eventbrite ticket).',
+        message: `Matched location to ${FAIR} (Eventbrite ticket).`,
         at: at(-3),
       },
       {
         id: 'g2',
         agent: 6,
-        message: 'Switched mode to Event and updated Slack status.',
+        message: 'Switched mode to Event and updated your broadcast status.',
         at: at(-3),
       },
       {
         id: 'g3',
         agent: 3,
-        message: 'Captured Priya Natarajan via NFC tap and transcribed 3 notes.',
+        message: 'Captured Priya Natarajan (Lumen Health recruiter) via NFC tap and transcribed 3 notes.',
         at: at(-1.2),
       },
     ],
