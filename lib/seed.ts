@@ -1,4 +1,5 @@
 import type { AppState, Profile } from './types'
+import { createDemoContact } from './onboarding'
 
 const HOUR = 60 * 60 * 1000
 
@@ -322,7 +323,7 @@ export function createEmptyState(user: { name: string; email: string }): AppStat
       learnedPreferences: [],
       companion: { ...seed.settings.companion, photo: null },
     },
-    contacts: [],
+    contacts: [createDemoContact()],
     events: [],
     todos: [],
     jobs: [],

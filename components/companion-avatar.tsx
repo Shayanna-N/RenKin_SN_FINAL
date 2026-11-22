@@ -117,7 +117,7 @@ export function CompanionAvatar({
   )
 }
 
-/** Avatar for a saved contact: their Renkin pfp when we have it, otherwise initials. */
+/** Avatar for a saved contact: their RenKin pfp when we have it, otherwise initials. */
 export function ContactAvatar({
   name,
   avatar,

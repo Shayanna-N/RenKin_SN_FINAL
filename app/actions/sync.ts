@@ -215,7 +215,7 @@ export async function previewHandle(
     })
     .from(profile)
     .where(eq(profile.handle, handle.data))
-  if (!target) return { ok: false, error: 'No Renkin user with that handle.' }
+  if (!target) return { ok: false, error: 'No RenKin user with that handle.' }
   if (target.userId === userId) return { ok: false, error: "That's your own handle." }
   return {
     ok: true,
@@ -233,7 +233,7 @@ export async function connectByHandle(
   if (!handle.success) return { ok: false, error: handle.error.issues[0].message }
 
   const [target] = await db.select().from(profile).where(eq(profile.handle, handle.data))
-  if (!target) return { ok: false, error: 'No Renkin user with that handle.' }
+  if (!target) return { ok: false, error: 'No RenKin user with that handle.' }
   if (target.userId === userId) return { ok: false, error: "That's your own handle." }
 
   await db.insert(connection).values({ userId, contactUserId: target.userId }).onConflictDoNothing()

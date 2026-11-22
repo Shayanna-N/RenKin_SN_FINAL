@@ -9,11 +9,11 @@ const geistSans = Geist({ subsets: ['latin'], variable: '--font-geist-sans' })
 const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono' })
 
 export const metadata: Metadata = {
-  title: 'Renkin — agent-powered contactless networking',
+  title: 'RenKin — agent-powered contactless networking',
   description:
     'Share a living digital card by tap or QR, read any card online or offline, and let a team of agents capture the who, what and why of every connection.',
   generator: 'v0.app',
-  applicationName: 'Renkin',
+  applicationName: 'RenKin',
   icons: {
     icon: [
       { url: '/icon-light-32x32.png', media: '(prefers-color-scheme: light)' },

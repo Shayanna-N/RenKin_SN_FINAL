@@ -54,7 +54,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <span className="text-sm font-bold">R</span>
           </span>
-          <span className="font-semibold tracking-tight">Renkin</span>
+          <span className="font-semibold tracking-tight">RenKin</span>
         </div>
         <nav aria-label="Main" className="flex flex-1 flex-col gap-1 px-3">
           {NAV.map(({ href, label, icon: Icon }) => (
@@ -84,7 +84,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
               <span className="text-sm font-bold">R</span>
             </span>
-            <span className="sr-only">Renkin</span>
+            <span className="sr-only">RenKin</span>
           </div>
           <div data-tour="modes">
             <ModeSwitcher className="[&_button]:px-2.5 [&_button]:py-1.5 [&_button]:text-xs [&_svg]:size-3.5 md:[&_button]:px-3.5 md:[&_button]:py-2 md:[&_button]:text-sm md:[&_svg]:size-4" />

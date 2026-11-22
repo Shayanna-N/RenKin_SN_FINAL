@@ -2,8 +2,8 @@ import type { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Renkin',
-    short_name: 'Renkin',
+    name: 'RenKin',
+    short_name: 'RenKin',
     description: 'Agent-powered contactless networking',
     start_url: '/',
     display: 'standalone',

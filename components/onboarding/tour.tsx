@@ -167,7 +167,7 @@ export function OnboardingTour() {
             disabled={hasDemo}
           >
             {hasDemo ? <Check className="size-4" aria-hidden /> : <UserPlus className="size-4" aria-hidden />}
-            {hasDemo ? 'Demo contact added' : 'Add a demo contact'}
+            {hasDemo ? 'RenKin demo contact added' : 'Add the RenKin demo contact'}
           </Button>
         )}
 

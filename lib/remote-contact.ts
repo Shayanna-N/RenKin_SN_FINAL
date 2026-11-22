@@ -32,8 +32,8 @@ export function contactFromRemote(
     mode,
     what: [],
     why: {
-      context: 'Connected on Renkin',
-      evidence: ['Added by Renkin handle'],
+      context: 'Connected on RenKin',
+      evidence: ['Added by RenKin handle'],
       confidence: 1,
       confirmed: true,
       alternatives: [],

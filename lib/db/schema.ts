@@ -52,7 +52,7 @@ export const verification = pgTable('verification', {
   updatedAt: timestamp('updatedAt').defaultNow(),
 })
 
-// --- Renkin app tables ---
+// --- RenKin app tables ---
 
 /** A user's published card, discoverable by handle. */
 export const profile = pgTable('profile', {

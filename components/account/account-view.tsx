@@ -80,7 +80,7 @@ export function AccountView({ welcome = false }: { welcome?: boolean }) {
   if (!session?.user || !account) {
     return (
       <div className="flex flex-col gap-6">
-        <PageHeader title="Account & sync" description="Optional. Renkin works fully offline without an account." />
+        <PageHeader title="Account & sync" description="Optional. RenKin works fully offline without an account." />
         <Section
           title="Sign in to sync"
           description="Back up contacts, use the same card on phone, desktop and watch, and get notified when mutual connections change how they want to be reached."
@@ -106,7 +106,7 @@ export function AccountView({ welcome = false }: { welcome?: boolean }) {
     const res = await publishProfile({ handle, card: toPublishedCard(activeProfile(state), state.settings), preferredChannel })
     setBusy(null)
     if (!res.ok) return toast.error(res.error)
-    toast.success('Your card is live on Renkin')
+    toast.success('Your card is live on RenKin')
     mutate()
   }
 
@@ -175,7 +175,7 @@ export function AccountView({ welcome = false }: { welcome?: boolean }) {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Section
-          title="Your Renkin handle"
+          title="Your RenKin handle"
           description="Your card is published under this handle. Edits on the My card page sync automatically and notify mutual connections."
         >
           {account.handle ? (
@@ -216,7 +216,7 @@ export function AccountView({ welcome = false }: { welcome?: boolean }) {
       </div>
 
       <Section
-        title="Renkin connections"
+        title="RenKin connections"
         description="Add someone by handle. When you've both saved each other, you'll be prompted whenever either of you changes how you want to be reached."
       >
         <form onSubmit={lookup} className="flex flex-col gap-2 sm:flex-row">
@@ -241,7 +241,7 @@ export function AccountView({ welcome = false }: { welcome?: boolean }) {
         <ul className="mt-5 flex flex-col divide-y">
           {account.connections.length === 0 && (
             <li className="flex items-center gap-2 py-3 text-sm text-muted-foreground">
-              <Users className="size-4" aria-hidden /> No Renkin connections yet.
+              <Users className="size-4" aria-hidden /> No RenKin connections yet.
             </li>
           )}
           {account.connections.map((c) => (

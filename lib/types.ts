@@ -140,7 +140,7 @@ export interface Contact {
   followUp?: FollowUp
   followedUp: boolean
   pendingEnrichment: boolean
-  /** Set when this contact is another Renkin user; enables live contact updates. */
+  /** Set when this contact is another RenKin user; enables live contact updates. */
   remoteUserId?: string
   preferredChannel?: Priority
   avatar?: PublicAvatar

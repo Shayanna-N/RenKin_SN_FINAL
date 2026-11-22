@@ -18,8 +18,7 @@ export default function CardPage() {
     <>
       <PageHeader title="My card" description="One living card that adapts to how you're networking right now." />
       <div className="grid items-start gap-6 lg:grid-cols-[1fr_26rem]">
-        <div className="flex min-w-0 flex-col gap-6 lg:order-2">
-          <div className="flex flex-col gap-3">
+        <div className="flex min-w-0 flex-col gap-3 lg:col-start-2 lg:row-start-1">
             <div data-tour="card-preview" className="mx-auto w-full max-w-md">
             <DigitalCard
               profile={activeProfile(state)}
@@ -36,13 +35,9 @@ export default function CardPage() {
             <div className="flex justify-center">
               <ModeSwitcher />
             </div>
-          </div>
-          <div data-tour="appearance">
-            <Appearance />
-          </div>
         </div>
 
-        <div className="flex min-w-0 flex-col gap-6 lg:order-1">
+        <div className="flex min-w-0 flex-col gap-6 lg:col-start-1 lg:row-start-1">
           {/* Tabbed widget: Card details (per mode) + Channels */}
           <div className="overflow-hidden rounded-2xl border bg-card">
             <Tabs defaultValue="card-details">
@@ -66,6 +61,10 @@ export default function CardPage() {
                 <ContactChannelRecommender />
               </TabsContent>
             </Tabs>
+          </div>
+
+          <div data-tour="appearance" className="min-w-0">
+            <Appearance />
           </div>
         </div>
       </div>

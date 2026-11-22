@@ -127,7 +127,7 @@ export function DigitalCard({
 
         <div className="flex items-center justify-between text-[10px] font-medium uppercase tracking-widest opacity-70">
           <span>{modeLabel} card</span>
-          <span className="font-mono">Renkin · Tap</span>
+          <span className="font-mono">RenKin · Tap</span>
         </div>
       </div>
     </div>
