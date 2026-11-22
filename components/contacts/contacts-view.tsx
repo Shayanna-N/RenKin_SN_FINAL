@@ -126,7 +126,7 @@ export function ContactsView() {
         </div>
 
         {/* View toggles — independent, both can be active */}
-        <div className="flex shrink-0 gap-2 text-sm">
+        <div className="flex shrink-0 gap-4 text-sm">
           {VIEW_BUTTONS.map(({ id, label, tooltip }) => {
             const active = id === 'context' ? byEvent : pendingOnly
             const toggle = id === 'context'
@@ -142,7 +142,7 @@ export function ContactsView() {
                     'inline-flex h-10 cursor-pointer items-center justify-center whitespace-nowrap rounded-lg border px-4 font-medium shadow-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:translate-y-px',
                     active
                       ? 'border-primary bg-primary text-primary-foreground hover:bg-primary/90'
-                      : 'bg-card text-muted-foreground hover:border-primary/40 hover:bg-accent hover:text-foreground',
+                      : 'border-foreground/20 bg-card text-muted-foreground hover:border-primary/40 hover:bg-accent hover:text-foreground',
                   )}
                 >
                   {label}
