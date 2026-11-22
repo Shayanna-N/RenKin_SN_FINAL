@@ -326,8 +326,7 @@ export function ContactDetail({ contact, onClose }: { contact: Contact | null; o
                     <a
                       key={l.url}
                       href={l.url}
-                      target="_blank"
-                      rel="noreferrer"
+                      {...(l.kind === 'phone' ? {} : { target: '_blank', rel: 'noreferrer' })}
                       className={buttonVariants({ size: 'sm', variant: 'outline', className: 'capitalize' })}
                     >
                       {l.kind}

@@ -8,6 +8,7 @@ export type LinkKind =
   | 'x'
   | 'github'
   | 'calendly'
+  | 'phone'
   | 'other'
 
 export type CaptureSource = 'nfc' | 'qr' | 'photo' | 'manual' | 'voice'

@@ -111,12 +111,14 @@ export function DigitalCard({
           )}
           {v.links.slice(0, 2).map((l) => (
             <li key={l.id} className="flex items-center gap-2 truncate">
-              {l.kind === 'website' || l.kind === 'portfolio' ? (
+              {l.kind === 'phone' ? (
+                <Phone className="size-3.5 shrink-0 opacity-80" aria-hidden />
+              ) : l.kind === 'website' || l.kind === 'portfolio' ? (
                 <Globe className="size-3.5 shrink-0 opacity-80" aria-hidden />
               ) : (
                 <Link2 className="size-3.5 shrink-0 opacity-80" aria-hidden />
               )}
-              {l.url.replace(/^https?:\/\//, '')}
+              {l.url.replace(/^(https?:\/\/|tel:)/i, '')}
             </li>
           ))}
           {mode === 'custom' && customCardFields.slice(0, 5).map((f, i) => (

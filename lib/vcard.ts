@@ -26,7 +26,10 @@ export function buildVCard(profile: Profile, mode: Mode) {
   ]
   if (v.email) lines.push(`EMAIL;TYPE=INTERNET:${v.email}`)
   if (v.phone) lines.push(`TEL;TYPE=CELL:${v.phone}`)
-  for (const link of v.links) lines.push(`URL;TYPE=${link.kind}:${link.url}`)
+  for (const link of v.links) {
+    if (link.kind === 'phone') lines.push(`TEL;TYPE=WORK:${link.url.replace(/^tel:/i, '')}`)
+    else lines.push(`URL;TYPE=${link.kind}:${link.url}`)
+  }
   lines.push('END:VCARD')
   return lines.join('\n')
 }

@@ -13,7 +13,24 @@ import { cn } from '@/lib/utils'
 import type { LinkKind, Mode, Profile } from '@/lib/types'
 
 const MODES = Object.keys(MODE_META) as Mode[]
-const KINDS: LinkKind[] = ['linkedin', 'website', 'portfolio', 'instagram', 'x', 'github', 'calendly', 'other']
+const KINDS: LinkKind[] = ['linkedin', 'website', 'portfolio', 'instagram', 'x', 'github', 'calendly', 'phone', 'other']
+
+const KIND_LABEL: Record<LinkKind, string> = {
+  linkedin: 'LinkedIn',
+  website: 'Website',
+  portfolio: 'Portfolio',
+  instagram: 'Instagram',
+  x: 'X',
+  github: 'GitHub',
+  calendly: 'Calendly',
+  phone: 'Phone',
+  other: 'Other',
+}
+
+const VALUE_PLACEHOLDER: Partial<Record<LinkKind, string>> = {
+  phone: '+1 (415) 555-0142',
+  other: 'Link or detail',
+}
 
 function ModeChips({ value, onChange, label }: { value: Mode[]; onChange: (m: Mode[]) => void; label: string }) {
   return (
@@ -44,26 +61,35 @@ export function CardEditor({ embedded }: { embedded?: boolean }) {
   const p = state.profile
   const [newUrl, setNewUrl] = useState('')
   const [newKind, setNewKind] = useState<LinkKind>('website')
+  const [newLabel, setNewLabel] = useState('')
 
   const set = (patch: Partial<Profile>) => update((s) => ({ ...s, profile: { ...s.profile, ...patch } }))
 
   function addLink(e: React.FormEvent) {
     e.preventDefault()
-    const url = newUrl.trim()
-    if (!url) return
+    const value = newUrl.trim()
+    if (!value) return
+    const isPhone = newKind === 'phone'
+    const url = isPhone
+      ? `tel:${value.replace(/^tel:/i, '')}`
+      : /^(https?:|mailto:|tel:)/i.test(value)
+        ? value
+        : `https://${value}`
+    const label = newKind === 'other' ? newLabel.trim() || KIND_LABEL.other : KIND_LABEL[newKind]
     set({
       links: [
         ...p.links,
         {
           id: crypto.randomUUID(),
           kind: newKind,
-          label: newKind[0].toUpperCase() + newKind.slice(1),
-          url: url.startsWith('http') ? url : `https://${url}`,
+          label,
+          url,
           modes: [state.settings.mode],
         },
       ],
     })
     setNewUrl('')
+    setNewLabel('')
   }
 
   const inner = (
@@ -150,23 +176,46 @@ export function CardEditor({ embedded }: { embedded?: boolean }) {
           </li>
         ))}
       </ul>
-      <form onSubmit={addLink} className="mt-3 flex gap-2">
+      <form onSubmit={addLink} className="mt-3 flex flex-wrap gap-2">
         <Select value={newKind} onValueChange={(v) => setNewKind(v as LinkKind)}>
-          <SelectTrigger className="w-36" aria-label="Link type">
-            <SelectValue />
+          <SelectTrigger className="w-36 shrink-0" aria-label="Link type">
+            <SelectValue>{KIND_LABEL[newKind]}</SelectValue>
           </SelectTrigger>
           <SelectContent>
             {KINDS.map((k) => (
-              <SelectItem key={k} value={k} className="capitalize">
-                {k}
+              <SelectItem key={k} value={k}>
+                {KIND_LABEL[k]}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
+        {newKind === 'other' && (
+          <>
+            <label htmlFor="new-label" className="sr-only">
+              Custom name
+            </label>
+            <Input
+              id="new-label"
+              value={newLabel}
+              onChange={(e) => setNewLabel(e.target.value)}
+              placeholder="Name (e.g. Telegram)"
+              maxLength={24}
+              className="w-44 shrink-0"
+            />
+          </>
+        )}
         <label htmlFor="new-url" className="sr-only">
-          Link URL
+          {newKind === 'phone' ? 'Phone number' : 'Link URL'}
         </label>
-        <Input id="new-url" value={newUrl} onChange={(e) => setNewUrl(e.target.value)} placeholder="yoursite.com" />
+        <Input
+          id="new-url"
+          type={newKind === 'phone' ? 'tel' : 'text'}
+          inputMode={newKind === 'phone' ? 'tel' : undefined}
+          value={newUrl}
+          onChange={(e) => setNewUrl(e.target.value)}
+          placeholder={VALUE_PLACEHOLDER[newKind] ?? 'yoursite.com'}
+          className="min-w-40 flex-1"
+        />
         <Button type="submit" variant="secondary" size="icon" aria-label="Add link">
           <Plus className="size-4" aria-hidden />
         </Button>
