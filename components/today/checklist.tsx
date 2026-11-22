@@ -5,6 +5,10 @@ import { Briefcase, CheckCircle2, Circle, ListTodo, Plus, Target } from 'lucide-
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { ProfileAvatar } from '@/components/companion-avatar'
+import { SuggestionsTab } from '@/components/today/suggestions-tab'
+import { toPublicAvatar } from '@/lib/companion'
 import { useStore } from '@/lib/store'
 import { cn } from '@/lib/utils'
 
@@ -35,16 +39,47 @@ export function Checklist() {
     }))
   }
 
+  const companion = state.settings.companion
+  const companionName = companion.name.trim() || 'Companion'
   const metCompanies = new Set(state.contacts.map((c) => c.company.toLowerCase()))
 
   return (
     <section aria-labelledby="checklist-heading" className="rounded-2xl border bg-card p-5 md:p-6">
-      <h2 id="checklist-heading" className="font-semibold">
-        Your plan for today
-      </h2>
-      <p className="text-sm text-muted-foreground">Summarized from connected apps and your goals.</p>
+      <Tabs defaultValue="plan" className="gap-0">
+        <div className="flex items-center gap-3">
+          <ProfileAvatar
+            avatar={toPublicAvatar(companion, state.settings.brand, state.settings.mode)}
+            name={companionName}
+            size="sm"
+          />
+          <div className="min-w-0">
+            <h2 id="checklist-heading" className="font-semibold">
+              Your plan for today
+            </h2>
+            <p className="text-sm text-muted-foreground">Summarized from connected apps and your goals.</p>
+          </div>
+        </div>
 
-      <div className="mt-5 flex flex-col gap-6">
+        <TabsList variant="line" className="mt-4 h-9 w-full justify-start border-b pb-0">
+          <TabsTrigger value="plan" className="flex-none px-3">
+            Your plan
+          </TabsTrigger>
+          <TabsTrigger value="suggestions" className="max-w-64 flex-none px-3">
+            <span className="truncate">{companionName}&apos;s Suggestions</span>
+            {state.suggestions.length > 0 && (
+              <span className="rounded-full bg-primary/10 px-1.5 text-xs text-primary">
+                {state.suggestions.length}
+              </span>
+            )}
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="suggestions" className="mt-5">
+          <SuggestionsTab />
+        </TabsContent>
+
+        <TabsContent value="plan" className="mt-5">
+      <div className="flex flex-col gap-6">
         <div>
           <h3 className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
             <ListTodo className="size-3.5" aria-hidden /> To-dos
@@ -125,6 +160,8 @@ export function Checklist() {
           </form>
         </div>
       </div>
+        </TabsContent>
+      </Tabs>
     </section>
   )
 }

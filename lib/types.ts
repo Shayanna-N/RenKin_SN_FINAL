@@ -238,6 +238,19 @@ export interface AgentLogEntry {
   at: string
 }
 
+export type SuggestionKind = 'action' | 'starter'
+export type SuggestionAgent = 'Context' | 'Scribe' | 'Organizer' | 'Doer'
+
+/** A companion suggestion the user chose to keep from the pop-up. */
+export interface Suggestion {
+  id: string
+  kind: SuggestionKind
+  text: string
+  reason: string
+  agent: SuggestionAgent
+  savedAt: string
+}
+
 export interface AppState {
   /** One full card profile per networking mode. */
   profiles: Record<Mode, Profile>
@@ -249,6 +262,7 @@ export interface AppState {
   log: AgentLogEntry[]
   watchSaved: SavedCard[]
   orphanNotes: OrphanNote[]
+  suggestions: Suggestion[]
 }
 
 export interface CapturedPerson {
