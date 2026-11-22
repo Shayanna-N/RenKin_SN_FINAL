@@ -68,10 +68,31 @@ export function CardEditor({ embedded }: { embedded?: boolean }) {
 
   const inner = (
     <>
-      <h2 id="editor-heading" className="font-semibold">
-        Card details
-      </h2>
-      <p className="text-sm text-muted-foreground">Choose which modes share each field.</p>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <h2 id="editor-heading" className="font-semibold">
+            Card details
+          </h2>
+          <p className="text-sm text-muted-foreground">Choose which modes share each field.</p>
+        </div>
+        <div className="grid gap-1.5 sm:w-1/2 sm:max-w-sm">
+          <Label htmlFor="qr-url">QR code link</Label>
+          <Input
+            id="qr-url"
+            type="url"
+            inputMode="url"
+            placeholder="https://yoursite.com"
+            value={state.settings.customQrUrl ?? ''}
+            onChange={(e) =>
+              update((s) => ({ ...s, settings: { ...s.settings, customQrUrl: e.target.value } }))
+            }
+            aria-describedby="qr-url-hint"
+          />
+          <p id="qr-url-hint" className="text-xs text-muted-foreground">
+            Your card&apos;s QR updates automatically.
+          </p>
+        </div>
+      </div>
 
       <div className="mt-5 grid gap-4 sm:grid-cols-2">
         <div className="grid gap-1.5">

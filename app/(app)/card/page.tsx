@@ -7,10 +7,9 @@ import { ModeSwitcher } from '@/components/mode-switcher'
 import { CardEditor } from '@/components/card/card-editor'
 import { Appearance } from '@/components/card/appearance'
 import { CompanionCustomizer } from '@/components/card/companion-customizer'
-import { CustomModeWidget } from '@/components/card/custom-mode-widget'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { ContactChannelRecommender } from '@/components/card/contact-channel-recommender'
-import { CreditCard, Smile, Sparkles, SlidersHorizontal } from 'lucide-react'
+import { CreditCard, Smile, Sparkles } from 'lucide-react'
 
 export default function CardPage() {
   const { state } = useStore()
@@ -41,19 +40,6 @@ export default function CardPage() {
         </div>
 
         <div className="flex min-w-0 flex-col gap-6 lg:order-1">
-          {/* Custom mode widget */}
-          <div className="overflow-hidden rounded-2xl border bg-card">
-            <div className="border-b px-5 py-3">
-              <div className="flex items-center gap-2 font-medium text-sm">
-                <SlidersHorizontal className="size-4" aria-hidden />
-                Custom mode
-              </div>
-            </div>
-            <div className="p-5 md:p-6">
-              <CustomModeWidget />
-            </div>
-          </div>
-
           {/* Tabbed widget: Card details (1) + Companion & Profile Customization (2) */}
           <div className="overflow-hidden rounded-2xl border bg-card">
             <Tabs defaultValue="card-details">
