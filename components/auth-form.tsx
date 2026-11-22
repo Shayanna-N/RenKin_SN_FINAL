@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { ArrowLeft, Loader2 } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
@@ -10,7 +9,6 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
 export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
-  const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
   const isSignUp = mode === 'sign-up'
@@ -39,8 +37,8 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
   }
       return
     }
-    router.push('/account?welcome=1')
-    router.refresh()
+    // Full navigation so the app reloads with the new session cookie instead of a stale signed-out client cache.
+    window.location.assign('/account?welcome=1')
   }
 
   return (
