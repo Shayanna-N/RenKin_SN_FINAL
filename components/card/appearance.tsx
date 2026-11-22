@@ -3,10 +3,8 @@
 import { Check, ChevronDown, Moon, Sun } from 'lucide-react'
 import { useCallback, useRef, useState } from 'react'
 import { useStore } from '@/lib/store'
-import { StyledQr, normalizeQrUrl } from '@/components/styled-qr'
 import { cn } from '@/lib/utils'
 import { CARD_STYLES, readableOn } from '@/lib/companion'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import type { Settings } from '@/lib/types'
@@ -40,12 +38,6 @@ function SaveButton({ saved, onClick }: { saved: boolean; onClick: () => void })
   )
 }
 
-const QR_STYLE_OPTIONS: { value: Settings['customQrStyle']; label: string }[] = [
-  { value: 'squares', label: 'Squares' },
-  { value: 'rounded', label: 'Rounded' },
-  { value: 'dots', label: 'Dots' },
-]
-
 const SWATCHES = [
   { name: 'Teal', value: '#0f766e' },
   { name: 'Cobalt', value: '#1d4ed8' },
@@ -62,7 +54,6 @@ export function Appearance() {
   const set = (patch: Partial<Settings>) => update((st) => ({ ...st, settings: { ...st.settings, ...patch } }))
   const { saved, flash } = useSaved()
   const [open, setOpen] = useState(false)
-  const qrUrl = normalizeQrUrl(s.customQrUrl ?? '')
 
   return (
     <section aria-labelledby="appearance-heading" className="rounded-2xl border bg-card p-5 md:p-6">
@@ -143,97 +134,6 @@ export function Appearance() {
         </div>
         <Switch id="match-ui" checked={s.matchUiToCard} onCheckedChange={(v) => set({ matchUiToCard: v })} />
       </div>
-
-      <fieldset className="mt-5">
-        <legend className="text-sm font-medium">QR code</legend>
-
-        {/* URL input */}
-        <div className="mt-2 flex flex-col gap-1.5">
-          <Label htmlFor="qr-url" className="text-xs text-muted-foreground">Link URL</Label>
-          <Input
-            id="qr-url"
-            type="url"
-            value={s.customQrUrl ?? ''}
-            onChange={(e) => set({ customQrUrl: e.target.value })}
-            placeholder="https://yoursite.com"
-          />
-          {!s.customQrUrl && (
-            <p className="text-xs text-muted-foreground">Enter a URL to enable the QR code on your card.</p>
-          )}
-        </div>
-
-        <div className="mt-3 flex flex-wrap items-center gap-4">
-          {/* Shape */}
-          <div className="flex flex-col gap-1.5">
-            <span className="text-xs text-muted-foreground">Shape</span>
-            <div className="flex gap-2">
-              {QR_STYLE_OPTIONS.map((o) => (
-                <button
-                  key={o.value}
-                  type="button"
-                  aria-pressed={s.customQrStyle === o.value}
-                  onClick={() => set({ customQrStyle: o.value })}
-                  className={cn(
-                    'rounded-md border px-3 py-1.5 text-xs font-medium transition-colors',
-                    s.customQrStyle === o.value
-                      ? 'border-primary bg-primary/10 text-primary'
-                      : 'text-muted-foreground hover:text-foreground',
-                  )}
-                >
-                  {o.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <span className="text-xs text-muted-foreground">Color</span>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                aria-pressed={!s.customQrColor}
-                onClick={() => set({ customQrColor: '' })}
-                className={cn(
-                  'rounded-md border px-3 py-1.5 text-xs font-medium transition-colors',
-                  !s.customQrColor
-                    ? 'border-primary bg-primary/10 text-primary'
-                    : 'text-muted-foreground hover:text-foreground',
-                )}
-              >
-                Auto
-              </button>
-              <label className="flex items-center gap-2 text-xs text-muted-foreground">
-                <input
-                  type="color"
-                  value={s.customQrColor || readableOn(s.brand)}
-                  onChange={(e) => set({ customQrColor: e.target.value })}
-                  className={cn(
-                    'size-9 cursor-pointer rounded-full border bg-transparent',
-                    s.customQrColor && 'ring-2 ring-primary ring-offset-2 ring-offset-card',
-                  )}
-                  aria-label="Custom QR code color"
-                />
-                Custom
-              </label>
-            </div>
-          </div>
-
-          {qrUrl && (
-            <div className="flex flex-col gap-1.5">
-              <span className="text-xs text-muted-foreground">Preview</span>
-              <div className={cn('w-fit max-w-full rounded-lg p-2', `card-tex-${s.cardStyle}`)}>
-                <StyledQr
-                  value={qrUrl}
-                  shape={s.customQrStyle}
-                  color={s.customQrColor || 'currentColor'}
-                  margin={0}
-                  className="size-20 max-h-20 max-w-20"
-                />
-              </div>
-            </div>
-          )}
-        </div>
-      </fieldset>
 
       <fieldset className="mt-5">
         <legend className="text-sm font-medium">Theme</legend>
