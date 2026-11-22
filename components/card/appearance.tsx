@@ -1,6 +1,6 @@
 'use client'
 
-import { Check, Moon, Sun } from 'lucide-react'
+import { Check, ChevronDown, Moon, Sun } from 'lucide-react'
 import { useCallback, useRef, useState } from 'react'
 import { useStore } from '@/lib/store'
 import { StyledQr, normalizeQrUrl } from '@/components/styled-qr'
@@ -61,15 +61,31 @@ export function Appearance() {
   const s = state.settings
   const set = (patch: Partial<Settings>) => update((st) => ({ ...st, settings: { ...st.settings, ...patch } }))
   const { saved, flash } = useSaved()
+  const [open, setOpen] = useState(false)
   const qrUrl = normalizeQrUrl(s.customQrUrl ?? '')
 
   return (
     <section aria-labelledby="appearance-heading" className="rounded-2xl border bg-card p-5 md:p-6">
       <h2 id="appearance-heading" className="font-semibold">
-        Appearance
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          aria-expanded={open}
+          aria-controls="appearance-panel"
+          className="flex w-full items-center justify-between gap-4 rounded-md text-left outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <span className="flex flex-col">
+            <span>Appearance</span>
+            <span className="text-sm font-normal text-muted-foreground">Applies to your card and the whole app.</span>
+          </span>
+          <ChevronDown
+            className={cn('size-5 shrink-0 text-muted-foreground transition-transform', open && 'rotate-180')}
+            aria-hidden
+          />
+        </button>
       </h2>
-      <p className="text-sm text-muted-foreground">Applies to your card and the whole app.</p>
 
+      <div id="appearance-panel" hidden={!open}>
       <fieldset className="mt-5">
         <legend className="text-sm font-medium">Color</legend>
         <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -241,6 +257,7 @@ export function Appearance() {
       </fieldset>
 
       <SaveButton saved={saved} onClick={flash} />
+      </div>
     </section>
   )
 }
