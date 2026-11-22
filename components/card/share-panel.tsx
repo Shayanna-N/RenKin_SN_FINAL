@@ -1,6 +1,6 @@
 'use client'
 
-import { QRCodeSVG } from 'qrcode.react'
+import { StyledQr } from '@/components/styled-qr'
 import { Download, Nfc, Wallet } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useStore } from '@/lib/store'
@@ -27,11 +27,12 @@ export function SharePanel({
     <div className="flex flex-col gap-5">
       {/* QR — purely display, no progress needed */}
       <div className="flex flex-col items-center gap-3 rounded-xl bg-white p-5">
-        <QRCodeSVG
+        <StyledQr
           value={vcard}
-          size={192}
-          level="M"
-          fgColor={state.settings.brand}
+          shape={state.settings.customQrStyle}
+          color={state.settings.brand}
+          margin={0}
+          className="size-48"
           title={`QR code for ${state.profile.name}'s contact card`}
         />
         <p className="text-xs text-neutral-600">Point any phone camera here</p>

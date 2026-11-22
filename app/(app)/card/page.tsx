@@ -18,8 +18,8 @@ export default function CardPage() {
   return (
     <>
       <PageHeader title="My card" description="One living card that adapts to how you're networking right now." />
-      <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
-        <div className="flex min-w-0 flex-col gap-6">
+      <div className="grid items-start gap-6 lg:grid-cols-[1fr_26rem]">
+        <div className="flex min-w-0 flex-col gap-6 lg:order-2">
           <div className="flex flex-col gap-3">
             <DigitalCard
               profile={state.profile}
@@ -31,13 +31,16 @@ export default function CardPage() {
               customQrColor={state.settings.customQrColor}
               customCardFields={state.settings.customCardFields}
               customModeName={state.settings.customModeName}
-              className="mx-auto max-w-md"
+              className="mx-auto w-full max-w-md"
             />
             <div className="flex justify-center">
               <ModeSwitcher />
             </div>
           </div>
+          <Appearance />
+        </div>
 
+        <div className="flex min-w-0 flex-col gap-6 lg:order-1">
           {/* Custom mode widget */}
           <div className="overflow-hidden rounded-2xl border bg-card">
             <div className="border-b px-5 py-3">
@@ -82,9 +85,6 @@ export default function CardPage() {
               </TabsContent>
             </Tabs>
           </div>
-        </div>
-        <div className="flex min-w-0 flex-col gap-6">
-          <Appearance />
         </div>
       </div>
     </>

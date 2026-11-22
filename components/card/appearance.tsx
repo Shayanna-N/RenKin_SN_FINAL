@@ -2,8 +2,8 @@
 
 import { Check, Moon, Sun } from 'lucide-react'
 import { useCallback, useRef, useState } from 'react'
-import { QRCodeSVG } from 'qrcode.react'
 import { useStore } from '@/lib/store'
+import { StyledQr, normalizeQrUrl } from '@/components/styled-qr'
 import { cn } from '@/lib/utils'
 import { CARD_STYLES, readableOn } from '@/lib/companion'
 import { Input } from '@/components/ui/input'
@@ -61,6 +61,7 @@ export function Appearance() {
   const s = state.settings
   const set = (patch: Partial<Settings>) => update((st) => ({ ...st, settings: { ...st.settings, ...patch } }))
   const { saved, flash } = useSaved()
+  const qrUrl = normalizeQrUrl(s.customQrUrl ?? '')
 
   return (
     <section aria-labelledby="appearance-heading" className="rounded-2xl border bg-card p-5 md:p-6">
@@ -169,38 +170,48 @@ export function Appearance() {
             </div>
           </div>
 
-          {/* Color */}
           <div className="flex flex-col gap-1.5">
             <span className="text-xs text-muted-foreground">Color</span>
-            <label className="flex items-center gap-2 text-xs text-muted-foreground">
-              <input
-                type="color"
-                value={s.customQrColor ?? '#ffffff'}
-                onChange={(e) => set({ customQrColor: e.target.value })}
-                className="size-9 cursor-pointer rounded-full border bg-transparent"
-                aria-label="QR code color"
-              />
-              Custom
-            </label>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                aria-pressed={!s.customQrColor}
+                onClick={() => set({ customQrColor: '' })}
+                className={cn(
+                  'rounded-md border px-3 py-1.5 text-xs font-medium transition-colors',
+                  !s.customQrColor
+                    ? 'border-primary bg-primary/10 text-primary'
+                    : 'text-muted-foreground hover:text-foreground',
+                )}
+              >
+                Auto
+              </button>
+              <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                <input
+                  type="color"
+                  value={s.customQrColor || readableOn(s.brand)}
+                  onChange={(e) => set({ customQrColor: e.target.value })}
+                  className={cn(
+                    'size-9 cursor-pointer rounded-full border bg-transparent',
+                    s.customQrColor && 'ring-2 ring-primary ring-offset-2 ring-offset-card',
+                  )}
+                  aria-label="Custom QR code color"
+                />
+                Custom
+              </label>
+            </div>
           </div>
 
-          {/* Live preview — only shown when URL is set */}
-          {s.customQrUrl && (
+          {qrUrl && (
             <div className="flex flex-col gap-1.5">
               <span className="text-xs text-muted-foreground">Preview</span>
-              <div className="rounded-md p-1" style={{ background: s.brand }}>
-                <QRCodeSVG
-                  value={s.customQrUrl}
-                  size={56}
-                  bgColor="transparent"
-                  fgColor={s.customQrColor ?? '#ffffff'}
-                  level="M"
-                  style={{
-                    borderRadius:
-                      s.customQrStyle === 'dots' ? '6px'
-                      : s.customQrStyle === 'rounded' ? '4px'
-                      : undefined,
-                  }}
+              <div className={cn('rounded-lg p-2', `card-tex-${s.cardStyle}`)}>
+                <StyledQr
+                  value={qrUrl}
+                  shape={s.customQrStyle}
+                  color={s.customQrColor || 'currentColor'}
+                  margin={0}
+                  className="size-20"
                 />
               </div>
             </div>

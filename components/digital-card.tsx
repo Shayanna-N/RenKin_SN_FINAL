@@ -1,8 +1,8 @@
 'use client'
 
 import { Globe, Link2, Mail, Phone } from 'lucide-react'
-import { QRCodeSVG } from 'qrcode.react'
 import { cn } from '@/lib/utils'
+import { StyledQr, normalizeQrUrl } from '@/components/styled-qr'
 import { visibleProfile } from '@/lib/vcard'
 import { MODE_META } from '@/lib/agents'
 import { AnimalSilhouette } from '@/components/companion-avatar'
@@ -15,7 +15,7 @@ export function DigitalCard({
   companion,
   customQrUrl,
   customQrStyle = 'squares',
-  customQrColor = '#ffffff',
+  customQrColor = '',
   customCardFields = [],
   customModeName,
   className,
@@ -46,8 +46,7 @@ export function DigitalCard({
       ? customModeName
       : (MODE_META[mode]?.label ?? mode)
 
-  // QR dot radius based on style
-  const qrRadius = customQrStyle === 'dots' ? 0.5 : customQrStyle === 'rounded' ? 0.3 : 0
+  const qrUrl = normalizeQrUrl(customQrUrl ?? '')
 
   return (
     <div
@@ -57,25 +56,14 @@ export function DigitalCard({
       )}
       aria-label={`Digital card for ${profile.name}`}
     >
-      {/* QR code: absolutely positioned, vertically centered, right half of card */}
-      {customQrUrl && (
-        <div
-          className="pointer-events-none absolute inset-y-0 right-0 flex w-[45%] items-center justify-center opacity-90"
-          aria-hidden
-        >
-          <QRCodeSVG
-            value={customQrUrl}
-            size={999}
-            bgColor="transparent"
-            fgColor={customQrColor}
-            level="M"
-            style={{
-              width: '72%',
-              height: '72%',
-              borderRadius: qrRadius > 0 ? `${qrRadius * 12}px` : undefined,
-            }}
-          />
-        </div>
+      {qrUrl && (
+        <StyledQr
+          value={qrUrl}
+          shape={customQrStyle}
+          color={customQrColor || 'currentColor'}
+          margin={0}
+          className="pointer-events-none absolute bottom-9 right-5 aspect-square h-[42%] sm:bottom-10 sm:right-6"
+        />
       )}
 
       <div className="flex h-full flex-col justify-between">
@@ -107,7 +95,7 @@ export function DigitalCard({
           </div>
         </div>
 
-        <ul className="flex flex-col gap-1 text-xs sm:text-sm">
+        <ul className={cn('flex flex-col gap-1 text-xs sm:text-sm', qrUrl && 'pr-[32%]')}>
           {v.email && (
             <li className="flex items-center gap-2 truncate">
               <Mail className="size-3.5 shrink-0 opacity-80" aria-hidden />
