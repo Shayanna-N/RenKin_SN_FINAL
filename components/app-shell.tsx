@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils'
 import { useBrowserOnline, useOnline, useStore } from '@/lib/store'
 import { activeProfile } from '@/lib/profile'
 import { OfflineNotice } from '@/components/offline-notice'
+import { AutoSync } from '@/components/auto-sync'
 import { ModeSwitcher } from '@/components/mode-switcher'
 import { ContactUpdates } from '@/components/contact-updates'
 
@@ -45,6 +46,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-dvh md:flex">
       <OfflineNotice />
+      <AutoSync />
       <aside className="hidden md:flex md:w-60 md:shrink-0 md:flex-col md:border-r md:bg-sidebar">
         <div className="flex h-16 items-center gap-2 px-5">
           <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">

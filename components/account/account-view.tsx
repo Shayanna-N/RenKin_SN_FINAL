@@ -3,9 +3,13 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { CloudDownload, CloudUpload, Loader2, LogOut, UserPlus, Users } from 'lucide-react'
+import { Download, Loader2, LogOut, Trash2, UserPlus, Users } from 'lucide-react'
 import { toast } from 'sonner'
-import { connectByHandle, previewHandle, publishProfile, pullContacts, pushContacts } from '@/app/actions/sync'
+import { connectByHandle, previewHandle, publishProfile } from '@/app/actions/sync'
+import { PhotoPicker } from '@/components/account/photo-picker'
+import { SyncControls } from '@/components/account/sync-controls'
+import { WelcomeSetup } from '@/components/account/welcome-setup'
+import { buildContactsVCard, downloadTextFile } from '@/lib/vcard'
 import { ContactAvatar, ProfileAvatar } from '@/components/companion-avatar'
 import {
   Dialog,
@@ -37,10 +41,12 @@ function Section({ title, description, children }: { title: string; description?
   )
 }
 
-export function AccountView() {
+export function AccountView({ welcome = false }: { welcome?: boolean }) {
   const router = useRouter()
-  const { state, update } = useStore()
+  const { state, update, reset } = useStore()
   const { data: account, mutate, session, sessionPending, isLoading } = useAccount()
+  const [welcomeOpen, setWelcomeOpen] = useState(welcome)
+  const [clearOpen, setClearOpen] = useState(false)
   const [handle, setHandle] = useState('')
   const [connectHandle, setConnectHandle] = useState('')
   const [busy, setBusy] = useState<string | null>(null)
@@ -128,25 +134,16 @@ export function AccountView() {
     mutate()
   }
 
-  async function backup() {
-    setBusy('push')
-    const res = await pushContacts(state.contacts)
-    setBusy(null)
-    toast.success(`Backed up ${res.synced} contacts`)
+  function downloadContacts() {
+    if (!state.contacts.length) return toast.error('You have no contacts to download yet')
+    downloadTextFile('renkin-contacts.vcf', buildContactsVCard(state.contacts), 'text/vcard')
+    toast.success(`Downloaded ${state.contacts.length} contacts`)
   }
 
-  async function restore() {
-    setBusy('pull')
-    const remote = await pullContacts()
-    let added = 0
-    update((s) => {
-      const have = new Set(s.contacts.map((c) => c.id))
-      const fresh = remote.filter((c) => !have.has(c.id))
-      added = fresh.length
-      return { ...s, contacts: [...s.contacts, ...fresh] }
-    })
-    setBusy(null)
-    toast.success(added ? `Restored ${added} contacts from the cloud` : 'This device is already up to date')
+  function clearProfile() {
+    reset()
+    setClearOpen(false)
+    toast.success('Profile cleared on this device')
   }
 
   async function onSignOut() {
@@ -157,14 +154,11 @@ export function AccountView() {
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader
-        title="Account & sync"
-        description={`Signed in as ${account.user.email}`}
-      >
-        <Button variant="outline" size="sm" onClick={onSignOut}>
-          <LogOut className="size-4" aria-hidden /> Sign out
-        </Button>
-      </PageHeader>
+      <PageHeader title="Account & sync" description={`Signed in as ${account.user.email}`} />
+
+      <Section title="Profile picture" description="Shown on your card and to people who accept it.">
+        <PhotoPicker />
+      </Section>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Section
@@ -201,19 +195,10 @@ export function AccountView() {
         </Section>
 
         <Section
-          title="Contact sync"
-          description="Back up this device's address book — including cards you scanned offline — and restore it on any device."
+          title="Sync across devices"
+          description="Keep this device's contacts, including cards you scanned offline, in step with your account so every device shares them."
         >
-          <div className="flex flex-wrap gap-2">
-            <Button onClick={backup} disabled={busy === 'push'}>
-              {busy === 'push' ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <CloudUpload className="size-4" aria-hidden />}
-              Back up {state.contacts.length} contacts
-            </Button>
-            <Button variant="outline" onClick={restore} disabled={busy === 'pull'}>
-              {busy === 'pull' ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <CloudDownload className="size-4" aria-hidden />}
-              Restore
-            </Button>
-          </div>
+          <SyncControls />
         </Section>
       </div>
 
@@ -260,6 +245,54 @@ export function AccountView() {
           ))}
         </ul>
       </Section>
+
+      <Section
+        title="Your data"
+        description="Take your contacts with you, or wipe this device. Neither changes what is saved in your account."
+      >
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Button variant="outline" onClick={downloadContacts} className="sm:w-fit">
+            <Download className="size-4" aria-hidden />
+            Download {state.contacts.length} contacts (.vcf)
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => setClearOpen(true)}
+            className="text-destructive hover:text-destructive sm:w-fit"
+          >
+            <Trash2 className="size-4" aria-hidden />
+            Clear profile
+          </Button>
+        </div>
+      </Section>
+
+      <div className="flex justify-center pb-4 pt-2">
+        <Button variant="outline" onClick={onSignOut} className="min-w-40">
+          <LogOut className="size-4" aria-hidden /> Sign out
+        </Button>
+      </div>
+
+      <WelcomeSetup open={welcomeOpen} onOpenChange={setWelcomeOpen} name={account.user.name} />
+
+      <Dialog open={clearOpen} onOpenChange={setClearOpen}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Clear profile on this device?</DialogTitle>
+            <DialogDescription>
+              This removes your card, contacts, notes and settings from this device only. Anything already synced stays
+              in your account, and you can restore it with Sync now.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setClearOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={clearProfile}>
+              Clear profile
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={pending !== null} onOpenChange={(open) => !open && setPending(null)}>
         <DialogContent className="sm:max-w-sm">

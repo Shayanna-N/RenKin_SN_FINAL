@@ -1,4 +1,4 @@
-import type { CapturedPerson, ContactLink, LinkKind, Profile } from './types'
+import type { CapturedPerson, Contact, ContactLink, LinkKind, Profile } from './types'
 
 export function visibleProfile(profile: Profile) {
   return {
@@ -32,6 +32,37 @@ export function buildVCard(profile: Profile) {
   }
   lines.push('END:VCARD')
   return lines.join('\n')
+}
+
+export function buildContactsVCard(contacts: Contact[]) {
+  return contacts
+    .map((c) => {
+      const lines = ['BEGIN:VCARD', 'VERSION:3.0', `FN:${escape(c.name)}`]
+      if (c.headline) lines.push(`TITLE:${escape(c.headline)}`)
+      if (c.company) lines.push(`ORG:${escape(c.company)}`)
+      if (c.email) lines.push(`EMAIL;TYPE=INTERNET:${c.email}`)
+      if (c.phone) lines.push(`TEL;TYPE=CELL:${c.phone}`)
+      for (const link of c.links) {
+        if (!link.url) continue
+        if (link.kind === 'phone') lines.push(`TEL;TYPE=WORK:${link.url.replace(/^tel:/i, '')}`)
+        else lines.push(`URL;TYPE=${link.kind}:${link.url}`)
+      }
+      const note = [`Met via ${c.source} on ${c.capturedAt.slice(0, 10)}`, c.why?.context].filter(Boolean).join(' - ')
+      lines.push(`NOTE:${escape(note)}`, 'END:VCARD')
+      return lines.join('\r\n')
+    })
+    .join('\r\n')
+}
+
+export function downloadTextFile(filename: string, text: string, type: string) {
+  const url = URL.createObjectURL(new Blob([text], { type }))
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  URL.revokeObjectURL(url)
 }
 
 export function guessLinkKind(url: string): LinkKind {

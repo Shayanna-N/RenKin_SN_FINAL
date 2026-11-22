@@ -211,6 +211,10 @@ export interface Settings {
   autoOffline: boolean
   /** The user tapped "Online" to take the app offline by hand. */
   manualOffline: boolean
+  /** Back up contacts to the account automatically while signed in and online. */
+  autoSync: boolean
+  /** ISO time of the last successful sync with the account. */
+  lastSyncedAt?: string
   theme: 'light' | 'dark'
   brand: string
   cardStyle: CardStyle
