@@ -1,13 +1,8 @@
-import { WatsonXAI } from '@ibm-cloud/watsonx-ai'
 import { z } from 'zod'
+import { getWatsonx } from '@/lib/watsonx'
 import { jsonSchemaFormat } from '@/lib/watsonx-format'
 
 export const maxDuration = 60
-
-const watsonx = WatsonXAI.newInstance({
-  version: '2024-05-31',
-  serviceUrl: process.env.WATSONX_AI_URL!,
-})
 
 const MODEL_ID = 'meta-llama/llama-3-3-70b-instruct'
 const PROJECT_ID = process.env.WATSONX_PROJECT_ID!
@@ -62,7 +57,7 @@ export async function POST(req: Request) {
   const { messages, snapshot } = parsed.data
 
   try {
-    const { result } = await watsonx.textChat({
+    const { result } = await getWatsonx().textChat({
       modelId: MODEL_ID,
       projectId: PROJECT_ID,
       maxTokens: 1024,

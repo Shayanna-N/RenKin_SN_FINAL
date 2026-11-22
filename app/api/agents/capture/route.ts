@@ -1,13 +1,8 @@
-import { WatsonXAI } from '@ibm-cloud/watsonx-ai'
 import { z } from 'zod'
+import { getWatsonx } from '@/lib/watsonx'
 import { jsonSchemaFormat } from '@/lib/watsonx-format'
 
 export const maxDuration = 60
-
-const watsonx = WatsonXAI.newInstance({
-  version: '2024-05-31',
-  serviceUrl: process.env.WATSONX_AI_URL!,
-})
 
 const MODEL_ID = 'meta-llama/llama-3-2-90b-vision-instruct'
 const PROJECT_ID = process.env.WATSONX_PROJECT_ID!
@@ -64,7 +59,7 @@ Never invent contact details that are not present. Use null for missing email/ph
 
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { result } = await watsonx.textChat({
+    const { result } = await getWatsonx().textChat({
       modelId: MODEL_ID,
       projectId: PROJECT_ID,
       maxTokens: 1024,
