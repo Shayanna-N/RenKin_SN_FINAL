@@ -71,21 +71,31 @@ export default function TodayPage() {
     <>
       {cardExpanded ? (
         /* ── Expanded layout: card full-width, widgets in a row below ── */
-        <div className="flex flex-col gap-6">
-          <CardWidget
-            expanded={cardExpanded}
-            onToggleExpand={() => setCardExpanded((v) => !v)}
-          />
-          {greeting}
-          <div className="lg:hidden">{watchButton}</div>
-          <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
-            <div className="flex min-w-0 flex-col gap-6">
+        /* Below lg the column wrappers use `contents` so every widget is a direct grid item
+           and `order` can place Capture right under the card and greeting. */
+        <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
+          <div className="order-1 min-w-0 lg:order-none lg:col-span-2">
+            <CardWidget
+              expanded={cardExpanded}
+              onToggleExpand={() => setCardExpanded((v) => !v)}
+            />
+          </div>
+          <div className="order-2 lg:order-none lg:col-span-2">{greeting}</div>
+          <div className="order-4 lg:hidden">{watchButton}</div>
+          <div className="contents lg:flex lg:min-w-0 lg:flex-col lg:gap-6">
+            <div className="order-5 min-w-0 lg:order-none">
               <ContextBanner />
+            </div>
+            <div className="order-6 min-w-0 lg:order-none">
               <Checklist />
             </div>
-            <div className="flex min-w-0 flex-col gap-6">
-              <div className="hidden lg:block">{watchButton}</div>
+          </div>
+          <div className="contents lg:flex lg:min-w-0 lg:flex-col lg:gap-6">
+            <div className="hidden lg:block">{watchButton}</div>
+            <div className="order-7 min-w-0 lg:order-none">
               <InsightsPanel />
+            </div>
+            <div className="order-3 min-w-0 lg:order-none">
               <CaptureWidget />
             </div>
           </div>
@@ -93,20 +103,30 @@ export default function TodayPage() {
       ) : (
         /* ── Compact layout: card in left column, widgets in right column ── */
         <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
-          <div className="flex min-w-0 flex-col gap-6">
-            <CardWidget
-              expanded={cardExpanded}
-              onToggleExpand={() => setCardExpanded((v) => !v)}
-            />
-            {greeting}
-            <div className="lg:hidden">{watchButton}</div>
-            <ContextBanner />
-            <Checklist />
+          <div className="contents lg:flex lg:min-w-0 lg:flex-col lg:gap-6">
+            <div className="order-1 min-w-0 lg:order-none">
+              <CardWidget
+                expanded={cardExpanded}
+                onToggleExpand={() => setCardExpanded((v) => !v)}
+              />
+            </div>
+            <div className="order-2 lg:order-none">{greeting}</div>
+            <div className="order-4 lg:hidden">{watchButton}</div>
+            <div className="order-5 min-w-0 lg:order-none">
+              <ContextBanner />
+            </div>
+            <div className="order-6 min-w-0 lg:order-none">
+              <Checklist />
+            </div>
           </div>
-          <div className="flex min-w-0 flex-col gap-6">
+          <div className="contents lg:flex lg:min-w-0 lg:flex-col lg:gap-6">
             <div className="hidden lg:block">{watchButton}</div>
-            <InsightsPanel />
-            <CaptureWidget />
+            <div className="order-7 min-w-0 lg:order-none">
+              <InsightsPanel />
+            </div>
+            <div className="order-3 min-w-0 lg:order-none">
+              <CaptureWidget />
+            </div>
           </div>
         </div>
       )}
