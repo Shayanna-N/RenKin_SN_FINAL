@@ -63,7 +63,7 @@ export function DigitalCard({
           shape={customQrStyle}
           color={customQrColor || 'currentColor'}
           margin={0}
-          className="pointer-events-none absolute bottom-9 right-5 aspect-square h-[42%] sm:bottom-10 sm:right-6"
+          className="pointer-events-none absolute bottom-9 right-5 aspect-square h-[42%] max-h-32 sm:bottom-10 sm:right-6"
         />
       )}
 

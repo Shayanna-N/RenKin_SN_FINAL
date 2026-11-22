@@ -32,7 +32,7 @@ export function SharePanel({
           shape={state.settings.customQrStyle}
           color={state.settings.brand}
           margin={0}
-          className="size-48"
+          className="size-48 max-h-48 max-w-full"
           title={`QR code for ${state.profile.name}'s contact card`}
         />
         <p className="text-xs text-neutral-600">Point any phone camera here</p>

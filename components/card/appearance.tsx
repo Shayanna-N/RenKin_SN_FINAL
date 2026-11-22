@@ -205,13 +205,13 @@ export function Appearance() {
           {qrUrl && (
             <div className="flex flex-col gap-1.5">
               <span className="text-xs text-muted-foreground">Preview</span>
-              <div className={cn('rounded-lg p-2', `card-tex-${s.cardStyle}`)}>
+              <div className={cn('w-fit max-w-full rounded-lg p-2', `card-tex-${s.cardStyle}`)}>
                 <StyledQr
                   value={qrUrl}
                   shape={s.customQrStyle}
                   color={s.customQrColor || 'currentColor'}
                   margin={0}
-                  className="size-20"
+                  className="size-20 max-h-20 max-w-20"
                 />
               </div>
             </div>
