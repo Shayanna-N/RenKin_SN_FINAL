@@ -238,12 +238,6 @@ export interface AgentLogEntry {
   at: string
 }
 
-export interface ChatMessage {
-  id: string
-  role: 'user' | 'assistant'
-  content: string
-}
-
 export interface AppState {
   /** One full card profile per networking mode. */
   profiles: Record<Mode, Profile>
@@ -253,7 +247,6 @@ export interface AppState {
   todos: TodoItem[]
   jobs: JobTarget[]
   log: AgentLogEntry[]
-  chat: ChatMessage[]
   watchSaved: SavedCard[]
   orphanNotes: OrphanNote[]
 }

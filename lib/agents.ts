@@ -51,7 +51,7 @@ export const AGENTS = [
     name: 'Companion',
     role: 'Your buddy',
     description:
-      'The agent you talk to. Takes manual prompts, switches modes and broadcasts your status to other apps.',
+      'Switches modes and broadcasts your status to other apps.',
   },
   {
     id: 7,

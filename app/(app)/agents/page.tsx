@@ -5,6 +5,8 @@ import { Badge } from '@/components/ui/badge'
 import { useOnline, useStore } from '@/lib/store'
 import { AGENTS, stewardPolicy } from '@/lib/agents'
 
+const COMPANION_AGENT_ID = 6
+
 function timeAgo(iso: string) {
   const mins = Math.round((Date.now() - new Date(iso).getTime()) / 60000)
   if (mins < 1) return 'just now'
@@ -53,7 +55,7 @@ export default function AgentsPage() {
 
       {/* Agent cards below */}
       <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {AGENTS.map((a) => {
+        {AGENTS.filter((a) => a.id !== COMPANION_AGENT_ID).map((a) => {
           const s = status(a.id)
           const last = state.log.find((l) => l.agent === a.id)
           return (

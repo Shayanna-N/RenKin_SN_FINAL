@@ -290,13 +290,5 @@ export function createSeedState(): AppState {
         at: at(-1.2),
       },
     ],
-    chat: [
-      {
-        id: 'm0',
-        role: 'assistant',
-        content:
-          "Hi Jordan — you're at Design Forward Summit. I switched you to Event mode and queued your hiring-related goals. Ask me anything or tell me how to sort your contacts.",
-      },
-    ],
   }
 }

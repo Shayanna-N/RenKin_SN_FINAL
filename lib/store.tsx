@@ -109,7 +109,10 @@ function migrate(saved: Partial<AppState>): AppState {
   const seed = createSeedState()
   const savedMode = saved.settings?.mode
   const contacts = (saved.contacts ?? seed.contacts).map(migrateContact)
-  const { profile: _legacyProfile, ...savedRest } = saved as Partial<AppState> & { profile?: LegacyProfile }
+  const { profile: _legacyProfile, chat: _legacyChat, ...savedRest } = saved as Partial<AppState> & {
+    profile?: LegacyProfile
+    chat?: unknown
+  }
   const { customQrUrl: legacyQrUrl = '', ...savedSettings } = (saved.settings ?? {}) as Partial<Settings> & {
     customQrUrl?: string
   }
