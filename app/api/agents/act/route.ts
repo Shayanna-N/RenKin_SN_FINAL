@@ -1,7 +1,16 @@
-import { generateText, Output } from 'ai'
+import { WatsonXAI } from '@ibm-cloud/watsonx-ai'
 import { z } from 'zod'
+import { zodToJsonSchema } from 'zod-to-json-schema'
 
 export const maxDuration = 60
+
+const watsonx = WatsonXAI.newInstance({
+  version: '2024-05-31',
+  serviceUrl: process.env.WATSONX_AI_URL!,
+})
+
+const MODEL_ID = 'meta-llama/llama-3-3-70b-instruct'
+const PROJECT_ID = process.env.WATSONX_PROJECT_ID!
 
 const requestSchema = z.object({
   sender: z.object({ name: z.string(), headline: z.string(), company: z.string() }),
@@ -33,21 +42,40 @@ export async function POST(req: Request) {
   const { sender, contact, mode, goals, preferences } = parsed.data
 
   try {
-    const { output } = await generateText({
-      model: 'openai/gpt-4o-mini',
-      system: `You are Agent 5 ("Doer") in a networking app. Draft a follow-up for the user to review before sending.
+    const { result } = await watsonx.textChat({
+      modelId: MODEL_ID,
+      projectId: PROJECT_ID,
+      maxTokens: 1024,
+      responseFormat: {
+        type: 'json_schema',
+        json_schema: {
+          name: 'follow_up',
+          schema: zodToJsonSchema(followUpSchema),
+        },
+      },
+      messages: [
+        {
+          role: 'system',
+          content: `You are Agent 5 ("Doer") in a networking app. Draft a follow-up for the user to review before sending.
 Tone: ${mode === 'everyday' ? 'friendly and relaxed' : 'professional but human'}. Keep the email under 120 words. Do not fabricate facts beyond what is provided.
 User goals: ${goals.join('; ') || 'none'}. Learned preferences: ${preferences.join('; ') || 'none'}.`,
-      prompt: `Sender: ${sender.name}, ${sender.headline} at ${sender.company}.
+        },
+        {
+          role: 'user',
+          content: `Sender: ${sender.name}, ${sender.headline} at ${sender.company}.
 Contact: ${contact.name}, ${contact.headline} at ${contact.company}.
 Where we met: ${contact.context}.
 What they shared: ${contact.what.join('; ') || 'nothing recorded'}.
 Notes: ${contact.notes || 'none'}.`,
-      output: Output.object({ schema: followUpSchema }),
+        },
+      ],
     })
+
+    const raw = result.choices?.[0]?.message?.content ?? ''
+    const output = followUpSchema.parse(JSON.parse(typeof raw === 'string' ? raw : JSON.stringify(raw)))
     return Response.json({ followUp: output })
   } catch (error) {
-    console.error('[v0] doer agent failed', error)
+    console.error('[watsonx] doer agent failed', error)
     return Response.json({ error: 'Doer agent failed.' }, { status: 502 })
   }
 }

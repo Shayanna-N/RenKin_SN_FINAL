@@ -5,6 +5,7 @@ import { Watch } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useStore } from '@/lib/store'
 import { CardWidget } from '@/components/today/card-widget'
+import { CaptureWidget } from '@/components/today/capture-widget'
 import { ContextBanner } from '@/components/today/context-banner'
 import { Checklist } from '@/components/today/checklist'
 import { InsightsPanel } from '@/components/today/insights-panel'
@@ -15,8 +16,8 @@ export default function TodayPage() {
     (c) => new Date(c.capturedAt).toDateString() === new Date().toDateString(),
   ).length
 
-  // true = full-width (default), false = column-width (previous/compact)
-  const [cardExpanded, setCardExpanded] = useState(true)
+  // false = column-width (default/compact), true = full-width
+  const [cardExpanded, setCardExpanded] = useState(false)
 
   // Fade-out the greeting as the user scrolls down
   const greetingRef = useRef<HTMLDivElement>(null)
@@ -79,6 +80,7 @@ export default function TodayPage() {
             <div className="flex min-w-0 flex-col gap-6">
               <div className="hidden lg:block">{watchButton}</div>
               <InsightsPanel />
+              <CaptureWidget />
             </div>
           </div>
         </div>
@@ -98,6 +100,7 @@ export default function TodayPage() {
           <div className="flex min-w-0 flex-col gap-6">
             <div className="hidden lg:block">{watchButton}</div>
             <InsightsPanel />
+            <CaptureWidget />
           </div>
         </div>
       )}

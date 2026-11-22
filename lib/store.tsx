@@ -11,7 +11,7 @@ import {
 } from 'react'
 import { readableOn } from './companion'
 import { createSeedState } from './seed'
-import type { AgentLogEntry, AppState, CompanionConfig, Contact, Mode } from './types'
+import type { AgentLogEntry, AppState, CompanionConfig, Contact, Mode, NoteEntry, OrphanNote } from './types'
 
 const STORAGE_KEY = 'renkin:v1'
 const LEGACY_KEYS = ['handshake:v1']
@@ -33,12 +33,30 @@ function migrateCompanion(seed: CompanionConfig, saved?: Partial<CompanionConfig
 
 const VALID_MODES = new Set(['everyday', 'event', 'custom'])
 
+/** Migrate a legacy contact that may still have `notes: string` instead of `noteEntries`. */
+function migrateContact(c: Contact & { notes?: string }): Contact {
+  if (c.noteEntries) return c
+  const legacy = (c as unknown as { notes?: string }).notes ?? ''
+  if (!legacy.trim()) return { ...c, noteEntries: [] }
+  // Wrap the old flat string as a single entry at capturedAt
+  const entry: NoteEntry = {
+    id: crypto.randomUUID(),
+    at: c.capturedAt,
+    location: c.why?.context ?? '',
+    body: legacy,
+    photos: [],
+  }
+  return { ...c, noteEntries: [entry] }
+}
+
 function migrate(saved: Partial<AppState>): AppState {
   const seed = createSeedState()
   const savedMode = saved.settings?.mode
+  const contacts = (saved.contacts ?? seed.contacts).map(migrateContact)
   return {
     ...seed,
     ...saved,
+    contacts,
     settings: {
       ...seed.settings,
       ...saved.settings,
@@ -54,6 +72,7 @@ function migrate(saved: Partial<AppState>): AppState {
       defaultContactSort: saved.settings?.defaultContactSort ?? seed.settings.defaultContactSort,
     },
     watchSaved: saved.watchSaved ?? [],
+    orphanNotes: saved.orphanNotes ?? [],
   } as AppState
 }
 
@@ -65,6 +84,10 @@ interface StoreValue {
   setMode: (mode: Mode, reason?: string) => void
   addContact: (contact: Contact) => void
   updateContact: (id: string, patch: Partial<Contact>) => void
+  addNoteEntry: (contactId: string, entry: NoteEntry) => void
+  addOrphanNote: (note: OrphanNote) => void
+  updateOrphanNote: (id: string, patch: Partial<OrphanNote>) => void
+  deleteOrphanNote: (id: string) => void
   reset: () => void
 }
 
@@ -148,11 +171,35 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     }))
   }, [])
 
+  const addNoteEntry = useCallback((contactId: string, entry: NoteEntry) => {
+    setState((s) => ({
+      ...s,
+      contacts: s.contacts.map((c) =>
+        c.id === contactId ? { ...c, noteEntries: [...(c.noteEntries ?? []), entry] } : c,
+      ),
+    }))
+  }, [])
+
+  const addOrphanNote = useCallback((note: OrphanNote) => {
+    setState((s) => ({ ...s, orphanNotes: [note, ...(s.orphanNotes ?? [])] }))
+  }, [])
+
+  const updateOrphanNote = useCallback((id: string, patch: Partial<OrphanNote>) => {
+    setState((s) => ({
+      ...s,
+      orphanNotes: (s.orphanNotes ?? []).map((n) => (n.id === id ? { ...n, ...patch } : n)),
+    }))
+  }, [])
+
+  const deleteOrphanNote = useCallback((id: string) => {
+    setState((s) => ({ ...s, orphanNotes: (s.orphanNotes ?? []).filter((n) => n.id !== id) }))
+  }, [])
+
   const reset = useCallback(() => setState(createSeedState()), [])
 
   const value = useMemo(
-    () => ({ state, hydrated, update, log, setMode, addContact, updateContact, reset }),
-    [state, hydrated, update, log, setMode, addContact, updateContact, reset],
+    () => ({ state, hydrated, update, log, setMode, addContact, updateContact, addNoteEntry, addOrphanNote, updateOrphanNote, deleteOrphanNote, reset }),
+    [state, hydrated, update, log, setMode, addContact, updateContact, addNoteEntry, addOrphanNote, updateOrphanNote, deleteOrphanNote, reset],
   )
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>

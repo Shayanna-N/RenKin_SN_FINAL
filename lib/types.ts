@@ -84,6 +84,30 @@ export interface WhyEntry {
   alternatives: string[]
 }
 
+/** A single stamped note session. The `stamp` line is read-only once created. */
+export interface NoteEntry {
+  id: string
+  /** ISO timestamp */
+  at: string
+  /** Location string (may be empty) */
+  location: string
+  /** Free-form text body */
+  body: string
+  /** Photos as data-URLs */
+  photos: string[]
+}
+
+/** Unassigned (orphan) note — not yet linked to any contact. */
+export interface OrphanNote {
+  id: string
+  at: string
+  location: string
+  /** User-editable title; defaults to mm/dd/yy / location / time */
+  title: string
+  body: string
+  photos: string[]
+}
+
 export interface FollowUp {
   subject: string
   body: string
@@ -104,7 +128,8 @@ export interface Contact {
   mode: Mode
   what: string[]
   why: WhyEntry
-  notes: string
+  /** Structured note entries. Legacy string notes are auto-migrated on load. */
+  noteEntries: NoteEntry[]
   tags: string[]
   followUp?: FollowUp
   followedUp: boolean
@@ -229,6 +254,7 @@ export interface AppState {
   log: AgentLogEntry[]
   chat: ChatMessage[]
   watchSaved: SavedCard[]
+  orphanNotes: OrphanNote[]
 }
 
 export interface CapturedPerson {

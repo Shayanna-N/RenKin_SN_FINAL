@@ -120,7 +120,7 @@ export default function WatchPage() {
               confirmed: false,
               alternatives: [],
             },
-            notes: '',
+            noteEntries: [],
             tags: ['watch'],
             followedUp: false,
             pendingEnrichment: true,

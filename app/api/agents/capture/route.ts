@@ -1,7 +1,16 @@
-import { generateText, Output } from 'ai'
+import { WatsonXAI } from '@ibm-cloud/watsonx-ai'
 import { z } from 'zod'
+import { zodToJsonSchema } from 'zod-to-json-schema'
 
 export const maxDuration = 60
+
+const watsonx = WatsonXAI.newInstance({
+  version: '2024-05-31',
+  serviceUrl: process.env.WATSONX_AI_URL!,
+})
+
+const MODEL_ID = 'meta-llama/llama-3-2-90b-vision-instruct'
+const PROJECT_ID = process.env.WATSONX_PROJECT_ID!
 
 const personSchema = z.object({
   name: z.string().describe('Full name of the person, or "Unknown" if not present'),
@@ -36,27 +45,44 @@ export async function POST(req: Request) {
   }
   const { text, image, mode, depth, context } = parsed.data
 
-  const instructions = `You are Agent 3 ("Scribe") in a networking app. Extract the WHO (the person) and the WHAT (information they shared) from a business card, flier, voice-memo transcript or note.
+  const systemPrompt = `You are Agent 3 ("Scribe") in a networking app. Extract the WHO (the person) and the WHAT (information they shared) from a business card, flier, voice-memo transcript or note.
 Networking mode: ${mode}. Capture depth: ${depth} (light = 1-2 bullets, standard = 2-4, detailed = up to 6).
 ${context ? `Known context: ${context}.` : ''}
 Never invent contact details that are not present. Use null for missing email/phone.`
 
-  const content: Array<
-    { type: 'text'; text: string } | { type: 'file'; mediaType: string; data: string }
-  > = [{ type: 'text', text: text ? `Input:\n${text}` : 'Read this card or flier.' }]
+  // Build the user message content, including image if provided
+  type TextPart = { type: 'text'; text: string }
+  type ImagePart = { type: 'image_url'; image_url: { url: string } }
+  const userContent: Array<TextPart | ImagePart> = [
+    { type: 'text', text: text ? `Input:\n${text}` : 'Read this card or flier.' },
+  ]
   if (image) {
     const match = image.match(/^data:(image\/[\w.+-]+);base64,(.+)$/)
     if (!match) return Response.json({ error: 'Invalid image.' }, { status: 400 })
-    content.push({ type: 'file', mediaType: match[1], data: match[2] })
+    userContent.push({ type: 'image_url', image_url: { url: image } })
   }
 
   try {
-    const { output } = await generateText({
-      model: 'openai/gpt-5.4-mini',
-      system: instructions,
-      messages: [{ role: 'user', content }],
-      output: Output.object({ schema: personSchema }),
-    })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { result } = await watsonx.textChat({
+      modelId: MODEL_ID,
+      projectId: PROJECT_ID,
+      maxTokens: 1024,
+      responseFormat: {
+        type: 'json_schema',
+        json_schema: {
+          name: 'captured_person',
+          schema: zodToJsonSchema(personSchema),
+        },
+      },
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userContent as any },
+      ],
+    } as any)
+
+    const raw = result.choices?.[0]?.message?.content ?? ''
+    const output = personSchema.parse(JSON.parse(typeof raw === 'string' ? raw : JSON.stringify(raw)))
     return Response.json({
       person: {
         ...output,
@@ -65,7 +91,7 @@ Never invent contact details that are not present. Use null for missing email/ph
       },
     })
   } catch (error) {
-    console.error('[v0] capture agent failed', error)
+    console.error('[watsonx] capture agent failed', error)
     return Response.json({ error: 'Scribe agent failed.' }, { status: 502 })
   }
 }

@@ -1,7 +1,16 @@
-import { generateText, Output } from 'ai'
+import { WatsonXAI } from '@ibm-cloud/watsonx-ai'
 import { z } from 'zod'
+import { zodToJsonSchema } from 'zod-to-json-schema'
 
 export const maxDuration = 60
+
+const watsonx = WatsonXAI.newInstance({
+  version: '2024-05-31',
+  serviceUrl: process.env.WATSONX_AI_URL!,
+})
+
+const MODEL_ID = 'meta-llama/llama-3-3-70b-instruct'
+const PROJECT_ID = process.env.WATSONX_PROJECT_ID!
 
 const requestSchema = z.object({
   messages: z
@@ -53,18 +62,37 @@ export async function POST(req: Request) {
   const { messages, snapshot } = parsed.data
 
   try {
-    const { output } = await generateText({
-      model: 'openai/gpt-5.4-mini',
-      system: `You are Agent 6 ("Companion"), the user-facing buddy in a real-time networking app. You relay instructions to Agent 1 (settings/compliance) via actions.
+    const { result } = await watsonx.textChat({
+      modelId: MODEL_ID,
+      projectId: PROJECT_ID,
+      maxTokens: 1024,
+      responseFormat: {
+        type: 'json_schema',
+        json_schema: {
+          name: 'companion_reply',
+          schema: zodToJsonSchema(replySchema),
+        },
+      },
+      messages: [
+        {
+          role: 'system',
+          content: `You are Agent 6 ("Companion"), the user-facing buddy in a real-time networking app. You relay instructions to Agent 1 (settings/compliance) via actions.
 You can switch modes (everyday, event, custom), add networking goals, reorder contact channel priorities, and record learned preferences.
 Only include an action when the user asks for a change or clearly states a preference. Answer questions using the snapshot. Never invent contacts.
 Snapshot: ${JSON.stringify(snapshot)}`,
-      messages,
-      output: Output.object({ schema: replySchema }),
+        },
+        ...messages.map((m) => ({
+          role: m.role as 'user' | 'assistant',
+          content: m.content,
+        })),
+      ],
     })
+
+    const raw = result.choices?.[0]?.message?.content ?? ''
+    const output = replySchema.parse(JSON.parse(typeof raw === 'string' ? raw : JSON.stringify(raw)))
     return Response.json(output)
   } catch (error) {
-    console.error('[v0] companion agent failed', error)
+    console.error('[watsonx] companion agent failed', error)
     return Response.json({ error: 'Companion agent failed.' }, { status: 502 })
   }
 }

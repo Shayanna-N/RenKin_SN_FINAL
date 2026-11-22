@@ -6,6 +6,7 @@ import { QRCodeSVG } from 'qrcode.react'
 import { useStore } from '@/lib/store'
 import { cn } from '@/lib/utils'
 import { CARD_STYLES, readableOn } from '@/lib/companion'
+import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import type { Settings } from '@/lib/types'
@@ -128,7 +129,23 @@ export function Appearance() {
 
       <fieldset className="mt-5">
         <legend className="text-sm font-medium">QR code</legend>
-        <div className="mt-2 flex flex-wrap items-center gap-4">
+
+        {/* URL input */}
+        <div className="mt-2 flex flex-col gap-1.5">
+          <Label htmlFor="qr-url" className="text-xs text-muted-foreground">Link URL</Label>
+          <Input
+            id="qr-url"
+            type="url"
+            value={s.customQrUrl ?? ''}
+            onChange={(e) => set({ customQrUrl: e.target.value })}
+            placeholder="https://yoursite.com"
+          />
+          {!s.customQrUrl && (
+            <p className="text-xs text-muted-foreground">Enter a URL to enable the QR code on your card.</p>
+          )}
+        </div>
+
+        <div className="mt-3 flex flex-wrap items-center gap-4">
           {/* Shape */}
           <div className="flex flex-col gap-1.5">
             <span className="text-xs text-muted-foreground">Shape</span>
@@ -167,17 +184,23 @@ export function Appearance() {
             </label>
           </div>
 
-          {/* Live preview */}
+          {/* Live preview — only shown when URL is set */}
           {s.customQrUrl && (
             <div className="flex flex-col gap-1.5">
               <span className="text-xs text-muted-foreground">Preview</span>
               <div className="rounded-md p-1" style={{ background: s.brand }}>
                 <QRCodeSVG
                   value={s.customQrUrl}
-                  size={48}
+                  size={56}
                   bgColor="transparent"
                   fgColor={s.customQrColor ?? '#ffffff'}
                   level="M"
+                  style={{
+                    borderRadius:
+                      s.customQrStyle === 'dots' ? '6px'
+                      : s.customQrStyle === 'rounded' ? '4px'
+                      : undefined,
+                  }}
                 />
               </div>
             </div>

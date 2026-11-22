@@ -163,7 +163,7 @@ export function makeContact(
     mode: state.settings.mode,
     what: person.what,
     why: contextWhy(state),
-    notes: '',
+    noteEntries: [],
     tags: person.tags,
     followedUp: false,
     pendingEnrichment,

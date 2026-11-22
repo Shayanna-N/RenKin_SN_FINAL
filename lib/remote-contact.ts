@@ -38,7 +38,7 @@ export function contactFromRemote(
       confirmed: true,
       alternatives: [],
     },
-    notes: '',
+    noteEntries: [],
     tags: ['renkin'],
     followedUp: false,
     pendingEnrichment: false,
