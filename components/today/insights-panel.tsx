@@ -8,8 +8,10 @@ import { useStore } from '@/lib/store'
 import { insights } from '@/lib/agents'
 
 export function InsightsPanel() {
-  const { state, log } = useStore()
-  const items = insights(state)
+  const { state, log, hydrated } = useStore()
+  // Seed timestamps are derived from the current time, so the server and client disagree on
+  // which contacts count as "today". Only compute suggestions once the client store is ready.
+  const items = hydrated ? insights(state) : null
 
   function blockTime() {
     log(5, 'Blocked 4:30 – 5:00 PM on Google Calendar for follow-ups.')
@@ -21,7 +23,12 @@ export function InsightsPanel() {
       <h2 id="insights-heading" className="flex items-center gap-2 font-semibold">
         <Lightbulb className="size-4 text-primary" aria-hidden /> Organizer suggestions
       </h2>
-      {items.length === 0 ? (
+      {items === null ? (
+        <div className="mt-3 flex flex-col gap-3" aria-busy="true">
+          <span className="sr-only">Loading suggestions</span>
+          <div className="h-16 animate-pulse rounded-xl bg-muted/60" />
+        </div>
+      ) : items.length === 0 ? (
         <p className="mt-2 text-sm text-muted-foreground">{"You're all caught up."}</p>
       ) : (
         <ul className="mt-3 flex flex-col gap-3">
