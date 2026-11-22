@@ -1,6 +1,6 @@
 import { WatsonXAI } from '@ibm-cloud/watsonx-ai'
 import { z } from 'zod'
-import { zodToJsonSchema } from 'zod-to-json-schema'
+import { jsonSchemaFormat } from '@/lib/watsonx-format'
 
 export const maxDuration = 60
 
@@ -68,13 +68,7 @@ Never invent contact details that are not present. Use null for missing email/ph
       modelId: MODEL_ID,
       projectId: PROJECT_ID,
       maxTokens: 1024,
-      responseFormat: {
-        type: 'json_schema',
-        json_schema: {
-          name: 'captured_person',
-          schema: zodToJsonSchema(personSchema),
-        },
-      },
+      responseFormat: jsonSchemaFormat('captured_person', personSchema),
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userContent as any },

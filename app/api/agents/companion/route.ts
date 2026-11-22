@@ -1,6 +1,6 @@
 import { WatsonXAI } from '@ibm-cloud/watsonx-ai'
 import { z } from 'zod'
-import { zodToJsonSchema } from 'zod-to-json-schema'
+import { jsonSchemaFormat } from '@/lib/watsonx-format'
 
 export const maxDuration = 60
 
@@ -66,13 +66,7 @@ export async function POST(req: Request) {
       modelId: MODEL_ID,
       projectId: PROJECT_ID,
       maxTokens: 1024,
-      responseFormat: {
-        type: 'json_schema',
-        json_schema: {
-          name: 'companion_reply',
-          schema: zodToJsonSchema(replySchema),
-        },
-      },
+      responseFormat: jsonSchemaFormat('companion_reply', replySchema),
       messages: [
         {
           role: 'system',

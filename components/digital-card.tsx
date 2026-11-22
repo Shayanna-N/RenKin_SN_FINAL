@@ -53,6 +53,7 @@ export function DigitalCard({
       className={cn(
         'relative aspect-[1.586/1] w-full overflow-hidden rounded-2xl p-5 shadow-lg ring-1 ring-black/5 sm:p-6',
         `card-tex-${style}`,
+        className,
       )}
       aria-label={`Digital card for ${profile.name}`}
     >
