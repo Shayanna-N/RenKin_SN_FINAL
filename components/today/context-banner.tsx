@@ -21,8 +21,8 @@ export function ContextBanner() {
       aria-labelledby="context-heading"
       className="rounded-2xl border bg-card"
     >
-      <div className="flex flex-col gap-4 p-5 md:flex-row md:items-center md:justify-between md:p-6">
-        <div className="flex gap-4">
+      <div className="flex flex-col items-center gap-4 p-5 text-center md:p-6">
+        <div className="flex flex-col items-center gap-3">
           <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
             <MapPin className="size-5" aria-hidden />
           </span>
@@ -44,8 +44,8 @@ export function ContextBanner() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 md:items-end">
-          <div className="flex flex-wrap items-center gap-2 md:justify-end">
+        <div className="flex flex-col items-center gap-3">
+          <div className="flex flex-wrap items-center justify-center gap-2">
             <label className="flex items-center gap-3 rounded-lg border bg-background px-3 py-2 text-sm">
               <Radar className="size-4 text-primary" aria-hidden />
               Passive collection

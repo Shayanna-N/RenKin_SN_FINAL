@@ -287,7 +287,7 @@ function VoiceTab({ onDone }: { onDone: (entry: { body: string; at: string; loca
   return (
     <div className="flex flex-col gap-4">
       {/* Controls */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-center gap-2">
         {phase === 'idle' && (
           <Button onClick={startRecording} className="gap-2">
             <Mic className="size-4" aria-hidden /> Start recording
@@ -344,7 +344,7 @@ function VoiceTab({ onDone }: { onDone: (entry: { body: string; at: string; loca
         />
       )}
       {phase === 'idle' && (
-        <p className="text-sm text-muted-foreground">
+        <p className="text-center text-sm text-muted-foreground">
           Press Start to record. Your speech will be transcribed automatically. Press Stop when finished.
         </p>
       )}
@@ -499,11 +499,11 @@ export function CaptureWidget() {
       <section aria-label="Conversation capture" className="overflow-hidden rounded-2xl border bg-card">
         <Tabs defaultValue="voice">
           <div className="border-b px-5 pt-3">
-            <div className="flex items-center gap-2 pb-3">
+            <div className="flex items-center justify-center gap-2 pb-3">
               <PenLine className="size-4 text-muted-foreground" aria-hidden />
               <span className="text-sm font-medium">Conversation Capture</span>
             </div>
-            <TabsList className="w-full sm:w-auto">
+            <TabsList className="mx-auto w-full sm:w-auto">
               <TabsTrigger value="voice" className="flex-1 gap-1.5 sm:flex-none">
                 <Mic className="size-4" aria-hidden />
                 Voice

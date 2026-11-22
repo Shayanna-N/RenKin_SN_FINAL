@@ -60,7 +60,7 @@ export function Checklist() {
           </div>
         </div>
 
-        <TabsList variant="line" className="mt-4 h-9 w-full justify-start border-b pb-0">
+        <TabsList variant="line" className="mt-4 h-9 w-full justify-center border-b pb-0">
           <TabsTrigger value="plan" className="flex-none px-3">
             Your plan
           </TabsTrigger>
@@ -81,7 +81,7 @@ export function Checklist() {
         <TabsContent value="plan" className="mt-5">
       <div className="flex flex-col gap-6">
         <div>
-          <h3 className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+          <h3 className="flex items-center justify-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
             <ListTodo className="size-3.5" aria-hidden /> To-dos
           </h3>
           <ul className="mt-2 flex flex-col">
@@ -107,7 +107,7 @@ export function Checklist() {
         </div>
 
         <div>
-          <h3 className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+          <h3 className="flex items-center justify-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
             <Briefcase className="size-3.5" aria-hidden /> Areas to hit up · from your job search
           </h3>
           <ul className="mt-2 flex flex-col gap-1">
@@ -127,10 +127,10 @@ export function Checklist() {
         </div>
 
         <div>
-          <h3 className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+          <h3 className="flex items-center justify-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
             <Target className="size-3.5" aria-hidden /> Your goals
           </h3>
-          <ul className="mt-2 flex flex-wrap gap-2">
+          <ul className="mt-2 flex flex-wrap justify-center gap-2">
             {state.settings.goals.map((g) => (
               <li key={g}>
                 <button

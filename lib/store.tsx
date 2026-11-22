@@ -137,6 +137,7 @@ function migrate(saved: Partial<AppState>): AppState {
     watchSaved: saved.watchSaved ?? [],
     orphanNotes: saved.orphanNotes ?? [],
     suggestions: saved.suggestions ?? [],
+    memories: saved.memories ?? [],
   } as AppState
 }
 

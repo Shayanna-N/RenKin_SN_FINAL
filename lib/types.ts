@@ -249,6 +249,17 @@ export interface Suggestion {
   reason: string
   agent: SuggestionAgent
   savedAt: string
+  /** Starred suggestions are also committed to the companion's memories. */
+  favorite?: boolean
+}
+
+/** A starred suggestion the companion remembers. */
+export interface CompanionMemory {
+  id: string
+  kind: SuggestionKind
+  text: string
+  reason: string
+  savedAt: string
 }
 
 export interface AppState {
@@ -263,6 +274,7 @@ export interface AppState {
   watchSaved: SavedCard[]
   orphanNotes: OrphanNote[]
   suggestions: Suggestion[]
+  memories: CompanionMemory[]
 }
 
 export interface CapturedPerson {

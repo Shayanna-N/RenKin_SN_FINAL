@@ -271,6 +271,7 @@ export function createSeedState(): AppState {
     watchSaved: [],
     orphanNotes: [],
     suggestions: [],
+    memories: [],
     log: [
       {
         id: 'g1',

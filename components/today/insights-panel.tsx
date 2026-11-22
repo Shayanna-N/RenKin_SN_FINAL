@@ -19,8 +19,8 @@ export function InsightsPanel() {
   }
 
   return (
-    <section aria-labelledby="insights-heading" className="rounded-2xl border bg-card p-5 md:p-6">
-      <h2 id="insights-heading" className="flex items-center gap-2 font-semibold">
+    <section aria-labelledby="insights-heading" className="rounded-2xl border bg-card p-5 text-center md:p-6">
+      <h2 id="insights-heading" className="flex items-center justify-center gap-2 font-semibold">
         <Lightbulb className="size-4 text-primary" aria-hidden /> Organizer suggestions
       </h2>
       {items === null ? (
@@ -33,7 +33,7 @@ export function InsightsPanel() {
       ) : (
         <ul className="mt-3 flex flex-col gap-3">
           {items.map((i) => (
-            <li key={i.id} className="flex flex-col gap-2 rounded-xl bg-muted/60 p-3 text-sm">
+            <li key={i.id} className="flex flex-col items-center gap-2 rounded-xl bg-muted/60 p-3 text-sm">
               <p className="text-pretty">{i.text}</p>
               <div>
                 {i.action === 'block-followups' && (
