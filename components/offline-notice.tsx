@@ -27,7 +27,7 @@ export function OfflineNotice() {
     <div
       key={notice.key}
       role="status"
-      className="pointer-events-none fixed inset-x-0 top-3 z-50 flex justify-center px-4"
+      className="pointer-events-none fixed inset-x-0 top-[4.5rem] z-50 md:top-3 flex justify-center px-4"
     >
       <div
         className={cn(

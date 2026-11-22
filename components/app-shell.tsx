@@ -75,16 +75,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex h-32 items-center justify-between gap-3 border-b bg-background/85 px-4 backdrop-blur md:px-8">
+        <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-2 border-b bg-background/85 px-3 backdrop-blur md:h-32 md:gap-3 md:px-8">
           <div className="flex items-center gap-2 md:hidden">
             <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
               <span className="text-sm font-bold">R</span>
             </span>
             <span className="sr-only">Renkin</span>
           </div>
-          <ModeSwitcher className="[&_button]:px-3.5 [&_button]:py-2 [&_button]:text-sm [&_svg]:size-4" />
+          <ModeSwitcher className="[&_button]:px-2.5 [&_button]:py-1.5 [&_button]:text-xs [&_svg]:size-3.5 md:[&_button]:px-3.5 md:[&_button]:py-2 md:[&_button]:text-sm md:[&_svg]:size-4" />
           {/* Header ribbon */}
-          <div className="flex items-center gap-3">
+          <div className="flex shrink-0 items-center gap-1.5 md:gap-3">
             <ContactUpdates />
             {/* Online / Offline pill */}
             <button
@@ -101,22 +101,22 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               }
               title={lostConnection ? 'No connection. Reconnects automatically.' : online ? 'Tap to go offline' : 'Tap to go back online'}
               className={cn(
-                'flex items-center gap-3 rounded-full border px-6 py-2.5 text-base transition-colors disabled:cursor-not-allowed',
+                'flex size-9 shrink-0 items-center justify-center gap-3 rounded-full border text-base transition-colors disabled:cursor-not-allowed md:size-auto md:px-6 md:py-2.5',
                 online
                   ? 'text-muted-foreground hover:bg-accent hover:text-foreground'
                   : 'border-amber-500/40 bg-amber-500/10 text-amber-700 hover:bg-amber-500/20 dark:text-amber-400',
               )}
             >
-              {online ? <Wifi className="size-[1.75rem]" aria-hidden /> : <WifiOff className="size-[1.75rem]" aria-hidden />}
+              {online ? <Wifi className="size-5 md:size-[1.75rem]" aria-hidden /> : <WifiOff className="size-5 md:size-[1.75rem]" aria-hidden />}
               <span className="hidden sm:inline">{online ? 'Online' : 'Offline · saving locally'}</span>
             </button>
             {/* Account & sync button — 3× original (36px → 108px) */}
             <Link
               href="/account"
               aria-label="Account and sync"
-              className="flex size-[6.75rem] items-center justify-center rounded-2xl text-muted-foreground hover:bg-accent hover:text-foreground"
+              className="flex size-10 shrink-0 items-center justify-center rounded-2xl text-muted-foreground hover:bg-accent hover:text-foreground md:size-[6.75rem]"
             >
-              <UserCircle className="size-[3.75rem]" aria-hidden />
+              <UserCircle className="size-7 md:size-[3.75rem]" aria-hidden />
             </Link>
           </div>
         </header>
