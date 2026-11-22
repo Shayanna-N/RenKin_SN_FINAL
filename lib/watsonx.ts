@@ -1,4 +1,5 @@
 import { WatsonXAI } from '@ibm-cloud/watsonx-ai'
+import { IamAuthenticator } from '@ibm-cloud/watsonx-ai/authentication'
 
 let client: WatsonXAI | undefined
 
@@ -13,9 +14,12 @@ export function getWatsonx(): WatsonXAI {
   if (missing.length > 0) {
     throw new Error(`Missing watsonx.ai environment variables: ${missing.join(', ')}`)
   }
+  // Without an explicit authenticator the SDK reads WATSONX_AI_URL as the token endpoint and
+  // posts /identity/token to the watsonx host, which answers 404.
   client ??= WatsonXAI.newInstance({
     version: '2024-05-31',
-    serviceUrl: process.env.WATSONX_AI_URL!,
+    serviceUrl: process.env.WATSONX_AI_URL!.trim().replace(/\/+$/, ''),
+    authenticator: new IamAuthenticator({ apikey: process.env.WATSONX_AI_APIKEY! }),
   })
   return client
 }
