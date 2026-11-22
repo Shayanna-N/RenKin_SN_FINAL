@@ -42,7 +42,7 @@ export default function CardPage() {
           {/* Tabbed widget: Card details (per mode) + Channels */}
           <div className="overflow-hidden rounded-2xl border bg-card">
             <Tabs defaultValue="card-details">
-              <div className="border-b px-5 pt-3">
+              <div className="flex justify-center border-b px-5 pt-3">
                 <TabsList className="w-full sm:w-auto">
                     <TabsTrigger value="card-details" className="flex-1 gap-1.5 sm:flex-none">
                       <CreditCard className="size-4" aria-hidden />

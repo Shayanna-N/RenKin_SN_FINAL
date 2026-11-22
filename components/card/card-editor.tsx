@@ -10,7 +10,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useStore } from '@/lib/store'
 import { MODE_META } from '@/lib/agents'
-import { MODES, cloneProfile, modeLabel, normalizeUrl } from '@/lib/profile'
+import { Checkbox } from '@/components/ui/checkbox'
+import {
+  MAX_DETAILS_WITH_HEADER,
+  MODES,
+  RECOMMENDED_MIN_DETAILS,
+  cloneProfile,
+  hasHeader,
+  isHeaderOn,
+  maxDetails,
+  modeLabel,
+  normalizeUrl,
+  selectedDetailKeys,
+  type HeaderField,
+} from '@/lib/profile'
 import type { LinkKind, Mode, Profile } from '@/lib/types'
 
 const KINDS: LinkKind[] = ['linkedin', 'website', 'portfolio', 'instagram', 'x', 'github', 'calendly', 'phone', 'other']
@@ -86,6 +99,53 @@ function ModeForm({ mode }: { mode: Mode }) {
   const set = (patch: Partial<Profile>) =>
     update((s) => ({ ...s, profiles: { ...s.profiles, [mode]: { ...s.profiles[mode], ...patch } } }))
 
+  const selected = selectedDetailKeys(p)
+  const max = maxDetails(p)
+  const min = RECOMMENDED_MIN_DETAILS[mode]
+  const full = selected.length >= max
+  const statusId = `${mode}-lines-status`
+  const customFieldCount = mode === 'custom' ? state.settings.customCardFields.length : 0
+  // Turning on the first header field costs one line, so it needs a free slot.
+  const headerBlocked = !hasHeader(p) && selected.length > MAX_DETAILS_WITH_HEADER
+
+  const setHeaderField = (field: HeaderField, on: boolean) => {
+    const hidden = (p.hiddenHeader ?? []).filter((f) => f !== field)
+    set({ hiddenHeader: on ? hidden : [...hidden, field] })
+  }
+
+  const setDetail = (key: string, on: boolean) =>
+    set({ shownDetails: on ? [...selected, key] : selected.filter((k) => k !== key) })
+
+  const headerToggle = (field: HeaderField, noun: string) => {
+    const blank = p[field].trim() === ''
+    const on = isHeaderOn(p, field)
+    const blocked = !on && headerBlocked
+    return (
+      <Checkbox
+        checked={on}
+        disabled={blank || blocked}
+        onCheckedChange={(v) => setHeaderField(field, v === true)}
+        aria-label={`Show ${noun} on card`}
+        aria-describedby={statusId}
+        title={blank ? 'Blank fields stay off the card' : blocked ? 'Turn off a detail line first' : undefined}
+      />
+    )
+  }
+
+  const detailToggle = (key: string, noun: string, hasValue: boolean) => {
+    const on = selected.includes(key)
+    return (
+      <Checkbox
+        checked={on}
+        disabled={!hasValue || (!on && full)}
+        onCheckedChange={(v) => setDetail(key, v === true)}
+        aria-label={`Show ${noun} on card`}
+        aria-describedby={statusId}
+        title={!hasValue ? 'Blank fields stay off the card' : !on && full ? 'Card is full. Turn another line off first.' : undefined}
+      />
+    )
+  }
+
   const differing = (field: TextField) =>
     others
       .filter((m) => (state.profiles[m][field] ?? '') !== (p[field] ?? ''))
@@ -118,14 +178,21 @@ function ModeForm({ mode }: { mode: Mode }) {
         ? value
         : `https://${value}`
     const label = newKind === 'other' ? newLabel.trim() || KIND_LABEL.other : KIND_LABEL[newKind]
-    set({ links: [...p.links, { id: crypto.randomUUID(), kind: newKind, label, url }] })
+    const id = crypto.randomUUID()
+    set({
+      links: [...p.links, { id, kind: newKind, label, url }],
+      shownDetails: full ? selected : [...selected, id],
+    })
     setNewUrl('')
     setNewLabel('')
   }
 
-  const fieldLabel = (field: TextField, text: string) => (
+  const fieldLabel = (field: TextField, text: string, toggle?: React.ReactNode) => (
     <div className="flex items-center justify-between gap-2">
-      <Label htmlFor={`${mode}-${field}`}>{text}</Label>
+      <div className="flex items-center gap-2">
+        {toggle}
+        <Label htmlFor={`${mode}-${field}`}>{text}</Label>
+      </div>
       <CopyFrom
         idPrefix={`${mode}-${field}`}
         label={text.toLowerCase()}
@@ -187,25 +254,47 @@ function ModeForm({ mode }: { mode: Mode }) {
         )}
       </div>
 
+      <div id={statusId} aria-live="polite" className="mt-4 rounded-xl bg-muted p-3 text-xs">
+        <p className="text-sm font-medium">
+          {selected.length} of {max} detail lines on your card
+        </p>
+        <p
+          className={
+            selected.length < min ? 'mt-0.5 text-amber-700 dark:text-amber-400' : 'mt-0.5 text-muted-foreground'
+          }
+        >
+          {selected.length < min
+            ? `Recommended: at least ${min} for ${nameOf(mode)} mode. Tick a detail below to add one.`
+            : full
+              ? 'Card is full. Turn a line off to add another.'
+              : `Room for ${max - selected.length} more.`}{' '}
+          {hasHeader(p)
+            ? 'Turn off name, title and company (or leave them blank) to fit a fifth line.'
+            : 'Name, title and company are off, so a fifth line fits.'}
+          {customFieldCount > 0 &&
+            ` Your ${customFieldCount} custom field${customFieldCount === 1 ? '' : 's'} fill any lines left over.`}
+        </p>
+      </div>
+
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <div className="grid gap-1.5">
-          {fieldLabel('name', 'Name')}
+          {fieldLabel('name', 'Name', headerToggle('name', 'name'))}
           <Input id={`${mode}-name`} value={p.name} onChange={(e) => set({ name: e.target.value })} />
         </div>
         <div className="grid gap-1.5">
-          {fieldLabel('headline', 'Title')}
+          {fieldLabel('headline', 'Title', headerToggle('headline', 'title'))}
           <Input id={`${mode}-headline`} value={p.headline} onChange={(e) => set({ headline: e.target.value })} />
         </div>
         <div className="grid gap-1.5 sm:col-span-2">
-          {fieldLabel('company', 'Company')}
+          {fieldLabel('company', 'Company', headerToggle('company', 'company'))}
           <Input id={`${mode}-company`} value={p.company} onChange={(e) => set({ company: e.target.value })} />
         </div>
         <div className="grid gap-1.5">
-          {fieldLabel('email', 'Email')}
+          {fieldLabel('email', 'Email', detailToggle('email', 'email', p.email.trim() !== ''))}
           <Input id={`${mode}-email`} type="email" value={p.email} onChange={(e) => set({ email: e.target.value })} />
         </div>
         <div className="grid gap-1.5">
-          {fieldLabel('phone', 'Phone')}
+          {fieldLabel('phone', 'Phone', detailToggle('phone', 'phone', p.phone.trim() !== ''))}
           <Input id={`${mode}-phone`} type="tel" value={p.phone} onChange={(e) => set({ phone: e.target.value })} />
         </div>
         <div className="grid gap-1.5 sm:col-span-2">
@@ -235,18 +324,26 @@ function ModeForm({ mode }: { mode: Mode }) {
           idPrefix={`${mode}-links`}
           label="links"
           options={linkOptions}
-          onCopy={(from) =>
-            set({ links: state.profiles[from].links.map((l) => ({ ...l, id: crypto.randomUUID() })) })
-          }
+          onCopy={(from) => {
+            const source = state.profiles[from]
+            const sourceKeys = selectedDetailKeys(source)
+            const links = source.links.map((l) => ({ ...l, id: crypto.randomUUID() }))
+            const copiedKeys = links.filter((_, i) => sourceKeys.includes(source.links[i].id)).map((l) => l.id)
+            const kept = selected.filter((k) => k === 'email' || k === 'phone')
+            set({ links, shownDetails: [...kept, ...copiedKeys].slice(0, max) })
+          }}
         />
       </div>
       <ul className="mt-2 flex flex-col divide-y rounded-xl border">
         {p.links.length === 0 && <li className="p-3 text-sm text-muted-foreground">No links yet.</li>}
         {p.links.map((l) => (
           <li key={l.id} className="flex items-center justify-between gap-2 p-3">
-            <div className="min-w-0">
-              <p className="text-sm font-medium">{l.label}</p>
-              <p className="truncate text-xs text-muted-foreground">{l.url}</p>
+            <div className="flex min-w-0 items-center gap-3">
+              {detailToggle(l.id, l.label, l.url !== '')}
+              <div className="min-w-0">
+                <p className="text-sm font-medium">{l.label}</p>
+                <p className="truncate text-xs text-muted-foreground">{l.url}</p>
+              </div>
             </div>
             <Button
               variant="ghost"

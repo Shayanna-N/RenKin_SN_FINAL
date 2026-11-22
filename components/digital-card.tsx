@@ -3,7 +3,7 @@
 import { Globe, Link2, Mail, Phone } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { StyledQr, normalizeQrUrl } from '@/components/styled-qr'
-import { visibleProfile } from '@/lib/vcard'
+import { availableDetails, isHeaderOn, maxDetails, selectedDetailKeys } from '@/lib/profile'
 import { MODE_META } from '@/lib/agents'
 import { AnimalSilhouette } from '@/components/companion-avatar'
 import type { CompanionConfig, Mode, Profile, Settings } from '@/lib/types'
@@ -31,7 +31,13 @@ export function DigitalCard({
   customModeName?: string
   className?: string
 }) {
-  const v = visibleProfile(profile)
+  const showName = isHeaderOn(profile, 'name')
+  const subline = [isHeaderOn(profile, 'headline') && profile.headline, isHeaderOn(profile, 'company') && profile.company]
+    .filter(Boolean)
+    .join(' · ')
+  const shownKeys = selectedDetailKeys(profile)
+  const details = availableDetails(profile).filter((d) => shownKeys.includes(d.key))
+  const customRoom = Math.max(0, maxDetails(profile) - details.length)
   const initials = profile.name
     .split(' ')
     .map((p) => p[0])
@@ -70,10 +76,10 @@ export function DigitalCard({
       <div className="flex h-full flex-col justify-between">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="truncate text-xl font-semibold tracking-tight sm:text-2xl">{v.name}</p>
-            <p className={cn('truncate text-sm', minimal ? 'text-muted-foreground' : 'opacity-80')}>
-              {v.headline} · {v.company}
-            </p>
+            {showName && <p className="truncate text-xl font-semibold tracking-tight sm:text-2xl">{profile.name}</p>}
+            {subline && (
+              <p className={cn('truncate text-sm', minimal ? 'text-muted-foreground' : 'opacity-80')}>{subline}</p>
+            )}
           </div>
           <div className="flex shrink-0 flex-col items-center gap-1.5">
             {showAnimal && companion ? (
@@ -97,31 +103,21 @@ export function DigitalCard({
         </div>
 
         <ul className={cn('flex flex-col gap-1 text-xs sm:text-sm', qrUrl && 'pr-[32%]')}>
-          {v.email && (
-            <li className="flex items-center gap-2 truncate">
-              <Mail className="size-3.5 shrink-0 opacity-80" aria-hidden />
-              {v.email}
-            </li>
-          )}
-          {v.phone && (
-            <li className="flex items-center gap-2 truncate">
-              <Phone className="size-3.5 shrink-0 opacity-80" aria-hidden />
-              {v.phone}
-            </li>
-          )}
-          {v.links.slice(0, 2).map((l) => (
-            <li key={l.id} className="flex items-center gap-2 truncate">
-              {l.kind === 'phone' ? (
+          {details.map((d) => (
+            <li key={d.key} className="flex items-center gap-2 truncate">
+              {d.kind === 'email' ? (
+                <Mail className="size-3.5 shrink-0 opacity-80" aria-hidden />
+              ) : d.kind === 'phone' ? (
                 <Phone className="size-3.5 shrink-0 opacity-80" aria-hidden />
-              ) : l.kind === 'website' || l.kind === 'portfolio' ? (
+              ) : d.kind === 'website' || d.kind === 'portfolio' ? (
                 <Globe className="size-3.5 shrink-0 opacity-80" aria-hidden />
               ) : (
                 <Link2 className="size-3.5 shrink-0 opacity-80" aria-hidden />
               )}
-              {l.url.replace(/^(https?:\/\/|tel:)/i, '')}
+              {d.display}
             </li>
           ))}
-          {mode === 'custom' && customCardFields.slice(0, 5).map((f, i) => (
+          {mode === 'custom' && customCardFields.slice(0, customRoom).map((f, i) => (
             <li key={i} className="flex items-center gap-2 truncate opacity-90">
               <span className="opacity-70">{f.label}:</span>
               <span>{f.value}</span>

@@ -71,6 +71,10 @@ export interface Profile {
   links: ProfileLink[]
   /** URL the card's QR code links to. */
   qrUrl: string
+  /** Detail lines shown on the card: 'email', 'phone' or a link id. Unset means the first lines that fit. */
+  shownDetails?: string[]
+  /** Name, title or company the user has switched off for this mode. */
+  hiddenHeader?: ('name' | 'headline' | 'company')[]
 }
 
 export interface ContactLink {
