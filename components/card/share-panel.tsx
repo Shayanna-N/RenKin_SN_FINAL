@@ -36,7 +36,7 @@ export function SharePanel({
         <StyledQr
           value={vcard}
           shape={state.settings.customQrStyle}
-          color={state.settings.brand}
+          color={state.settings.customQrColor || state.settings.brand}
           margin={0}
           className="size-48 max-h-48 max-w-full"
           title={`QR code for ${activeProfile(state).name}'s contact card`}

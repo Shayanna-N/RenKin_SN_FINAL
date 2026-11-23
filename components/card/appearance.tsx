@@ -3,6 +3,7 @@
 import { Check, ChevronDown, Moon, Palette, Smile, Sun } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { CompanionCustomizer } from '@/components/card/companion-customizer'
+import { StyledQr } from '@/components/styled-qr'
 import { useCallback, useRef, useState } from 'react'
 import { useStore } from '@/lib/store'
 import { cn } from '@/lib/utils'
@@ -48,11 +49,24 @@ const SWATCHES = [
   { name: 'Amber', value: '#b45309' },
   { name: 'Ink', value: '#27272a' },
 ]
+const QR_SHAPES: { id: Settings['customQrStyle']; label: string }[] = [
+  { id: 'squares', label: 'Squares' },
+  { id: 'rounded', label: 'Rounded' },
+  { id: 'dots', label: 'Dots' },
+]
 
+const QR_COLORS = [
+  { name: 'Black', value: '#111827' },
+  { name: 'Navy', value: '#1e3a8a' },
+  { name: 'Forest', value: '#166534' },
+  { name: 'Plum', value: '#6b21a8' },
+  { name: 'Crimson', value: '#9f1239' },
+]
 
 export function Appearance() {
   const { state, update } = useStore()
   const s = state.settings
+  const qrColor = s.customQrColor || s.brand
   const set = (patch: Partial<Settings>) => update((st) => ({ ...st, settings: { ...st.settings, ...patch } }))
   const { saved, flash } = useSaved()
   const [open, setOpen] = useState(false)
@@ -141,6 +155,76 @@ export function Appearance() {
               {st.label}
             </button>
           ))}
+        </div>
+      </fieldset>
+
+      <fieldset className="mt-5">
+        <legend className="text-sm font-medium">QR code style</legend>
+        <p className="mt-1 text-xs text-muted-foreground">Used on your card and the Share tab.</p>
+        <div className="mt-2 grid grid-cols-3 gap-2">
+          {QR_SHAPES.map((shape) => (
+            <button
+              key={shape.id}
+              type="button"
+              aria-pressed={s.customQrStyle === shape.id}
+              onClick={() => set({ customQrStyle: shape.id })}
+              className={cn(
+                'flex flex-col items-center gap-1.5 rounded-lg border p-2 text-xs',
+                s.customQrStyle === shape.id && 'border-primary bg-primary/10 font-medium text-primary',
+              )}
+            >
+              <span className="rounded-md bg-white p-1.5">
+                <StyledQr
+                  value="https://renkin.app"
+                  shape={shape.id}
+                  color={qrColor}
+                  margin={0}
+                  className="size-14"
+                />
+              </span>
+              {shape.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            aria-pressed={!s.customQrColor}
+            onClick={() => set({ customQrColor: '' })}
+            className={cn(
+              'flex h-9 items-center gap-2 rounded-full border px-3 text-xs',
+              !s.customQrColor && 'border-primary bg-primary/10 font-medium text-primary',
+            )}
+          >
+            <span className="size-4 rounded-full" style={{ backgroundColor: s.brand }} aria-hidden />
+            Match card
+          </button>
+          {QR_COLORS.map((c) => (
+            <button
+              key={c.value}
+              type="button"
+              onClick={() => set({ customQrColor: c.value })}
+              aria-label={`QR color ${c.name}`}
+              aria-pressed={s.customQrColor === c.value}
+              className="flex size-9 items-center justify-center rounded-full ring-offset-2 ring-offset-card aria-pressed:ring-2 aria-pressed:ring-foreground"
+              style={{ backgroundColor: c.value }}
+            >
+              {s.customQrColor === c.value && (
+                <Check className="size-4" style={{ color: readableOn(c.value) }} aria-hidden />
+              )}
+            </button>
+          ))}
+          <label className="flex items-center gap-2 text-xs text-muted-foreground">
+            <input
+              type="color"
+              value={qrColor.startsWith('#') ? qrColor : '#000000'}
+              onChange={(e) => set({ customQrColor: e.target.value })}
+              className="size-9 cursor-pointer rounded-full border bg-transparent"
+              aria-label="Custom QR color"
+            />
+            Custom
+          </label>
         </div>
       </fieldset>
 
