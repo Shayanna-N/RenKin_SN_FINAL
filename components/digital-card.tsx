@@ -52,7 +52,7 @@ export function DigitalCard({
       ? customModeName
       : (MODE_META[mode]?.label ?? mode)
 
-  const qrUrl = normalizeQrUrl(customQrUrl ?? '')
+  const qrUrl = normalizeQrUrl(customQrUrl ?? profile.qrUrl ?? '')
 
   return (
     <div
