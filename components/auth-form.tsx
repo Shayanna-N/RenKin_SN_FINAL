@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { ArrowLeft, Loader2 } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
+import { BrandMark } from '@/components/brand-mark'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -56,8 +57,7 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
         </HoverHint>
         <HoverHint hint="Returns to the RenKin home screen." align="start" className="mb-8 flex">
           <Link href="/" className="flex items-center gap-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/icon.svg" alt="" width={36} height={36} className="size-9" />
+            <BrandMark className="size-9" />
             <span className="text-lg font-semibold tracking-tight">RenKin</span>
           </Link>
         </HoverHint>
