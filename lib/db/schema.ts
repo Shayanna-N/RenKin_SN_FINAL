@@ -1,4 +1,4 @@
-import { boolean, jsonb, pgTable, primaryKey, serial, text, timestamp, unique } from 'drizzle-orm/pg-core'
+import { boolean, integer, jsonb, pgTable, primaryKey, serial, text, timestamp, unique } from 'drizzle-orm/pg-core'
 
 // --- Better Auth required tables (camelCase columns match Better Auth defaults) ---
 
@@ -97,3 +97,13 @@ export const syncedContact = pgTable(
   },
   (t) => [primaryKey({ columns: [t.userId, t.contactId] })],
 )
+
+/** Metadata for a resume/CV/portfolio PDF. The file itself lives in private Vercel Blob storage. */
+export const resumeDocument = pgTable('resume_document', {
+  id: text('id').primaryKey(),
+  userId: text('userId').notNull(),
+  name: text('name').notNull(),
+  pathname: text('pathname').notNull(),
+  size: integer('size').notNull(),
+  uploadedAt: timestamp('uploadedAt').notNull().defaultNow(),
+})

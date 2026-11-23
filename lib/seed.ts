@@ -205,6 +205,7 @@ export function createSeedState(): AppState {
       customCardFields: [],
       customQrStyle: 'squares' as const,
       customQrColor: '',
+      shareResume: false,
       defaultContactSort: 'az' as const,
     },
     contacts: seedContacts(),

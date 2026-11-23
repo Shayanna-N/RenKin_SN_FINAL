@@ -1,8 +1,13 @@
 'use client'
 
+import { useId, useState } from 'react'
 import { StyledQr } from '@/components/styled-qr'
-import { Download, Nfc, Wallet } from 'lucide-react'
+import { Download, FileText, Loader2, Nfc, Wallet } from 'lucide-react'
+import { toast } from 'sonner'
+import { ResumeToggle } from '@/components/resume/resume-toggle'
 import { Button } from '@/components/ui/button'
+import { formatUploaded, shareResume } from '@/lib/resume-actions'
+import { useResumes } from '@/lib/use-resumes'
 import { useStore } from '@/lib/store'
 import { activeProfile } from '@/lib/profile'
 import { buildVCard } from '@/lib/vcard'
@@ -59,6 +64,69 @@ export function SharePanel({
           Save as contact file (.vcf)
         </Button>
       </div>
+
+      <ResumeShare />
+    </div>
+  )
+}
+
+function ResumeShare() {
+  const { state } = useStore()
+  const { documents, userId, canShare } = useResumes()
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [sending, setSending] = useState(false)
+  const selectId = useId()
+
+  const enabled = state.settings.shareResume && canShare
+  const doc = documents.find((d) => d.id === selectedId) ?? documents[0]
+
+  async function send() {
+    if (!doc || !userId) return
+    setSending(true)
+    try {
+      const outcome = await shareResume(doc, userId)
+      if (outcome === 'downloaded') toast.success('Sharing is not supported here, so the PDF was downloaded')
+    } catch {
+      toast.error('Could not open this document. Connect to the internet and try again.')
+    } finally {
+      setSending(false)
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-3 border-t pt-4">
+      <ResumeToggle />
+      {enabled && doc && (
+        <div className="flex flex-col gap-2">
+          {documents.length > 1 && (
+            <div className="flex flex-col gap-1">
+              <label htmlFor={selectId} className="text-xs text-muted-foreground">
+                Document to send
+              </label>
+              <select
+                id={selectId}
+                value={doc.id}
+                onChange={(e) => setSelectedId(e.target.value)}
+                className="h-9 rounded-lg border bg-background px-2 text-sm"
+              >
+                {documents.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+          <Button variant="outline" onClick={send} disabled={sending}>
+            {sending ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <FileText className="size-4" aria-hidden />}
+            Send {doc.name}
+          </Button>
+          <p className="text-xs text-muted-foreground">
+            Uploaded {formatUploaded(doc.uploadedAt)}
+            {doc.offline ? ' · works offline' : ''}
+          </p>
+        </div>
+      )}
     </div>
   )
 }

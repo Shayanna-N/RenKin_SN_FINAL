@@ -8,7 +8,9 @@ import { Download, Loader2, LogOut, Trash2, UserPlus, Users } from 'lucide-react
 import { toast } from 'sonner'
 import { connectByHandle, previewHandle, publishProfile } from '@/app/actions/sync'
 import { PhotoPicker } from '@/components/account/photo-picker'
+import { ResumeWidget } from '@/components/account/resume-widget'
 import { SyncControls } from '@/components/account/sync-controls'
+import { LAST_USER_KEY, clearCachedResumes } from '@/lib/resume-cache'
 import { WelcomeSetup } from '@/components/account/welcome-setup'
 import { buildContactsVCard, downloadTextFile } from '@/lib/vcard'
 import { ContactAvatar, ProfileAvatar } from '@/components/companion-avatar'
@@ -166,6 +168,9 @@ export function AccountView({ welcome = false }: { welcome?: boolean }) {
 
   async function onSignOut() {
     await signOut()
+    await clearCachedResumes()
+    localStorage.removeItem(LAST_USER_KEY)
+    update((s) => ({ ...s, settings: { ...s.settings, shareResume: false } }))
     router.refresh()
     mutate(undefined, { revalidate: false })
   }
@@ -179,6 +184,7 @@ export function AccountView({ welcome = false }: { welcome?: boolean }) {
       </Section>
 
       <div className="grid gap-6 lg:grid-cols-2">
+        <div className="flex flex-col gap-6">
         <Section
           title="Your RenKin handle"
           description="Your card is published under this handle. Edits on the My card page sync automatically and notify mutual connections."
@@ -211,6 +217,14 @@ export function AccountView({ welcome = false }: { welcome?: boolean }) {
             </form>
           )}
         </Section>
+
+        <Section
+          title="Resume, CV & portfolio"
+          description="Store PDFs in your account and on this device so you can share or download them, even with no connection."
+        >
+          <ResumeWidget />
+        </Section>
+        </div>
 
         <Section
           title="Sync across devices"

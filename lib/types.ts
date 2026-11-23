@@ -241,6 +241,8 @@ export interface Settings {
   customQrStyle: 'squares' | 'dots' | 'rounded'
   /** QR code foreground color (hex). Defaults to white to show on card background. */
   customQrColor: string
+  /** Offer "Share My Resume/CV/Pdf" in the Share tab. Needs a signed-in account and a stored document. */
+  shareResume: boolean
   /** Default sort order for the contacts list. */
   defaultContactSort: 'az' | 'za' | 'recent' | 'title' | 'company'
 }
