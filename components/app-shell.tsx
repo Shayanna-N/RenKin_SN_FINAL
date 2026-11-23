@@ -51,9 +51,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <OnboardingTour />
       <aside className="hidden md:flex md:w-60 md:shrink-0 md:flex-col md:border-r md:bg-sidebar">
         <div className="flex h-16 items-center gap-2 px-5">
-          <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <span className="text-sm font-bold">R</span>
-          </span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/icon.svg" alt="" width={32} height={32} className="size-8" />
           <span className="font-semibold tracking-tight">RenKin</span>
         </div>
         <nav aria-label="Main" className="flex flex-1 flex-col gap-1 px-3">
@@ -81,9 +80,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-2 border-b bg-background/85 px-3 backdrop-blur md:h-32 md:gap-3 md:px-8">
           <div className="flex items-center gap-2 md:hidden">
-            <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <span className="text-sm font-bold">R</span>
-            </span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/icon.svg" alt="" width={32} height={32} className="size-8" />
             <span className="sr-only">RenKin</span>
           </div>
           <div data-tour="modes">

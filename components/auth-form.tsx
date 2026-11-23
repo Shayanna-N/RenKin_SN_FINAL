@@ -56,9 +56,8 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
         </HoverHint>
         <HoverHint hint="Returns to the RenKin home screen." align="start" className="mb-8 flex">
           <Link href="/" className="flex items-center gap-2">
-            <span className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <span className="text-sm font-bold">R</span>
-            </span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/icon.svg" alt="" width={36} height={36} className="size-9" />
             <span className="text-lg font-semibold tracking-tight">RenKin</span>
           </Link>
         </HoverHint>
